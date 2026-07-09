@@ -1,0 +1,91 @@
+/**
+ * Go Bagage — PriceField
+ * Champ numérique avec préfixe $ + calcul des gains potentiels (après commission).
+ */
+
+import { useState } from 'react'
+import { View, Text, TextInput, StyleSheet } from 'react-native'
+import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
+import { COMMISSION_RATE } from '../../../shared/constants/app.constants'
+
+interface PriceFieldProps {
+  pricePerKg: string
+  onChangePricePerKg: (value: string) => void
+  availableKg: number
+}
+
+export function PriceField({
+  pricePerKg,
+  onChangePricePerKg,
+  availableKg,
+}: PriceFieldProps) {
+  const [focused, setFocused] = useState(false)
+
+  const numericPrice = Number(pricePerKg) || 0
+  const potentialEarnings = numericPrice * availableKg * (1 - COMMISSION_RATE)
+
+  return (
+    <View>
+      <Text style={styles.label}>Price per kg (CAD)</Text>
+      <View style={styles.inputWrapper}>
+        <Text style={styles.dollarSign}>$</Text>
+        <TextInput
+          value={pricePerKg}
+          onChangeText={onChangePricePerKg}
+          keyboardType='numeric'
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          style={[styles.input, focused && styles.inputFocused]}
+        />
+      </View>
+
+      {pricePerKg && availableKg > 0 && (
+        <Text style={styles.earningsText}>
+          Potential earnings: ${potentialEarnings.toFixed(0)} CAD (after{' '}
+          {COMMISSION_RATE * 100}% fee)
+        </Text>
+      )}
+    </View>
+  )
+}
+
+const styles = StyleSheet.create({
+  label: {
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.semibold,
+    color: Colors.foreground,
+    marginBottom: Spacing[1],
+  },
+  inputWrapper: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
+  dollarSign: {
+    position: 'absolute',
+    left: Spacing[4],
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+    color: Colors.mutedForeground,
+    zIndex: 1,
+  },
+  input: {
+    backgroundColor: Colors.inputBackground,
+    borderRadius: Radius.xl,
+    borderWidth: 1.5,
+    borderColor: Colors.transparent,
+    paddingLeft: 28,
+    paddingRight: Spacing[4],
+    paddingVertical: Spacing[3],
+    fontSize: FontSize.md,
+    color: Colors.foreground,
+  },
+  inputFocused: {
+    borderColor: Colors.primary,
+  },
+  earningsText: {
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+    fontWeight: FontWeight.medium,
+    marginTop: 6,
+  },
+})
