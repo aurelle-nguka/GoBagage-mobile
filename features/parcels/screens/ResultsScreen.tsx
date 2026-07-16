@@ -1,80 +1,140 @@
-import { FlatList, View, Text, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { SearchHeader } from '../components/SearchHeader';
-import { SearchBar } from '../components/SearchBar';
-import { TravelerCard } from '../components/TravelerCard';
-import { PublicUser } from '../../../types/user.types';
-import { Colors, FontSize, Spacing } from '../../../theme';
+import { useEffect, useState } from 'react'
+import {
+  FlatList,
+  View,
+  Text,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import { SearchHeader } from '../components/SearchHeader'
+import { TravelerCard } from '../components/TravelerCard'
+import type { PublicUser } from '../../../types/user.types'
+import { Colors, FontSize, Spacing } from '../../../theme'
+import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
+import apiClient from '../../../shared/services/api.client'
 
-// TODO: remplacer par features/trips/hooks/useSearchTrips(query)
 interface TravelerResult {
-  id: string;
-  user: PublicUser;
-  initials: string;
-  from: string;
-  to: string;
-  departureDate: string;
-  availableKg: number;
-  pricePerKg: number;
-  totalTrips: number;
+  id: string
+  user: PublicUser
+  initials: string
+  from: string
+  to: string
+  departureDate: string
+  availableKg: number
+  pricePerKg: number
+  totalTrips: number
 }
-
-const MOCK_RESULTS: TravelerResult[] = [
-  {
-    id: '1',
-    user: {
-      id: 'u1', firstName: 'Kofi', lastName: 'Asante',
-      averageRating: 4.9, totalDeliveries: 47, kycStatus: 'VERIFIED',
-    },
-    initials: 'KA', from: 'Montreal', to: 'Douala', departureDate: 'Jun 18, 2026',
-    availableKg: 18, pricePerKg: 12, totalTrips: 23,
-  },
-  {
-    id: '2',
-    user: {
-      id: 'u2', firstName: 'Marie', lastName: 'Laurent',
-      averageRating: 4.7, totalDeliveries: 31, kycStatus: 'VERIFIED',
-    },
-    initials: 'ML', from: 'Montreal', to: 'Douala', departureDate: 'Jun 22, 2026',
-    availableKg: 12, pricePerKg: 15, totalTrips: 15,
-  },
-  {
-    id: '3',
-    user: {
-      id: 'u3', firstName: 'Ibrahim', lastName: 'Diallo',
-      averageRating: 4.8, totalDeliveries: 19, kycStatus: 'PENDING',
-    },
-    initials: 'ID', from: 'Toronto', to: 'Douala', departureDate: 'Jun 28, 2026',
-    availableKg: 25, pricePerKg: 10, totalTrips: 8,
-  },
-];
 
 interface ResultsScreenProps {
-  query: string;
-  onBack: () => void;
-  onClearSearch: () => void;
-  onSelectTraveler: (result: TravelerResult) => void;
+  corridorId: string
+  from: string
+  to: string
+  onBack: () => void
+  onClearSearch: () => void
+  onSelectTraveler: (result: TravelerResult) => void
 }
 
-export function ResultsScreen({ query, onBack, onClearSearch, onSelectTraveler }: ResultsScreenProps) {
+export function ResultsScreen({
+  corridorId,
+  from,
+  to,
+  onBack,
+  onClearSearch,
+  onSelectTraveler,
+}: ResultsScreenProps) {
+  const [results, setResults] = useState<TravelerResult[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    const fetchTrips = async () => {
+      setLoading(true)
+      setError('')
+      try {
+        const response = await apiClient.get('/trips', {
+          params: {
+            corridorId,
+            status: 'OPEN',
+            page: 0,
+            size: 20,
+          },
+        })
+
+        const trips = response.data?.content ?? response.data ?? []
+
+        const mapped: TravelerResult[] = trips.map((trip: any) => {
+          const traveler = trip.traveler
+          const corridor = trip.corridor
+
+          return {
+            id: String(trip.id),
+            user: {
+              id: String(traveler?.id ?? trip.travelerId),
+              firstName: traveler?.firstName ?? 'Traveler',
+              lastName: traveler?.lastNameInitial ?? '',
+              averageRating: traveler?.averageRating ?? 0,
+              totalDeliveries: traveler?.totalDeliveries ?? 0,
+              kycStatus: traveler?.kycVerified ? 'VERIFIED' : 'PENDING',
+            },
+            initials: traveler
+              ? `${(traveler.firstName ?? 'T')[0]}${(traveler.lastNameInitial ?? '')[0] ?? ''}`.toUpperCase()
+              : 'T',
+            from: corridor?.departureCity ?? from,
+            to: corridor?.arrivalCity ?? to,
+            departureDate: trip.departureDate ?? '',
+            availableKg: trip.availableKg ?? 0,
+            pricePerKg: trip.pricePerKg ?? trip.fixedPrice ?? 0,
+            totalTrips: traveler?.totalDeliveries ?? 0,
+          }
+        })
+
+        setResults(mapped)
+      } catch (err: any) {
+        setError(err?.response?.data?.message ?? 'Failed to load trips.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchTrips()
+  }, [corridorId])
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <SearchHeader title="Available Travelers" subtitle="Search by corridor" onBack={onBack} />
+      <SearchHeader
+        title='Available Travelers'
+        subtitle='Select a traveler for your parcel'
+        onBack={onBack}
+      />
 
-      <View style={styles.content}>
-        <SearchBar
-          value={query || 'Montreal → Douala'}
-          onChangeText={() => {}}
-          editable={false}
-          onClear={onClearSearch}
-        />
+      <View style={styles.corridorBanner}>
+        <RouteLabel from={from} to={to} size='md' />
+        <Text style={styles.changeText} onPress={onClearSearch}>
+          Change
+        </Text>
+      </View>
 
-        <Text style={styles.resultCount}>{MOCK_RESULTS.length} travelers found</Text>
-
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size='large' color={Colors.primary} />
+          <Text style={styles.loadingText}>Searching travelers...</Text>
+        </View>
+      ) : error ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
         <FlatList
-          data={MOCK_RESULTS}
+          data={results}
           keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.listContent}
+          ListHeaderComponent={
+            <Text style={styles.resultCount}>
+              {results.length} traveler{results.length !== 1 ? 's' : ''} found
+            </Text>
+          }
           renderItem={({ item }) => (
             <TravelerCard
               traveler={item.user}
@@ -88,10 +148,20 @@ export function ResultsScreen({ query, onBack, onClearSearch, onSelectTraveler }
               onPress={() => onSelectTraveler(item)}
             />
           )}
+          ListEmptyComponent={
+            <View style={styles.centered}>
+              <Text style={styles.emptyEmoji}>✈️</Text>
+              <Text style={styles.emptyTitle}>No travelers found</Text>
+              <Text style={styles.emptySubtitle}>
+                No trips available on this corridor yet.{'\n'}
+                Try another corridor or check back later.
+              </Text>
+            </View>
+          }
         />
-      </View>
+      )}
     </SafeAreaView>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -99,15 +169,59 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  content: {
-    flex: 1,
+  corridorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.white,
     paddingHorizontal: Spacing[5],
-    paddingTop: Spacing[5],
+    paddingVertical: Spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
+  },
+  changeText: {
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  listContent: {
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[4],
+    paddingBottom: Spacing[8],
   },
   resultCount: {
     fontSize: FontSize.sm,
     color: Colors.mutedForeground,
-    marginTop: Spacing[4],
     marginBottom: Spacing[4],
   },
-});
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing[12],
+  },
+  loadingText: {
+    marginTop: Spacing[3],
+    color: Colors.mutedForeground,
+    fontSize: FontSize.base,
+  },
+  errorText: {
+    color: Colors.destructive,
+    fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
+  },
+  emptyEmoji: { fontSize: 48, marginBottom: Spacing[3] },
+  emptyTitle: {
+    fontSize: FontSize.xl,
+    fontWeight: '700',
+    color: Colors.foreground,
+  },
+  emptySubtitle: {
+    fontSize: FontSize.base,
+    color: Colors.mutedForeground,
+    textAlign: 'center',
+    marginTop: Spacing[2],
+    lineHeight: FontSize.base * 1.5,
+  },
+})

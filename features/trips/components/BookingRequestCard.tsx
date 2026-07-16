@@ -1,9 +1,3 @@
-/**
- * Go Bagage — BookingRequestCard
- * Carte d'une demande de réservation reçue par le voyageur, avec actions Accept/Reject.
- * Couvre les endpoints CDC : PATCH /bookings/{id}/accept et /reject (section 9.5).
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import { CheckCircle, Star } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
@@ -19,9 +13,33 @@ interface BookingRequestCardProps {
   weightKg: number
   amount: number
   status: BookingStatus
-  onAccept: () => void
-  onReject: () => void
+  onAccept?: () => void
+  onReject?: () => void
   onPress: () => void
+}
+
+const STATUS_LABELS: Partial<Record<BookingStatus, string>> = {
+  PENDING: '⏳ Pending payment',
+  AWAITING_ACCEPTANCE: '⏳ Awaiting your response',
+  ACCEPTED: '✅ Accepted',
+  REJECTED: '❌ Declined',
+  PICKED_UP: '📦 Picked up',
+  IN_TRANSIT: '✈️ In transit',
+  DELIVERED: '📬 Delivered',
+  CONFIRMED: '✅ Confirmed',
+  CANCELLED: '🚫 Cancelled',
+}
+
+const STATUS_COLORS: Partial<Record<BookingStatus, string>> = {
+  PENDING: Colors.mutedForeground,
+  AWAITING_ACCEPTANCE: Colors.warning,
+  ACCEPTED: Colors.primary,
+  REJECTED: Colors.destructive,
+  PICKED_UP: Colors.primary,
+  IN_TRANSIT: Colors.secondary,
+  DELIVERED: Colors.primary,
+  CONFIRMED: Colors.primary,
+  CANCELLED: Colors.destructive,
 }
 
 export function BookingRequestCard({
@@ -37,7 +55,7 @@ export function BookingRequestCard({
   onReject,
   onPress,
 }: BookingRequestCardProps) {
-  const isPending = status === 'PENDING'
+  const showActions = status === 'AWAITING_ACCEPTANCE' && (onAccept || onReject)
 
   return (
     <TouchableOpacity
@@ -57,11 +75,13 @@ export function BookingRequestCard({
           </View>
           <View style={styles.ratingRow}>
             <Star size={11} color={Colors.warning} fill={Colors.warning} />
-            <Text style={styles.ratingText}>{senderRating.toFixed(1)}</Text>
+            <Text style={styles.ratingText}>
+              {senderRating > 0 ? senderRating.toFixed(1) : 'New'}
+            </Text>
           </View>
         </View>
 
-        <Text style={styles.amount}>{formatCAD(amount)}</Text>
+        {amount > 0 && <Text style={styles.amount}>{formatCAD(amount)}</Text>}
       </View>
 
       <View style={styles.parcelRow}>
@@ -70,39 +90,36 @@ export function BookingRequestCard({
         </Text>
       </View>
 
-      {isPending ? (
+      {showActions ? (
         <View style={styles.actionsRow}>
-          <TouchableOpacity
-            style={styles.rejectButton}
-            onPress={onReject}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.rejectLabel}>Decline</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.acceptButton}
-            onPress={onAccept}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.acceptLabel}>Accept</Text>
-          </TouchableOpacity>
+          {onReject && (
+            <TouchableOpacity
+              style={styles.rejectButton}
+              onPress={onReject}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.rejectLabel}>Decline</Text>
+            </TouchableOpacity>
+          )}
+          {onAccept && (
+            <TouchableOpacity
+              style={styles.acceptButton}
+              onPress={onAccept}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.acceptLabel}>Accept</Text>
+            </TouchableOpacity>
+          )}
         </View>
       ) : (
         <View style={styles.statusRow}>
           <Text
             style={[
               styles.statusLabel,
-              {
-                color:
-                  status === 'REJECTED' ? Colors.destructive : Colors.primary,
-              },
+              { color: STATUS_COLORS[status] ?? Colors.mutedForeground },
             ]}
           >
-            {status === 'ACCEPTED'
-              ? '✅ Accepted'
-              : status === 'REJECTED'
-                ? '❌ Declined'
-                : status}
+            {STATUS_LABELS[status] ?? status}
           </Text>
         </View>
       )}
@@ -141,9 +158,7 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.primary,
   },
-  info: {
-    flex: 1,
-  },
+  info: { flex: 1 },
   nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -168,9 +183,7 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.primary,
   },
-  parcelRow: {
-    marginBottom: Spacing[3],
-  },
+  parcelRow: { marginBottom: Spacing[3] },
   parcelText: {
     fontSize: FontSize.sm,
     color: Colors.mutedForeground,

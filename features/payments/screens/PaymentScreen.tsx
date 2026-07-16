@@ -1,28 +1,25 @@
-/**
- * Go Bagage — PaymentScreen
- * Paiement séquestre (escrow) — CDC section 6.4.
- * Migré depuis Payment.tsx (maquette web) → React Native.
- */
-
 import { useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { ArrowLeft, Lock } from 'lucide-react-native'
+import { CardField, type CardFieldInput } from '@stripe/stripe-react-native'
 import type { PaymentProvider } from '../types/payment.types'
 import {
   calculateCommission,
   formatCAD,
 } from '../../../shared/utils/currency.utils'
 import { Colors } from '../../../theme/colors'
-import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
-import { FontSize, FontWeight, Spacing } from '../../../theme'
-import { CardForm } from '../components/CardForm'
+import { FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { EscrowBadge } from '../components/EscrowBadge'
 import { PaymentMethodSelector } from '../components/PaymentMethodSelector'
 import { TripSummaryCard } from '../components/TripSummaryCard'
+import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
+import { ErrorBanner } from '../../../shared/components/feedback/ErrorBanner'
+import { useStripePayment } from '../hooks/useStripePayment'
 
 interface PaymentScreenProps {
+  bookingId: string
   from: string
   to: string
   travelerName: string
@@ -34,6 +31,7 @@ interface PaymentScreenProps {
 }
 
 export function PaymentScreen({
+  bookingId,
   from,
   to,
   travelerName,
@@ -45,23 +43,23 @@ export function PaymentScreen({
 }: PaymentScreenProps) {
   const [selectedMethod, setSelectedMethod] =
     useState<PaymentProvider>('STRIPE')
-  const [loading, setLoading] = useState(false)
-  const [cardNumber, setCardNumber] = useState('')
-  const [expiry, setExpiry] = useState('')
-  const [cvv, setCvv] = useState('')
+  const [cardComplete, setCardComplete] = useState(false)
+
+  const { loading, error, pay } = useStripePayment()
 
   const subtotalBase = weightKg * pricePerKg
   const { subtotal, commission, total } = calculateCommission(subtotalBase)
 
-  const handlePay = () => {
-    setLoading(true)
+  const handlePay = async () => {
+    if (selectedMethod === 'STRIPE' && !cardComplete) {
+      Alert.alert('Incomplete card', 'Please fill in all card details.')
+      return
+    }
 
-    // TODO: brancher features/payments/api/payments.api.ts → POST /payments/initiate
-    // En production : Stripe Elements/CardField gère la tokenisation, jamais le numéro brut.
-    setTimeout(() => {
-      setLoading(false)
+    const success = await pay(bookingId)
+    if (success) {
       onSuccess(selectedMethod)
-    }, 1500)
+    }
   }
 
   return (
@@ -108,15 +106,62 @@ export function PaymentScreen({
         />
 
         {selectedMethod === 'STRIPE' && (
-          <CardForm
-            cardNumber={cardNumber}
-            expiry={expiry}
-            cvv={cvv}
-            onChangeCardNumber={setCardNumber}
-            onChangeExpiry={setExpiry}
-            onChangeCvv={setCvv}
-          />
+          <View style={styles.cardSection}>
+            <Text style={styles.cardLabel}>Card Information</Text>
+            <CardField
+              postalCodeEnabled={false}
+              placeholders={{ number: '4242 4242 4242 4242' }}
+              cardStyle={{
+                backgroundColor: Colors.white,
+                textColor: Colors.foreground,
+                placeholderColor: '#9ca3af',
+                borderRadius: 12,
+                borderWidth: 1.5,
+                borderColor: '#e5e7eb',
+                fontSize: 16,
+              }}
+              style={styles.cardField}
+              onCardChange={(cardDetails) => {
+                setCardComplete(cardDetails.complete)
+              }}
+            />
+            {!cardComplete && (
+              <Text style={styles.cardHint}>
+                Enter your card number, expiry date and CVV
+              </Text>
+            )}
+            <View style={styles.securityRow}>
+              <Lock size={12} color='#9ca3af' />
+              <Text style={styles.securityText}>
+                Your card details are encrypted by Stripe and never stored on
+                our servers.
+              </Text>
+            </View>
+            <Text style={styles.testHint}>
+              🧪 Test: 4242 4242 4242 4242 · 12/34 · 123
+            </Text>
+          </View>
         )}
+
+        {selectedMethod === 'ORANGE_MONEY' && (
+          <View style={styles.momoInfo}>
+            <Text style={styles.momoText}>
+              📱 After confirming, you will receive a prompt on your Orange
+              Money phone to authorize the payment.
+            </Text>
+          </View>
+        )}
+
+        {selectedMethod === 'MTN_MOMO' && (
+          <View style={styles.momoInfo}>
+            <Text style={styles.momoText}>
+              📱 After confirming, you will receive a prompt on your MTN MoMo
+              phone to authorize the payment.
+            </Text>
+          </View>
+        )}
+
+        {error ? <ErrorBanner message={error} /> : null}
 
         <PrimaryButton
           label={`🔒 Pay ${formatCAD(total)} Securely`}
@@ -135,10 +180,7 @@ export function PaymentScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -158,23 +200,14 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  sslRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
+  sslRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   sslText: {
     fontSize: FontSize.sm,
     color: Colors.primary,
     fontWeight: FontWeight.medium,
   },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[5],
-  },
+  scroll: { flex: 1 },
+  scrollContent: { paddingHorizontal: Spacing[5], paddingVertical: Spacing[5] },
   sectionTitle: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
@@ -183,8 +216,39 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  cardLabel: {
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.semibold,
+    color: Colors.foreground,
+    marginBottom: Spacing[2],
+    marginTop: Spacing[4],
+  },
+  cardField: {
+    width: '100%',
+    height: 52,
+    borderRadius: Radius.xl,
+  },
+  testHint: {
+    fontSize: FontSize.sm,
+    color: Colors.primary,
+    marginTop: Spacing[2],
+    textAlign: 'center',
+    fontWeight: FontWeight.medium,
+  },
+  momoInfo: {
+    backgroundColor: '#e8faf0',
+    borderRadius: Radius.xl,
+    padding: Spacing[4],
+    marginTop: Spacing[4],
+  },
+  momoText: {
+    fontSize: FontSize.base,
+    color: Colors.foreground,
+    lineHeight: FontSize.base * 1.5,
+  },
   payButton: {
     marginBottom: Spacing[4],
+    marginTop: Spacing[4],
     shadowColor: Colors.primary,
     shadowOpacity: 0.35,
     shadowRadius: 20,
@@ -196,5 +260,36 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: '#9ca3af',
     marginBottom: Spacing[6],
+  },
+  cardSection: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius['2xl'],
+    padding: Spacing[4],
+    marginBottom: Spacing[4],
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  cardHint: {
+    fontSize: FontSize.sm,
+    color: '#9ca3af',
+    marginTop: Spacing[2],
+  },
+  securityRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing[2],
+    marginTop: Spacing[3],
+    paddingTop: Spacing[3],
+    borderTopWidth: 1,
+    borderTopColor: '#f3f4f6',
+  },
+  securityText: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: '#9ca3af',
+    lineHeight: FontSize.sm * 1.5,
   },
 })

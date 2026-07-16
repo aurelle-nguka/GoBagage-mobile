@@ -1,8 +1,3 @@
-/**
- * Go Bagage — Page Onboarding
- * Après le choix du rôle, on le stocke dans le store puis on redirige vers Login.
- */
-
 import { useRouter } from 'expo-router'
 import { UserRole } from '../../types/user.types'
 import { useAuthStore } from '../../store/auth.store'

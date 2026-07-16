@@ -24,6 +24,7 @@ interface AdminDashboardScreenProps {
   refreshing: boolean
   onRefresh: () => void
   onGoToKycQueue: () => void
+  onGoToCorridors: () => void
   onLogout: () => void
 }
 
@@ -34,6 +35,7 @@ export function AdminDashboardScreen({
   refreshing,
   onRefresh,
   onGoToKycQueue,
+  onGoToCorridors,
   onLogout,
 }: AdminDashboardScreenProps) {
   return (
@@ -59,7 +61,7 @@ export function AdminDashboardScreen({
             emoji='👥'
             label='Total Users'
             value={totalUsers > 0 ? totalUsers : '—'}
-            subtitle={totalUsers > 0 ? 'Registered users' : 'Loading...'}
+            subtitle={totalUsers > 0 ? 'Registered users' : 'Coming soon'}
             backgroundColor='#e8f4fd'
           />
           <KpiCard
@@ -117,12 +119,21 @@ export function AdminDashboardScreen({
           </Text>
         </View>
 
-        <View style={styles.comingSoonCard}>
-          <TrendingUp size={20} color='#9ca3af' />
-          <Text style={styles.comingSoonText}>
-            Corridors Management — Coming soon
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={onGoToCorridors}
+          activeOpacity={0.9}
+        >
+          <View style={[styles.actionIcon, { backgroundColor: '#e8f4fd' }]}>
+            <TrendingUp size={24} color={Colors.secondary} />
+          </View>
+          <View style={styles.actionInfo}>
+            <Text style={styles.actionTitle}>Corridors Management</Text>
+            <Text style={styles.actionSubtitle}>
+              Activate, deactivate and configure routes
+            </Text>
+          </View>
+        </TouchableOpacity>
 
         <View style={styles.comingSoonCard}>
           <AlertTriangle size={20} color='#9ca3af' />

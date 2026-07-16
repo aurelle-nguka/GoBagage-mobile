@@ -1,18 +1,15 @@
-/**
- * Go Bagage — ActiveTripCard
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
-import { TripStatus } from '../../trips/types/trip.types'
+
+type TripCardStatus = 'Open' | 'Confirmed' | 'OPEN' | 'BOOKED'
 
 interface ActiveTripCardProps {
   from: string
   to: string
   date: string
   availableKg: number
-  status: Extract<TripStatus, 'OPEN' | 'BOOKED'> | 'Confirmed' | 'Open'
+  status: TripCardStatus
   pendingRequests: number
   onPress: () => void
 }

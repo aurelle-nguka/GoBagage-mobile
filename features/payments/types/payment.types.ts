@@ -1,4 +1,4 @@
-export type PaymentProvider = 'STRIPE' | 'INTERAC' | 'ORANGE' | 'MTN';
+export type PaymentProvider = 'STRIPE' | 'INTERAC' | 'ORANGE_MONEY' | 'MTN_MOMO';
 export type EscrowStatus = 'INITIATED' | 'HELD' | 'RELEASED' | 'REFUNDED';
 
 export interface Payment {

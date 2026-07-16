@@ -1,11 +1,3 @@
-/**
- * Go Bagage — Tabs Layout
- *
- * SENDER   : Home | Search | Profile
- * TRAVELER : Home | Publish | My Trips | Profile
- * BOTH     : Home | Search | Publish | My Trips | Profile
- */
-
 import { Platform } from 'react-native'
 import { Tabs } from 'expo-router'
 import { Home, PlusCircle, Search, Map, User } from 'lucide-react-native'
@@ -23,13 +15,14 @@ export default function TabsLayout() {
   const showPublish = isTraveler || isBoth
   const showTrips = isTraveler || isBoth
 
-  const tabBarHeight = Platform.OS === 'ios' ? 83 : 60
-  const tabBarPaddingBottom = Platform.OS === 'ios' ? 28 : 40
+  const tabBarHeight = Platform.OS === 'ios' ? 83 : 65
+  const tabBarPaddingBottom = Platform.OS === 'ios' ? 28 : 8
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
+        tabBarShowLabel: true,
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.mutedForeground,
         tabBarStyle: {
@@ -46,7 +39,7 @@ export default function TabsLayout() {
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '500',
+          fontWeight: '600',
           marginTop: 2,
         },
       }}

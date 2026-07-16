@@ -1,13 +1,11 @@
-/**
- * Go Bagage — Modale Payment
- */
-
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { PaymentScreen } from '../../features/payments/screens/PaymentScreen'
+import type { PaymentProvider } from '../../features/payments/types/payment.types'
 
 export default function PaymentPage() {
   const router = useRouter()
   const params = useLocalSearchParams<{
+    bookingId: string
     travelerId: string
     from?: string
     to?: string
@@ -19,6 +17,7 @@ export default function PaymentPage() {
 
   return (
     <PaymentScreen
+      bookingId={params.bookingId}
       from={params.from ?? 'Montreal'}
       to={params.to ?? 'Douala'}
       travelerName={params.travelerName ?? 'your traveler'}
@@ -26,10 +25,11 @@ export default function PaymentPage() {
       weightKg={Number(params.weight)}
       pricePerKg={Number(params.pricePerKg)}
       onBack={() => router.back()}
-      onSuccess={(provider) => {
-        // TODO: créer le booking + initier le paiement réel via payments.api.ts
-        // puis rediriger vers le tracking du booking nouvellement créé
-        router.replace('/(tabs)/')
+      onSuccess={(_provider: PaymentProvider) => {
+        router.replace({
+          pathname: '/(modals)/tracking',
+          params: { bookingId: params.bookingId },
+        })
       }}
     />
   )

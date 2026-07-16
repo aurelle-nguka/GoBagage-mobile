@@ -1,45 +1,69 @@
-/**
- * Go Bagage — Modale Tracking
- */
-
 import { useRouter, useLocalSearchParams } from 'expo-router'
+import { View, ActivityIndicator, Text, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { TrackingScreen } from '../../../features/bookings/screens/TrackingScreen'
+import { useBookingTracking } from '../../../features/bookings/hooks/useBookingTracking'
+import { Colors, FontSize, Spacing } from '../../../theme'
 
 export default function TrackingPage() {
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
-  // TODO: remplacer par features/bookings/hooks/useBookingTracking(bookingId)
-  // Données mockées en attendant le branchement API réel sur GET /bookings/{id}
+  const { data, loading, error, confirming, confirm } =
+    useBookingTracking(bookingId)
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <ActivityIndicator size='large' color={Colors.primary} />
+      </SafeAreaView>
+    )
+  }
+
+  if (error || !data) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{error || 'Booking not found.'}</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <TrackingScreen
-      from='Montreal'
-      to='Douala'
-      departureDate='Jun 18'
-      status='IN_TRANSIT'
-      progressPercent={68}
-      parcel={{
-        description: 'Family gifts & clothing',
-        category: 'Clothing',
-        weightKg: 4,
-        recipientName: 'Jean-Baptiste Mbeki',
-      }}
-      traveler={{
-        initials: 'KA',
-        name: 'Kofi Asante',
-        rating: 4.9,
-        reviewCount: 47,
-        verified: true,
-      }}
+      from={data.from}
+      to={data.to}
+      departureDate={data.departureDate}
+      status={data.status}
+      progressPercent={data.progressPercent}
+      parcel={data.parcel}
+      traveler={data.traveler}
       onBack={() => router.back()}
       onChat={() => router.push(`/(modals)/chat/${bookingId}`)}
-      onCall={() => {
-        // TODO: action d'appel — nécessite que les coordonnées soient déjà partagées (CDC 6.5)
-      }}
-      onConfirmDelivery={() => {
-        // TODO: brancher features/bookings/api/bookings.api.ts → POST /bookings/{id}/confirm
-        router.push(`/(modals)/review/${bookingId}`)
+      onCall={() => {}}
+      onConfirmDelivery={async () => {
+        const ok = await confirm()
+        if (ok) {
+          router.replace({
+            pathname: '/(modals)/review',
+            params: { bookingId },
+          })
+        }
       }}
     />
   )
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  errorText: {
+    color: Colors.destructive,
+    fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
+  },
+})

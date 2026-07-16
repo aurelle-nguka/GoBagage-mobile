@@ -1,42 +1,109 @@
-/**
- * Go Bagage — Modale Traveler Booking
- */
-
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter, useLocalSearchParams } from 'expo-router'
-import { BookingStatus } from '../../../features/bookings/types/booking.type'
+import { View, ActivityIndicator, Text, StyleSheet } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 import { TravelerBookingScreen } from '../../../features/bookings/screens/TravelerBookingScreen'
+import { useBookingActions } from '../../../features/bookings/hooks/useBookingActions'
+import { getBooking } from '../../../features/bookings/api/bookings.api'
+import { Colors, FontSize, Spacing } from '../../../theme'
+import { BookingDTO } from '../../../features/bookings/types/booking.type'
 
 export default function TravelerBookingPage() {
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
-  // TODO: remplacer par features/bookings/hooks/useBooking(bookingId) → GET /bookings/{id}
-  const [status, setStatus] = useState<BookingStatus>('ACCEPTED')
+  const [booking, setBooking] = useState<BookingDTO | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  const { pickUp, deliver, loading: actionLoading } = useBookingActions()
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const data = await getBooking(bookingId)
+      console.log('=== BOOKING DETAIL ===', JSON.stringify(data))
+      setBooking(data)
+    } catch (err: any) {
+      setError(err?.response?.data?.message ?? 'Failed to load booking.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    load()
+  }, [bookingId])
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <ActivityIndicator size='large' color={Colors.primary} />
+      </SafeAreaView>
+    )
+  }
+
+  if (error || !booking) {
+    return (
+      <SafeAreaView style={styles.centered}>
+        <Text style={styles.errorText}>{error || 'Booking not found.'}</Text>
+      </SafeAreaView>
+    )
+  }
+
+  const b = booking as any
+  const sender = b.sender
+  const parcel = b.parcel
+  const corridor = b.trip?.corridor
+
+  const senderName = sender
+    ? `${sender.firstName} ${sender.lastNameInitial}.`.trim()
+    : `Sender #${booking.senderId}`
+  const senderInitials = sender
+    ? `${(sender.firstName ?? 'S')[0]}${sender.lastNameInitial ?? ''}`.toUpperCase()
+    : 'S?'
 
   return (
     <TravelerBookingScreen
-      from='Montreal'
-      to='Douala'
-      departureDate='Jun 18, 2026'
-      status={status}
+      from={corridor?.departureCity ?? 'Unknown'}
+      to={corridor?.arrivalCity ?? 'Unknown'}
+      departureDate={b.trip?.departureDate ?? ''}
+      status={booking.status}
       parcel={{
-        description: 'Clothing & family gifts',
-        category: 'Clothing',
-        weightKg: 4,
-        recipientName: 'Jean-Baptiste Mbeki',
+        description: parcel?.description ?? 'Parcel',
+        category: parcel?.category ?? 'OTHER',
+        weightKg: booking.requestedKg ?? 0,
+        recipientName: parcel?.recipientName ?? 'Recipient',
       }}
-      sender={{ initials: 'ML', name: 'Marie Laurent' }}
+      sender={{
+        initials: senderInitials,
+        name: senderName,
+      }}
       onBack={() => router.back()}
       onChat={() => router.push(`/(modals)/chat/${bookingId}`)}
-      onMarkPickedUp={() => {
-        // TODO: brancher features/bookings/api/bookings.api.ts → PATCH /bookings/{id}/picked-up
-        setStatus('PICKED_UP')
+      onMarkPickedUp={async () => {
+        const result = await pickUp(bookingId)
+        if (result) setBooking({ ...booking, status: 'PICKED_UP' })
       }}
-      onMarkDelivered={() => {
-        // TODO: brancher features/bookings/api/bookings.api.ts → PATCH /bookings/{id}/delivered
-        setStatus('DELIVERED')
+      onMarkDelivered={async () => {
+        const result = await deliver(bookingId)
+        if (result) setBooking({ ...booking, status: 'DELIVERED' })
       }}
     />
   )
 }
+
+const styles = StyleSheet.create({
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.background,
+  },
+  errorText: {
+    color: Colors.destructive,
+    fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
+  },
+})

@@ -1,13 +1,19 @@
-/**
- * Go Bagage — RecentParcelCard
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import { Package, ArrowRight } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
-type ParcelDisplayStatus = 'In Transit' | 'Pending'
+type ParcelDisplayStatus = 'In Transit' | 'Pending' | 'Delivered' | 'Confirmed'
+
+const STATUS_CONFIG: Record<
+  ParcelDisplayStatus,
+  { bg: string; color: string }
+> = {
+  Pending: { bg: '#fff8e8', color: Colors.warning },
+  'In Transit': { bg: '#e8f4fd', color: Colors.secondary },
+  Delivered: { bg: '#e8faf0', color: Colors.primary },
+  Confirmed: { bg: '#e8faf0', color: Colors.primary },
+}
 
 interface RecentParcelCardProps {
   from: string
@@ -28,7 +34,7 @@ export function RecentParcelCard({
   status,
   onPress,
 }: RecentParcelCardProps) {
-  const isInTransit = status === 'In Transit'
+  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG['Pending']
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
@@ -43,18 +49,8 @@ export function RecentParcelCard({
           </View>
         </View>
 
-        <View
-          style={[
-            styles.statusBadge,
-            { backgroundColor: isInTransit ? '#e8f4fd' : '#fff8e8' },
-          ]}
-        >
-          <Text
-            style={[
-              styles.statusText,
-              { color: isInTransit ? Colors.secondary : Colors.warning },
-            ]}
-          >
+        <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
+          <Text style={[styles.statusText, { color: config.color }]}>
             {status}
           </Text>
         </View>
@@ -93,9 +89,7 @@ const styles = StyleSheet.create({
     gap: Spacing[2],
     flex: 1,
   },
-  textBlock: {
-    flex: 1,
-  },
+  textBlock: { flex: 1 },
   iconBox: {
     width: 32,
     height: 32,

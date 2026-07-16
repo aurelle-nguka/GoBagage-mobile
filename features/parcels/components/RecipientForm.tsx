@@ -1,15 +1,22 @@
-import { View } from 'react-native';
-import { StyleSheet } from 'react-native';
-import { TextField } from '../../../shared/components/ui/TextField';
-import { Spacing } from '../../../theme';
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native'
+import { TextField } from '../../../shared/components/ui/TextField'
+import { Spacing } from '../../../theme'
+
+interface RecipientFormErrors {
+  name?: string
+  phone?: string
+  address?: string
+}
 
 interface RecipientFormProps {
-  name: string;
-  phone: string;
-  address: string;
-  onChangeName: (value: string) => void;
-  onChangePhone: (value: string) => void;
-  onChangeAddress: (value: string) => void;
+  name: string
+  phone: string
+  address: string
+  onChangeName: (value: string) => void
+  onChangePhone: (value: string) => void
+  onChangeAddress: (value: string) => void
+  errors?: RecipientFormErrors
 }
 
 export function RecipientForm({
@@ -19,34 +26,36 @@ export function RecipientForm({
   onChangeName,
   onChangePhone,
   onChangeAddress,
+  errors = {},
 }: RecipientFormProps) {
   return (
     <View style={styles.container}>
       <TextField
-        label="Full Name *"
+        label='Full Name *'
         value={name}
         onChangeText={onChangeName}
-        placeholder="Jean-Baptiste Mbeki"
+        placeholder='Jean-Baptiste Mbeki'
+        error={errors.name}
       />
       <TextField
-        label="Phone Number *"
+        label='Phone Number *'
         value={phone}
         onChangeText={onChangePhone}
-        placeholder="+237 6XX XXX XXX"
-        keyboardType="phone-pad"
+        placeholder='+237 6XX XXX XXX'
+        keyboardType='phone-pad'
+        error={errors.phone}
       />
       <TextField
-        label="Full Address *"
+        label='Full Address *'
         value={address}
         onChangeText={onChangeAddress}
-        placeholder="Street, City, Country"
+        placeholder='Street, City, Country'
+        error={errors.address}
       />
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    gap: Spacing[4],
-  },
-});
+  container: { gap: Spacing[4] },
+})

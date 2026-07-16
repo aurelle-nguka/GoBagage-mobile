@@ -1,8 +1,3 @@
-/**
- * Go Bagage — Page Login
- * Redirige vers /(admin)/dashboard si ADMIN, sinon /(tabs)/
- */
-
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { LoginScreen } from '../../features/auth/screens/LoginScreen'
 

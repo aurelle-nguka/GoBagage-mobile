@@ -1,16 +1,32 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, TextInputProps } from 'react-native';
-import { Eye, EyeOff } from 'lucide-react-native';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+import { useState } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  TextInputProps,
+} from 'react-native'
+import { Eye, EyeOff } from 'lucide-react-native'
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 interface TextFieldProps extends TextInputProps {
-  label: string;
-  isPassword?: boolean;
+  label: string
+  isPassword?: boolean
+  error?: string
 }
 
-export function TextField({ label, isPassword = false, style, ...inputProps }: TextFieldProps) {
-  const [focused, setFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
+export function TextField({
+  label,
+  isPassword = false,
+  error,
+  style,
+  ...inputProps
+}: TextFieldProps) {
+  const [focused, setFocused] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  const hasError = Boolean(error)
 
   return (
     <View>
@@ -21,10 +37,11 @@ export function TextField({ label, isPassword = false, style, ...inputProps }: T
           secureTextEntry={isPassword && !showPassword}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor='#9ca3af'
           style={[
             styles.input,
             focused && styles.inputFocused,
+            hasError && styles.inputError,
             isPassword && styles.inputWithIcon,
             style,
           ]}
@@ -36,15 +53,16 @@ export function TextField({ label, isPassword = false, style, ...inputProps }: T
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             {showPassword ? (
-              <EyeOff size={18} color="#9ca3af" />
+              <EyeOff size={18} color='#9ca3af' />
             ) : (
-              <Eye size={18} color="#9ca3af" />
+              <Eye size={18} color='#9ca3af' />
             )}
           </TouchableOpacity>
         )}
       </View>
+      {hasError && <Text style={styles.errorText}>⚠ {error}</Text>}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -70,6 +88,10 @@ const styles = StyleSheet.create({
   inputFocused: {
     borderColor: Colors.primary,
   },
+  inputError: {
+    borderColor: Colors.destructive,
+    backgroundColor: '#fef2f2',
+  },
   inputWithIcon: {
     paddingRight: Spacing[12],
   },
@@ -80,4 +102,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
   },
-});
+  errorText: {
+    fontSize: FontSize.sm,
+    color: Colors.destructive,
+    marginTop: Spacing[1],
+  },
+})

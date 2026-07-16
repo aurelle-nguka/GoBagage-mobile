@@ -1,9 +1,3 @@
-/**
- * Go Bagage — ReviewScreen
- * Évaluation bidirectionnelle post-livraison (CDC section 6.6).
- * Migré depuis Review.tsx (maquette web) → React Native.
- */
-
 import { useState } from 'react'
 import {
   View,
@@ -38,7 +32,7 @@ interface ReviewScreenProps {
     rating: number
     badges: string[]
     comment: string
-  }) => void
+  }) => Promise<void> | void
 }
 
 export function ReviewScreen({
@@ -64,7 +58,7 @@ export function ReviewScreen({
     )
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (rating === 0) {
       setError('Please select a star rating.')
       return
@@ -72,15 +66,14 @@ export function ReviewScreen({
     setError('')
     setLoading(true)
 
-    // TODO: brancher features/reviews/api/reviews.api.ts → POST /reviews
-    setTimeout(() => {
-      setLoading(false)
+    try {
+      await onSubmit({ rating, badges: selectedBadges, comment })
       setDone(true)
-      setTimeout(
-        () => onSubmit({ rating, badges: selectedBadges, comment }),
-        2000,
-      )
-    }, 1200)
+    } catch {
+      setError('Failed to submit review. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (done) {

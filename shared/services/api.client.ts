@@ -46,11 +46,21 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`[API] ✅ ${response.status} ${response.config.url}`);
+    return response;
+  },
   async (error) => {
-    const originalRequest = error.config;
+    console.log(`[API] ❌ ${error.response?.status ?? 'NO_RESPONSE'} ${error.config?.url} — ${error.message}`);
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const originalRequest = error.config;
+    const isAuthEndpoint = originalRequest?.url?.includes('/auth/');
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint   // ← ne pas intercepter les erreurs d'auth
+    ) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject, config: originalRequest });
@@ -81,6 +91,7 @@ apiClient.interceptors.response.use(
       }
     }
 
+    // Laisser passer toutes les autres erreurs telles quelles
     return Promise.reject(error);
   },
 );

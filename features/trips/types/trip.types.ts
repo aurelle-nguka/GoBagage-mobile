@@ -1,6 +1,12 @@
-import { ParcelCategory, PickupMode } from "../../../types/common.types";
+import type { ParcelCategory, PickupMode } from '../../../types/common.types';
 
-export type TripStatus = 'OPEN' | 'BOOKED' | 'IN_TRANSIT' | 'DELIVERED' | 'COMPLETED' | 'CANCELLED';
+export type TripStatus =
+  | 'OPEN'
+  | 'BOOKED'
+  | 'IN_TRANSIT'
+  | 'DELIVERED'
+  | 'COMPLETED'
+  | 'CANCELLED';
 
 export interface Trip {
   id: string;
@@ -19,9 +25,12 @@ export interface Trip {
 export interface CreateTripDto {
   corridorId: string;
   departureDate: string;
+  departureTime?: string;
   availableKg: number;
-  pricePerKg: number;
+  pricePerKg?: number | null;
+  fixedPrice?: number | null;
   acceptedCategories: ParcelCategory[];
   restrictions?: string;
   pickupMode: PickupMode;
+  pickupDetails?: string;
 }
