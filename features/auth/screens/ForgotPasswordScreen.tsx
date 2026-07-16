@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ForgotPasswordScreen
- * POST /auth/password/forgot — envoie un lien de réinitialisation par email.
- */
-
 import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -24,12 +19,27 @@ export function ForgotPasswordScreen({
   onDone,
 }: ForgotPasswordScreenProps) {
   const [email, setEmail] = useState('')
+  const [emailError, setEmailError] = useState('')
   const [sent, setSent] = useState(false)
 
   const { loading, error, submit } = useForgotPassword()
 
+  const validate = (): boolean => {
+    if (!email.trim()) {
+      setEmailError('Email address is required.')
+      return false
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setEmailError('Please enter a valid email address.')
+      return false
+    }
+    setEmailError('')
+    return true
+  }
+
   const handleSubmit = async () => {
-    const success = await submit(email)
+    if (!validate()) return
+    const success = await submit(email.trim().toLowerCase())
     if (success) setSent(true)
   }
 
@@ -82,10 +92,14 @@ export function ForgotPasswordScreen({
           <TextField
             label='Email address'
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => {
+              setEmail(v)
+              if (emailError) setEmailError('')
+            }}
             placeholder='you@example.com'
             keyboardType='email-address'
             autoCapitalize='none'
+            error={emailError}
           />
 
           {error ? <ErrorBanner message={error} /> : null}

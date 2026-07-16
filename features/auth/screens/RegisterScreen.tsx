@@ -1,10 +1,3 @@
-/**
- * Go Bagage — RegisterScreen
- * Étape 1 : inscription. Champs alignés sur le contrat OpenAPI.
- * Validation Zod côté client avant l'appel API.
- * Le backend envoie automatiquement l'OTP SMS après inscription réussie.
- */
-
 import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -37,6 +30,14 @@ function roleChoiceToRoles(role: RoleChoice): UserRole[] {
   return role === 'BOTH' ? ['TRAVELER', 'SENDER'] : [role]
 }
 
+interface FieldErrors {
+  firstName?: string
+  lastName?: string
+  email?: string
+  phone?: string
+  password?: string
+}
+
 export function RegisterScreen({
   role,
   onBack,
@@ -48,10 +49,46 @@ export function RegisterScreen({
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
   const [password, setPassword] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const { loading, error, submit } = useRegister()
 
+  const validate = (): boolean => {
+    const errors: FieldErrors = {}
+
+    if (!firstName.trim()) errors.firstName = 'First name is required.'
+    else if (firstName.trim().length < 2)
+      errors.firstName = 'First name must be at least 2 characters.'
+
+    if (!lastName.trim()) errors.lastName = 'Last name is required.'
+    else if (lastName.trim().length < 2)
+      errors.lastName = 'Last name must be at least 2 characters.'
+
+    if (!email.trim()) errors.email = 'Email address is required.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errors.email = 'Please enter a valid email address.'
+
+    if (!phone.trim()) errors.phone = 'Phone number is required.'
+    else if (!/^\+[1-9]\d{7,14}$/.test(phone.trim()))
+      errors.phone = 'Use international format: +237650255873'
+
+    if (!password) errors.password = 'Password is required.'
+    else if (password.length < 8)
+      errors.password = 'Password must be at least 8 characters.'
+    else if (!/[A-Z]/.test(password))
+      errors.password = 'Password must contain at least 1 uppercase letter.'
+    else if (!/[0-9]/.test(password))
+      errors.password = 'Password must contain at least 1 number.'
+    else if (!/[^a-zA-Z0-9]/.test(password))
+      errors.password = 'Password must contain at least 1 special character.'
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleSubmit = async () => {
+    if (!validate()) return
+
     const result = await submit({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -86,18 +123,28 @@ export function RegisterScreen({
               <TextField
                 label='First name *'
                 value={firstName}
-                onChangeText={setFirstName}
+                onChangeText={(v) => {
+                  setFirstName(v)
+                  if (fieldErrors.firstName)
+                    setFieldErrors((e) => ({ ...e, firstName: undefined }))
+                }}
                 placeholder='Jean'
                 autoCapitalize='words'
+                error={fieldErrors.firstName}
               />
             </View>
             <View style={styles.nameField}>
               <TextField
                 label='Last name *'
                 value={lastName}
-                onChangeText={setLastName}
+                onChangeText={(v) => {
+                  setLastName(v)
+                  if (fieldErrors.lastName)
+                    setFieldErrors((e) => ({ ...e, lastName: undefined }))
+                }}
                 placeholder='Dupont'
                 autoCapitalize='words'
+                error={fieldErrors.lastName}
               />
             </View>
           </View>
@@ -105,38 +152,56 @@ export function RegisterScreen({
           <TextField
             label='Email address *'
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => {
+              setEmail(v)
+              if (fieldErrors.email)
+                setFieldErrors((e) => ({ ...e, email: undefined }))
+            }}
             placeholder='jean.dupont@email.com'
             keyboardType='email-address'
             autoCapitalize='none'
+            error={fieldErrors.email}
           />
 
           <View>
             <TextField
               label='Phone number *'
               value={phone}
-              onChangeText={setPhone}
+              onChangeText={(v) => {
+                setPhone(v)
+                if (fieldErrors.phone)
+                  setFieldErrors((e) => ({ ...e, phone: undefined }))
+              }}
               placeholder='+237650255873'
               keyboardType='phone-pad'
+              error={fieldErrors.phone}
             />
-            <Text style={styles.hint}>
-              International format required (e.g. +237650255873). We'll send a
-              verification code.
-            </Text>
+            {!fieldErrors.phone && (
+              <Text style={styles.hint}>
+                International format required (e.g. +237650255873)
+              </Text>
+            )}
           </View>
 
           <View>
             <TextField
               label='Password *'
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => {
+                setPassword(v)
+                if (fieldErrors.password)
+                  setFieldErrors((e) => ({ ...e, password: undefined }))
+              }}
               placeholder='Min. 8 chars, uppercase, number, special char'
               isPassword
+              error={fieldErrors.password}
             />
-            <Text style={styles.hint}>
-              At least 8 characters, 1 uppercase, 1 lowercase, 1 number, 1
-              special character
-            </Text>
+            {!fieldErrors.password && (
+              <Text style={styles.hint}>
+                At least 8 characters, 1 uppercase, 1 number, 1 special
+                character
+              </Text>
+            )}
           </View>
 
           {error ? <ErrorBanner message={error} /> : null}

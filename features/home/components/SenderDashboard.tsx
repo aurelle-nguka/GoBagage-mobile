@@ -1,55 +1,128 @@
 /**
  * Go Bagage — SenderDashboard
- * Vue expéditeur : recherche de corridor, routes populaires, colis récents.
+ * Vue expéditeur : recherche de corridor, colis récents avec vrais bookings.
  */
 
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import { Search, Package } from 'lucide-react-native';
-import { RecentParcelCard } from './RecentParcelCard';
-import { PopularRouteChip } from './PopularRouterChip';
-import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+import { useState, useCallback } from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
+import { Search, Package } from 'lucide-react-native'
+import { useFocusEffect } from 'expo-router'
+import { RecentParcelCard } from './RecentParcelCard'
+import { PopularRouteChip } from './PopularRouterChip'
+import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
+import apiClient from '../../../shared/services/api.client'
 
-
-// TODO: remplacer par features/parcels/hooks/useMyParcels()
-const MOCK_RECENT_PARCELS = [
-  { id: '1', from: 'Montreal', to: 'Douala', traveler: 'Kofi A.', date: 'Jun 18', weight: '4 kg', status: 'In Transit' as const },
-  { id: '2', from: 'Toronto', to: 'Abidjan', traveler: 'Marie L.', date: 'Jun 22', weight: '2 kg', status: 'Pending' as const },
-];
-
-// TODO: remplacer par features/trips/api → GET /corridors (populaires)
 const POPULAR_ROUTES = [
   { from: 'Montreal', to: 'Douala' },
   { from: 'Toronto', to: 'Abidjan' },
   { from: 'Paris', to: 'Lagos' },
   { from: 'Montreal', to: 'Paris' },
-];
+]
 
-interface SenderDashboardProps {
-  onSearch: (query?: string) => void;
-  onTracking: (parcelId: string) => void;
+type ParcelStatus = 'In Transit' | 'Pending' | 'Delivered' | 'Confirmed'
+
+interface RecentParcelItem {
+  id: string
+  from: string
+  to: string
+  travelerName: string
+  date: string
+  weight: string
+  status: ParcelStatus
 }
 
-export function SenderDashboard({ onSearch, onTracking }: SenderDashboardProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+function mapStatus(status: string): ParcelStatus {
+  switch (status) {
+    case 'PENDING':
+      return 'Pending'
+    case 'AWAITING_ACCEPTANCE':
+      return 'Pending'
+    case 'ACCEPTED':
+      return 'Pending'
+    case 'PICKED_UP':
+      return 'In Transit'
+    case 'IN_TRANSIT':
+      return 'In Transit'
+    case 'DELIVERED':
+      return 'In Transit'
+    case 'CONFIRMED':
+      return 'Confirmed'
+    default:
+      return 'Pending'
+  }
+}
+
+interface SenderDashboardProps {
+  onSearch: (query?: string) => void
+  onTracking: (bookingId: string) => void
+}
+
+export function SenderDashboard({
+  onSearch,
+  onTracking,
+}: SenderDashboardProps) {
+  const [searchQuery, setSearchQuery] = useState('')
+  const [parcels, setParcels] = useState<RecentParcelItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await apiClient.get('/bookings')
+      const raw = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.content ?? [])
+
+      const mapped: RecentParcelItem[] = raw.slice(0, 5).map((b: any) => {
+        const traveler = b.traveler ?? b.trip?.traveler
+        const corridor = b.trip?.corridor
+
+        return {
+          id: String(b.id),
+          from: corridor?.departureCity ?? 'Unknown',
+          to: corridor?.arrivalCity ?? 'Unknown',
+          travelerName: traveler
+            ? `${traveler.firstName} ${traveler.lastNameInitial}.`
+            : `Traveler #${b.travelerId}`,
+          date: b.trip?.departureDate ?? '',
+          weight: b.requestedKg ? `${b.requestedKg} kg` : '—',
+          status: mapStatus(b.status),
+        }
+      })
+
+      setParcels(mapped)
+    } catch {
+      // silencieux sur le dashboard
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      load()
+    }, [load]),
+  )
 
   return (
     <>
-      {/* Search card */}
+      {/* Recherche */}
       <View style={styles.searchCard}>
         <Text style={styles.searchTitle}>Find a corridor</Text>
 
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrapper}>
-            <Search size={16} color="#9ca3af" />
-            <TextInput
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="e.g. Montreal → Douala"
-              placeholderTextColor="#9ca3af"
-              style={styles.searchInput}
-            />
+            <Search size={16} color='#9ca3af' />
+            <Text style={styles.searchInput} onPress={() => onSearch()}>
+              {searchQuery || 'Montreal - Douala'}
+            </Text>
           </View>
           <TouchableOpacity
             style={styles.searchButton}
@@ -68,13 +141,14 @@ export function SenderDashboard({ onSearch, onTracking }: SenderDashboardProps) 
                 key={i}
                 from={route.from}
                 to={route.to}
-                onPress={() => onSearch(`${route.from} → ${route.to}`)}
+                onPress={() => onSearch()}
               />
             ))}
           </View>
         </View>
       </View>
 
+      {/* Colis récents */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Recent Parcels</Text>
         <TouchableOpacity>
@@ -82,13 +156,19 @@ export function SenderDashboard({ onSearch, onTracking }: SenderDashboardProps) 
         </TouchableOpacity>
       </View>
 
-      {MOCK_RECENT_PARCELS.length > 0 ? (
-        MOCK_RECENT_PARCELS.map((parcel) => (
+      {loading ? (
+        <ActivityIndicator
+          size='small'
+          color={Colors.primary}
+          style={{ marginTop: Spacing[4] }}
+        />
+      ) : parcels.length > 0 ? (
+        parcels.map((parcel) => (
           <RecentParcelCard
             key={parcel.id}
             from={parcel.from}
             to={parcel.to}
-            travelerName={parcel.traveler}
+            travelerName={parcel.travelerName}
             date={parcel.date}
             weight={parcel.weight}
             status={parcel.status}
@@ -97,17 +177,17 @@ export function SenderDashboard({ onSearch, onTracking }: SenderDashboardProps) 
         ))
       ) : (
         <View style={styles.emptyState}>
-          <Package size={48} color="#d1d5db" />
+          <Package size={48} color='#d1d5db' />
           <Text style={styles.emptyText}>No parcels yet</Text>
           <PrimaryButton
-            label="Send your first parcel"
+            label='Send your first parcel'
             onPress={() => onSearch()}
             style={styles.emptyButton}
           />
         </View>
       )}
     </>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -140,27 +220,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.inputBackground,
     paddingHorizontal: Spacing[4],
     borderRadius: Radius.xl,
+    paddingVertical: Spacing[3],
   },
   searchInput: {
     flex: 1,
     fontSize: FontSize.base,
-    color: Colors.foreground,
-    paddingVertical: Spacing[3],
+    color: '#9ca3af',
   },
   searchButton: {
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing[4],
     borderRadius: Radius.xl,
     justifyContent: 'center',
+    paddingVertical: Spacing[3],
   },
   searchButtonText: {
     color: Colors.white,
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
   },
-  popularSection: {
-    marginTop: Spacing[3],
-  },
+  popularSection: { marginTop: Spacing[3] },
   popularLabel: {
     fontSize: 11,
     color: '#9ca3af',
@@ -200,4 +279,4 @@ const styles = StyleSheet.create({
     marginTop: Spacing[4],
     paddingHorizontal: Spacing[6],
   },
-});
+})

@@ -18,12 +18,9 @@ export default function AdminDashboardPage() {
     } catch {
       setPendingKycCount(0)
     }
-
     try {
-      // Total users — GET /admin/kyc-queue sans filtre pour avoir tous les users
-      // TODO: remplacer par GET /admin/users?size=1 quand l'endpoint existera
-      const allUsers = await getKycQueue({ size: 1 })
-      setTotalUsers(allUsers.totalElements)
+      const allData = await getKycQueue({ size: 1 })
+      setTotalUsers(allData.totalElements)
     } catch {
       setTotalUsers(0)
     }
@@ -49,6 +46,7 @@ export default function AdminDashboardPage() {
       refreshing={refreshing}
       onRefresh={handleRefresh}
       onGoToKycQueue={() => router.push('/(admin)/kyc-queue')}
+      onGoToCorridors={() => router.push('/(admin)/corridors')}
       onLogout={async () => {
         await logout()
         router.replace('/(auth)/onboarding')

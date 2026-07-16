@@ -66,8 +66,12 @@ export function KycUploadScreen({
   const [idFrontUri, setIdFrontUri] = useState<string | null>(null)
   const [idBackUri, setIdBackUri] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const [confirmUpdate, setConfirmUpdate] = useState(false)
+
+  const [docTypeError, setDocTypeError] = useState('')
+  const [frontError, setFrontError] = useState('')
+  const [backError, setBackError] = useState('')
+  const [apiError, setApiError] = useState('')
 
   const isVerified = kycStatus === 'VERIFIED'
 
@@ -76,7 +80,7 @@ export function KycUploadScreen({
     if (status !== 'granted') {
       Alert.alert(
         'Permission required',
-        'Go Bagage needs access to your photos to upload your ID document.',
+        'Go Bagage needs access to your photos.',
       )
       return
     }
@@ -89,52 +93,69 @@ export function KycUploadScreen({
 
     if (!result.canceled && result.assets[0]) {
       const uri = result.assets[0].uri
-      if (side === 'front') setIdFrontUri(uri)
-      else setIdBackUri(uri)
+      if (side === 'front') {
+        setIdFrontUri(uri)
+        setFrontError('')
+      } else {
+        setIdBackUri(uri)
+        setBackError('')
+      }
     }
   }
 
-  const handleSubmit = async () => {
+  const validate = (): boolean => {
+    let valid = true
+
     if (!documentType) {
-      setError('Please select a document type.')
-      return
-    }
-    if (!idFrontUri) {
-      setError('Please upload the front of your document.')
-      return
-    }
-    if (!idBackUri) {
-      setError('Please upload the back of your document.')
-      return
+      setDocTypeError('Please select a document type.')
+      valid = false
+    } else {
+      setDocTypeError('')
     }
 
-    setError('')
+    if (!idFrontUri) {
+      setFrontError('Please upload the front of your document.')
+      valid = false
+    } else {
+      setFrontError('')
+    }
+
+    if (!idBackUri) {
+      setBackError('Please upload the back of your document.')
+      valid = false
+    } else {
+      setBackError('')
+    }
+
+    return valid
+  }
+
+  const handleSubmit = async () => {
+    if (!validate()) return
+
+    setApiError('')
     setLoading(true)
 
     try {
       const formData = new FormData()
-
       formData.append('frontFile', {
-        uri: idFrontUri,
+        uri: idFrontUri!,
         name: 'front_document.jpg',
         type: 'image/jpeg',
       } as any)
-
       formData.append('backFile', {
-        uri: idBackUri,
+        uri: idBackUri!,
         name: 'back_document.jpg',
         type: 'image/jpeg',
       } as any)
-
-      formData.append('documentType', documentType)
+      formData.append('documentType', documentType!)
 
       await apiClient.post('/users/me/kyc', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-
       onSuccess()
     } catch (err: any) {
-      setError(
+      setApiError(
         err?.response?.data?.message ??
           'Failed to submit documents. Please try again.',
       )
@@ -156,7 +177,6 @@ export function KycUploadScreen({
             Your identity has been successfully verified. You don't need to
             submit new documents unless your ID has expired or changed.
           </Text>
-
           <View style={styles.verifiedActions}>
             <TouchableOpacity
               style={styles.updateButton}
@@ -167,7 +187,6 @@ export function KycUploadScreen({
                 Update my documents anyway
               </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               style={styles.backButton}
               onPress={onBack}
@@ -208,7 +227,7 @@ export function KycUploadScreen({
           Select your document type and upload both sides.
         </Text>
 
-        <Text style={styles.sectionLabel}>Document type</Text>
+        <Text style={styles.sectionLabel}>Document type *</Text>
         <View style={styles.docTypeRow}>
           {DOCUMENT_TYPES.map((doc) => {
             const isSelected = documentType === doc.id
@@ -218,12 +237,15 @@ export function KycUploadScreen({
                 style={[
                   styles.docTypeCard,
                   isSelected && styles.docTypeCardSelected,
+                  docTypeError ? styles.docTypeCardError : null,
                 ]}
                 onPress={() => {
                   setDocumentType(doc.id)
                   setIdFrontUri(null)
                   setIdBackUri(null)
-                  setError('')
+                  setDocTypeError('')
+                  setFrontError('')
+                  setBackError('')
                 }}
                 activeOpacity={0.85}
               >
@@ -253,6 +275,9 @@ export function KycUploadScreen({
             )
           })}
         </View>
+        {docTypeError ? (
+          <Text style={styles.fieldError}>⚠ {docTypeError}</Text>
+        ) : null}
 
         {documentType && (
           <>
@@ -261,26 +286,41 @@ export function KycUploadScreen({
               <Text style={styles.infoEmoji}>ℹ️</Text>
               <Text style={styles.infoText}>
                 Your documents are encrypted and only used for identity
-                verification. They are never shared with other users.
+                verification.
               </Text>
             </View>
 
             <View style={styles.uploadList}>
-              <IdUploadCard
-                label={`Front of ${documentType === 'CNI' ? 'ID Card' : 'Passport'}`}
-                uploadedUri={idFrontUri}
-                onPress={() => pickImage('front')}
-              />
-              <IdUploadCard
-                label={`Back of ${documentType === 'CNI' ? 'ID Card' : 'Passport'}`}
-                uploadedUri={idBackUri}
-                onPress={() => pickImage('back')}
-              />
+              <View>
+                <IdUploadCard
+                  label={`Front of ${documentType === 'CNI' ? 'ID Card' : 'Passport'} *`}
+                  uploadedUri={idFrontUri}
+                  onPress={() => pickImage('front')}
+                />
+                {frontError ? (
+                  <Text style={styles.fieldError}>⚠ {frontError}</Text>
+                ) : null}
+              </View>
+
+              <View>
+                <IdUploadCard
+                  label={`Back of ${documentType === 'CNI' ? 'ID Card' : 'Passport'} *`}
+                  uploadedUri={idBackUri}
+                  onPress={() => pickImage('back')}
+                />
+                {backError ? (
+                  <Text style={styles.fieldError}>⚠ {backError}</Text>
+                ) : null}
+              </View>
             </View>
           </>
         )}
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {apiError ? (
+          <Text style={[styles.fieldError, { marginTop: Spacing[3] }]}>
+            ⚠ {apiError}
+          </Text>
+        ) : null}
 
         <PrimaryButton
           label='Submit Documents'
@@ -301,15 +341,9 @@ export function KycUploadScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
-  content: {
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[6],
-  },
+  content: { paddingHorizontal: Spacing[5], paddingVertical: Spacing[6] },
   verifiedContent: {
     flex: 1,
     alignItems: 'center',
@@ -339,10 +373,7 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.base * 1.6,
     marginBottom: Spacing[8],
   },
-  verifiedActions: {
-    width: '100%',
-    gap: Spacing[3],
-  },
+  verifiedActions: { width: '100%', gap: Spacing[3] },
   updateButton: {
     borderWidth: 1.5,
     borderColor: Colors.warning,
@@ -400,7 +431,7 @@ const styles = StyleSheet.create({
   docTypeRow: {
     flexDirection: 'row',
     gap: Spacing[3],
-    marginBottom: Spacing[5],
+    marginBottom: Spacing[1],
   },
   docTypeCard: {
     flex: 1,
@@ -416,6 +447,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: '#e8faf0',
   },
+  docTypeCardError: { borderColor: Colors.destructive },
   docTypeEmoji: { fontSize: 28, marginBottom: Spacing[2] },
   docTypeLabel: {
     fontSize: FontSize.sm,
@@ -465,14 +497,11 @@ const styles = StyleSheet.create({
     color: '#1565C0',
     lineHeight: FontSize.sm * 1.5,
   },
-  uploadList: {
-    gap: Spacing[4],
-    marginBottom: Spacing[2],
-  },
-  errorText: {
-    color: Colors.destructive,
+  uploadList: { gap: Spacing[4], marginBottom: Spacing[2] },
+  fieldError: {
     fontSize: FontSize.sm,
-    marginTop: Spacing[3],
+    color: Colors.destructive,
+    marginTop: Spacing[1],
   },
   submitButton: { marginTop: Spacing[6] },
   skipButton: {
@@ -480,8 +509,5 @@ const styles = StyleSheet.create({
     marginTop: Spacing[3],
     alignItems: 'center',
   },
-  skipText: {
-    color: Colors.mutedForeground,
-    fontSize: FontSize.base,
-  },
+  skipText: { color: Colors.mutedForeground, fontSize: FontSize.base },
 })

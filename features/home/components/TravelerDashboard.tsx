@@ -1,30 +1,27 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { useCallback, useState } from 'react'
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native'
 import { TrendingUp } from 'lucide-react-native'
+import { useFocusEffect } from 'expo-router'
 import { StatCard } from './StatCard'
 import { ActiveTripCard } from './ActiveTripCard'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
+import apiClient from '../../../shared/services/api.client'
 
-// TODO: remplacer par features/trips/hooks/useMyTrips()
-const MOCK_ACTIVE_TRIPS = [
-  {
-    id: '1',
-    from: 'Montreal',
-    to: 'Douala',
-    date: 'Jun 18, 2026',
-    kg: 15,
-    status: 'Confirmed' as const,
-    requests: 3,
-  },
-  {
-    id: '2',
-    from: 'Toronto',
-    to: 'Paris',
-    date: 'Jun 25, 2026',
-    kg: 20,
-    status: 'Open' as const,
-    requests: 0,
-  },
-]
+interface TripItem {
+  id: string
+  from: string
+  to: string
+  date: string
+  kg: number
+  status: 'Open' | 'Confirmed'
+  requests: number
+}
 
 interface TravelerDashboardProps {
   onPublish: () => void
@@ -35,25 +32,73 @@ export function TravelerDashboard({
   onPublish,
   onTracking,
 }: TravelerDashboardProps) {
+  const [trips, setTrips] = useState<TripItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTrips, setActiveTrips] = useState(0)
+  const [totalRequests, setTotalRequests] = useState(0)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    try {
+      const response = await apiClient.get('/trips/mine')
+      const raw = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.content ?? [])
+
+      const mapped: TripItem[] = raw
+        .filter((t: any) => t.status === 'OPEN' || t.status === 'BOOKED')
+        .slice(0, 3)
+        .map((t: any) => ({
+          id: String(t.id),
+          from: t.corridor?.departureCity ?? 'Unknown',
+          to: t.corridor?.arrivalCity ?? 'Unknown',
+          date: t.departureDate ?? '',
+          kg: t.availableKg ?? 0,
+          status: t.status === 'BOOKED' ? 'Confirmed' : 'Open',
+          requests: t.pendingRequestsCount ?? 0,
+        }))
+
+      setTrips(mapped)
+      setActiveTrips(
+        raw.filter((t: any) => t.status === 'OPEN' || t.status === 'BOOKED')
+          .length,
+      )
+      setTotalRequests(
+        raw.reduce(
+          (sum: number, t: any) => sum + (t.pendingRequestsCount ?? 0),
+          0,
+        ),
+      )
+    } catch {
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      load()
+    }, [load]),
+  )
+
   return (
     <>
       <View style={styles.statsRow}>
         <StatCard
           emoji='✈️'
-          value='2'
+          value={loading ? '…' : String(activeTrips)}
           label='Active Trips'
           backgroundColor='#e8faf0'
         />
         <StatCard
           emoji='📩'
-          value='3'
+          value={loading ? '…' : String(totalRequests)}
           label='Requests'
           backgroundColor='#e8f4fd'
         />
         <StatCard
           emoji='💰'
-          value='320'
-          suffix='CAD'
+          value='—'
           label='Earned'
           backgroundColor='#fff8e8'
         />
@@ -76,23 +121,39 @@ export function TravelerDashboard({
 
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>My Active Trips</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => {}}>
           <Text style={styles.seeAll}>See all</Text>
         </TouchableOpacity>
       </View>
 
-      {MOCK_ACTIVE_TRIPS.map((trip) => (
-        <ActiveTripCard
-          key={trip.id}
-          from={trip.from}
-          to={trip.to}
-          date={trip.date}
-          availableKg={trip.kg}
-          status={trip.status}
-          pendingRequests={trip.requests}
-          onPress={() => onTracking(trip.id)}
+      {loading ? (
+        <ActivityIndicator
+          size='small'
+          color={Colors.primary}
+          style={{ marginTop: Spacing[4] }}
         />
-      ))}
+      ) : trips.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyEmoji}>✈️</Text>
+          <Text style={styles.emptyText}>No active trips yet</Text>
+          <TouchableOpacity onPress={onPublish}>
+            <Text style={styles.emptyAction}>Publish your first trip →</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        trips.map((trip) => (
+          <ActiveTripCard
+            key={trip.id}
+            from={trip.from}
+            to={trip.to}
+            date={trip.date}
+            availableKg={trip.kg}
+            status={trip.status}
+            pendingRequests={trip.requests}
+            onPress={() => onTracking(trip.id)}
+          />
+        ))
+      )}
     </>
   )
 }
@@ -155,5 +216,20 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: Spacing[8],
+  },
+  emptyEmoji: { fontSize: 36, marginBottom: Spacing[2] },
+  emptyText: {
+    color: Colors.mutedForeground,
+    fontSize: FontSize.base,
+    marginBottom: Spacing[2],
+  },
+  emptyAction: {
+    color: Colors.primary,
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.semibold,
   },
 })

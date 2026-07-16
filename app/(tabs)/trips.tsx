@@ -1,7 +1,3 @@
-/**
- * Go Bagage — Page My Trips (Tab)
- */
-
 import { useRouter } from 'expo-router'
 import { MyTripsScreen } from '../../features/trips/screens/MyTripsScreen'
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { View, ActivityIndicator } from 'react-native'
 import { useRouter } from 'expo-router'
 import { User } from '../../types/user.types'
@@ -32,9 +32,7 @@ export default function ProfilePage() {
         createdAt: userDto.createdAt,
       }
       setUser(updatedUser)
-    } catch (err) {
-      console.log('Failed to refresh profile:', err)
-    }
+    } catch (err) {}
   }, [])
 
   const handleRefresh = async () => {
@@ -42,10 +40,6 @@ export default function ProfilePage() {
     await loadProfile()
     setRefreshing(false)
   }
-
-  console.log('=== USER IN STORE ===')
-  console.log('kycStatus:', user?.kycStatus)
-  console.log('kycRejectionReason:', user?.kycRejectionReason)
 
   if (!user) {
     return (

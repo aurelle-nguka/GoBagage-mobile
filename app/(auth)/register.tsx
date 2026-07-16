@@ -1,5 +1,6 @@
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { RegisterScreen } from '../../features/auth/screens/RegisterScreen'
+import { sendOtp } from '../../features/auth/api/auth.api'
 
 type RoleChoice = 'TRAVELER' | 'SENDER' | 'BOTH'
 
@@ -11,9 +12,14 @@ export default function RegisterPage() {
     <RegisterScreen
       role={role ?? 'BOTH'}
       onBack={() => router.back()}
-      onSuccess={(registerDto) => {
-        // Inscription réussie → OTP pour confirmer le numéro de téléphone
-        // TODO: déclencher POST /auth/otp/send { phone: registerDto.phone } ici
+      onSuccess={async (registerDto) => {
+        try {
+          await sendOtp({
+            phone: registerDto.phone,
+            purpose: 'PHONE_VERIFICATION',
+          })
+        } catch (err: any) {}
+
         router.push({
           pathname: '/(auth)/otp',
           params: { role, phone: registerDto.phone },

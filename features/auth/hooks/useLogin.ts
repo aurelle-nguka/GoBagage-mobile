@@ -56,10 +56,10 @@ export function useLogin(): UseLoginResult {
 
       return user.roles.includes('ADMIN') ? 'ADMIN' : 'USER';
 
-    } catch (err) {
-      setError(getApiErrorMessage(err));
-      return false;
-    } finally {
+} catch (err: any) {
+  setError(getApiErrorMessage(err));
+  return false;
+} finally {
       setLoading(false);
     }
   };

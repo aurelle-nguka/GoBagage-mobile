@@ -1,8 +1,3 @@
-/**
- * Go Bagage — Admin Layout
- * Protège toutes les routes admin : redirige si pas ADMIN.
- */
-
 import { useEffect } from 'react'
 import { Stack, useRouter } from 'expo-router'
 import { useAuthStore } from '../../store/auth.store'
@@ -25,6 +20,7 @@ export default function AdminLayout() {
       <Stack.Screen name='dashboard' />
       <Stack.Screen name='kyc-queue' />
       <Stack.Screen name='kyc-review/[kycId]' />
+      <Stack.Screen name='corridors' />
     </Stack>
   )
 }

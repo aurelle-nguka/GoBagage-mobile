@@ -1,26 +1,24 @@
-/**
- * Go Bagage — TripRequestsScreen
- * Détail d'un trajet + liste des demandes de réservation reçues (CDC section 6.2/9.5).
- * Écran absent de la maquette — construit à partir du parcours utilisateur du CDC :
- * "Le voyageur (A) accepte" (étape 4 du parcours, section 3.1).
- */
-
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
   StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+  Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ArrowLeft } from 'lucide-react-native'
+import { useFocusEffect } from 'expo-router'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { TripDetailSummary } from '../components/TripDetailSummary'
 import { BookingRequestCard } from '../components/BookingRequestCard'
+import { useBookingActions } from '../../bookings/hooks/useBookingActions'
+import apiClient from '../../../shared/services/api.client'
 import { BookingStatus } from '../../bookings/types/booking.type'
 
-// TODO: remplacer par features/bookings/hooks/useTripRequests(tripId) → GET /bookings?tripId=
 interface RequestListItem {
   id: string
   senderInitials: string
@@ -33,42 +31,6 @@ interface RequestListItem {
   status: BookingStatus
 }
 
-const MOCK_REQUESTS: RequestListItem[] = [
-  {
-    id: 'b1',
-    senderInitials: 'ML',
-    senderName: 'Marie Laurent',
-    senderRating: 4.7,
-    senderVerified: true,
-    parcelDescription: 'Clothing & family gifts',
-    weightKg: 4,
-    amount: 53.76,
-    status: 'PENDING',
-  },
-  {
-    id: 'b2',
-    senderInitials: 'JD',
-    senderName: 'Jean Diallo',
-    senderRating: 4.5,
-    senderVerified: true,
-    parcelDescription: 'Documents',
-    weightKg: 1.5,
-    amount: 20.16,
-    status: 'PENDING',
-  },
-  {
-    id: 'b3',
-    senderInitials: 'SK',
-    senderName: 'Sarah Kone',
-    senderRating: 4.9,
-    senderVerified: false,
-    parcelDescription: 'Electronics',
-    weightKg: 3,
-    amount: 40.32,
-    status: 'ACCEPTED',
-  },
-]
-
 interface TripRequestsScreenProps {
   tripId: string
   from: string
@@ -80,6 +42,7 @@ interface TripRequestsScreenProps {
 }
 
 export function TripRequestsScreen({
+  tripId,
   from,
   to,
   departureDate,
@@ -87,29 +50,137 @@ export function TripRequestsScreen({
   onBack,
   onOpenBooking,
 }: TripRequestsScreenProps) {
-  const [requests, setRequests] = useState(MOCK_REQUESTS)
+  const [requests, setRequests] = useState<RequestListItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
+
+  const { accept, reject, loading: actionLoading } = useBookingActions()
+
+  const loadRequests = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true)
+      else setLoading(true)
+      setError('')
+
+      try {
+        console.log('=== LOAD REQUESTS ===')
+        console.log('tripId:', tripId)
+        const response = await apiClient.get('/bookings', {
+          params: { tripId },
+        })
+        console.log('status:', response.status)
+        console.log('data:', JSON.stringify(response.data))
+
+        const raw = Array.isArray(response.data)
+          ? response.data
+          : (response.data?.content ?? [])
+
+        console.log('premier booking:', JSON.stringify(raw[0]))
+        console.log(
+          'tous les bookings:',
+          raw.map((b: any) => ({
+            id: b.id,
+            status: b.status,
+            tripId: b.tripId,
+          })),
+        )
+
+        const mapped: RequestListItem[] = raw.map((booking: any) => {
+          const sender = booking.sender
+          const parcel = booking.parcel
+
+          return {
+            id: String(booking.id),
+            senderInitials: sender
+              ? `${(sender.firstName ?? 'S')[0]}${sender.lastNameInitial ?? ''}`.toUpperCase()
+              : 'S?',
+            senderName: sender
+              ? `${sender.firstName ?? ''} ${sender.lastNameInitial ?? ''}`.trim()
+              : `Sender #${booking.senderId}`,
+            senderRating: sender?.averageRating ?? 0,
+            senderVerified: sender?.kycVerified ?? false,
+            parcelDescription: parcel?.description ?? 'Parcel',
+            weightKg: booking.requestedKg ?? 0,
+            amount: booking.totalAmountCad ?? 0,
+            status: booking.status ?? 'PENDING',
+          }
+        })
+
+        setRequests(mapped)
+      } catch (err: any) {
+        console.log(
+          '❌ Error:',
+          err?.response?.status,
+          JSON.stringify(err?.response?.data),
+        )
+        setError(
+          err?.response?.data?.message ?? 'Failed to load booking requests.',
+        )
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
+      }
+    },
+    [tripId],
+  )
+
+  useFocusEffect(
+    useCallback(() => {
+      loadRequests()
+    }, [loadRequests]),
+  )
+
+  const handleAccept = async (id: string) => {
+    Alert.alert(
+      'Accept Booking',
+      'Are you sure you want to accept this booking request?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Accept',
+          onPress: async () => {
+            const result = await accept(id)
+            if (result) {
+              setRequests((prev) =>
+                prev.map((r) =>
+                  r.id === id ? { ...r, status: 'ACCEPTED' } : r,
+                ),
+              )
+            }
+          },
+        },
+      ],
+    )
+  }
+
+  const handleReject = async (id: string) => {
+    Alert.alert(
+      'Reject Booking',
+      'Are you sure you want to reject this booking request?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reject',
+          style: 'destructive',
+          onPress: async () => {
+            const result = await reject(id)
+            if (result) {
+              setRequests((prev) =>
+                prev.map((r) =>
+                  r.id === id ? { ...r, status: 'REJECTED' } : r,
+                ),
+              )
+            }
+          },
+        },
+      ],
+    )
+  }
 
   const bookedKg = requests
     .filter((r) => r.status === 'ACCEPTED')
     .reduce((sum, r) => sum + r.weightKg, 0)
-
-  const handleAccept = (id: string) => {
-    // TODO: brancher features/bookings/api/bookings.api.ts → PATCH /bookings/{id}/accept
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, status: 'ACCEPTED' as BookingStatus } : r,
-      ),
-    )
-  }
-
-  const handleReject = (id: string) => {
-    // TODO: brancher features/bookings/api/bookings.api.ts → PATCH /bookings/{id}/reject
-    setRequests((prev) =>
-      prev.map((r) =>
-        r.id === id ? { ...r, status: 'REJECTED' as BookingStatus } : r,
-      ),
-    )
-  }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -120,7 +191,12 @@ export function TripRequestsScreen({
         >
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
-        <Text style={styles.navTitle}>Trip Requests</Text>
+        <View>
+          <Text style={styles.navTitle}>Trip Requests</Text>
+          <Text style={styles.navSubtitle}>
+            {requests.length} request{requests.length !== 1 ? 's' : ''}
+          </Text>
+        </View>
       </View>
 
       <TripDetailSummary
@@ -131,41 +207,68 @@ export function TripRequestsScreen({
         bookedKg={bookedKg}
       />
 
-      <FlatList
-        data={requests}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <BookingRequestCard
-            senderInitials={item.senderInitials}
-            senderName={item.senderName}
-            senderRating={item.senderRating}
-            senderVerified={item.senderVerified}
-            parcelDescription={item.parcelDescription}
-            weightKg={item.weightKg}
-            amount={item.amount}
-            status={item.status}
-            onAccept={() => handleAccept(item.id)}
-            onReject={() => handleReject(item.id)}
-            onPress={() => onOpenBooking(item.id)}
-          />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <Text style={styles.emptyText}>No booking requests yet</Text>
-          </View>
-        }
-      />
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size='large' color={Colors.primary} />
+        </View>
+      ) : error ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={requests}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => loadRequests(true)}
+              colors={[Colors.primary]}
+              tintColor={Colors.primary}
+            />
+          }
+          renderItem={({ item }) => (
+            <BookingRequestCard
+              senderInitials={item.senderInitials}
+              senderName={item.senderName}
+              senderRating={item.senderRating}
+              senderVerified={item.senderVerified}
+              parcelDescription={item.parcelDescription}
+              weightKg={item.weightKg}
+              amount={item.amount}
+              status={item.status}
+              onAccept={
+                item.status === 'AWAITING_ACCEPTANCE'
+                  ? () => handleAccept(item.id)
+                  : undefined
+              }
+              onReject={
+                item.status === 'AWAITING_ACCEPTANCE'
+                  ? () => handleReject(item.id)
+                  : undefined
+              }
+              onPress={() => onOpenBooking(item.id)}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyEmoji}>📭</Text>
+              <Text style={styles.emptyText}>No booking requests yet</Text>
+              <Text style={styles.emptySubtext}>
+                Requests will appear here when senders book your trip.
+              </Text>
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   navHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -174,23 +277,50 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing[5],
     paddingTop: Spacing[4],
     paddingBottom: Spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: '#f3f4f6',
   },
   navTitle: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
+  navSubtitle: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+  },
   listContent: {
     paddingHorizontal: Spacing[5],
     paddingTop: Spacing[4],
     paddingBottom: Spacing[6],
   },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing[12],
+  },
+  errorText: {
+    color: Colors.destructive,
+    fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
+  },
   emptyState: {
     alignItems: 'center',
     paddingVertical: Spacing[12],
   },
+  emptyEmoji: { fontSize: 48, marginBottom: Spacing[3] },
   emptyText: {
+    color: Colors.foreground,
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
+    marginBottom: Spacing[2],
+  },
+  emptySubtext: {
     color: '#9ca3af',
     fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
   },
 })

@@ -1,24 +1,43 @@
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { Colors, FontSize, Radius, Spacing } from '../../../theme';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 interface DeclarationCheckboxProps {
-  checked: boolean;
-  onToggle: () => void;
+  checked: boolean
+  onToggle: () => void
+  error?: string
 }
 
-export function DeclarationCheckbox({ checked, onToggle }: DeclarationCheckboxProps) {
+export function DeclarationCheckbox({
+  checked,
+  onToggle,
+  error,
+}: DeclarationCheckboxProps) {
   return (
-    <TouchableOpacity style={styles.row} onPress={onToggle} activeOpacity={0.8}>
-      <View style={[styles.box, checked ? styles.boxChecked : styles.boxUnchecked]}>
-        {checked && <Text style={styles.checkmark}>✓</Text>}
-      </View>
-      <Text style={styles.text}>
-        I confirm that the content of this parcel is{' '}
-        <Text style={styles.bold}>legal, not restricted</Text>, and complies with all applicable
-        customs regulations. I accept full legal responsibility.
-      </Text>
-    </TouchableOpacity>
-  );
+    <View>
+      <TouchableOpacity
+        style={styles.row}
+        onPress={onToggle}
+        activeOpacity={0.8}
+      >
+        <View
+          style={[
+            styles.box,
+            checked ? styles.boxChecked : styles.boxUnchecked,
+            error && !checked ? styles.boxError : null,
+          ]}
+        >
+          {checked && <Text style={styles.checkmark}>✓</Text>}
+        </View>
+        <Text style={styles.text}>
+          I confirm that the content of this parcel is{' '}
+          <Text style={styles.bold}>legal, not restricted</Text>, and complies
+          with all applicable customs regulations. I accept full legal
+          responsibility.
+        </Text>
+      </TouchableOpacity>
+      {error && !checked ? <Text style={styles.errorText}>{error}</Text> : null}
+    </View>
+  )
 }
 
 const styles = StyleSheet.create({
@@ -43,17 +62,21 @@ const styles = StyleSheet.create({
   boxChecked: {
     backgroundColor: Colors.primary,
   },
-  checkmark: {
-    color: Colors.white,
-    fontSize: 12,
+  boxError: {
+    borderColor: Colors.destructive,
+    backgroundColor: '#fef2f2',
   },
+  checkmark: { color: Colors.white, fontSize: 12 },
   text: {
     flex: 1,
     fontSize: FontSize.sm,
     color: Colors.foreground,
     lineHeight: FontSize.sm * 1.6,
   },
-  bold: {
-    fontWeight: '700',
+  bold: { fontWeight: '700' },
+  errorText: {
+    fontSize: FontSize.sm,
+    color: Colors.destructive,
+    marginTop: Spacing[1],
   },
-});
+})

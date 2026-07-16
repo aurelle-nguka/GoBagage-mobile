@@ -1,21 +1,22 @@
-/**
- * Go Bagage — MyTripsScreen
- * Liste des trajets publiés par le voyageur connecté (CDC section 6.2 — "Tableau de bord voyageur").
- * Écran absent de la maquette web — construit directement à partir du CDC et du design system existant.
- */
-
-import { useState, useMemo } from 'react'
-import { View, Text, FlatList, StyleSheet } from 'react-native'
+import { useState, useMemo, useCallback } from 'react'
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { PlusCircle } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
-
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
-import type { TripStatus } from '../types/trip.types'
 import { TripFilter, TripStatusFilter } from '../components/TripStatusFilter'
 import { MyTripCard } from '../components/MyTripCard'
+import type { TripStatus } from '../types/trip.types'
+import apiClient from '../../../shared/services/api.client'
+import { useFocusEffect } from 'expo-router'
 
-// TODO: remplacer par features/trips/hooks/useMyTrips() → GET /trips/mine
 interface MyTripListItem {
   id: string
   from: string
@@ -26,36 +27,6 @@ interface MyTripListItem {
   pendingRequestsCount: number
 }
 
-const MOCK_MY_TRIPS: MyTripListItem[] = [
-  {
-    id: '1',
-    from: 'Montreal',
-    to: 'Douala',
-    departureDate: 'Jun 18, 2026',
-    availableKg: 15,
-    status: 'BOOKED',
-    pendingRequestsCount: 3,
-  },
-  {
-    id: '2',
-    from: 'Toronto',
-    to: 'Paris',
-    departureDate: 'Jun 25, 2026',
-    availableKg: 20,
-    status: 'OPEN',
-    pendingRequestsCount: 0,
-  },
-  {
-    id: '3',
-    from: 'Montreal',
-    to: 'Abidjan',
-    departureDate: 'May 10, 2026',
-    availableKg: 18,
-    status: 'COMPLETED',
-    pendingRequestsCount: 0,
-  },
-]
-
 interface MyTripsScreenProps {
   onPublish: () => void
   onOpenTrip: (tripId: string) => void
@@ -63,11 +34,59 @@ interface MyTripsScreenProps {
 
 export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
   const [filter, setFilter] = useState<TripFilter>('ALL')
+  const [trips, setTrips] = useState<MyTripListItem[]>([])
+  const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
+  const [error, setError] = useState('')
+
+  const loadTrips = useCallback(async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true)
+    else setLoading(true)
+    setError('')
+
+    try {
+      console.log('=== GET /trips/mine ===')
+      const response = await apiClient.get('/trips/mine')
+      console.log('response:', JSON.stringify(response.data))
+
+      const raw = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.content ?? [])
+
+      const mapped: MyTripListItem[] = raw.map((trip: any) => ({
+        id: String(trip.id),
+        from: trip.corridor?.departureCity ?? 'Unknown',
+        to: trip.corridor?.arrivalCity ?? 'Unknown',
+        departureDate: trip.departureDate ?? '',
+        availableKg: trip.availableKg ?? 0,
+        status: trip.status ?? 'OPEN',
+        pendingRequestsCount: trip.pendingRequestsCount ?? 0,
+      }))
+
+      setTrips(mapped)
+    } catch (err: any) {
+      console.log(
+        '❌ Error:',
+        err?.response?.status,
+        JSON.stringify(err?.response?.data),
+      )
+      setError(err?.response?.data?.message ?? 'Failed to load trips.')
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
+    }
+  }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      loadTrips()
+    }, [loadTrips]),
+  )
 
   const filteredTrips = useMemo(() => {
-    if (filter === 'ALL') return MOCK_MY_TRIPS
-    return MOCK_MY_TRIPS.filter((trip) => trip.status === filter)
-  }, [filter])
+    if (filter === 'ALL') return trips
+    return trips.filter((trip) => trip.status === filter)
+  }, [filter, trips])
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -82,34 +101,63 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
         <TripStatusFilter selected={filter} onSelect={setFilter} />
       </View>
 
-      <FlatList
-        data={filteredTrips}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <MyTripCard
-            from={item.from}
-            to={item.to}
-            departureDate={item.departureDate}
-            availableKg={item.availableKg}
-            status={item.status}
-            pendingRequestsCount={item.pendingRequestsCount}
-            onPress={() => onOpenTrip(item.id)}
+      {loading ? (
+        <View style={styles.centered}>
+          <ActivityIndicator size='large' color={Colors.primary} />
+        </View>
+      ) : error ? (
+        <View style={styles.centered}>
+          <Text style={styles.errorText}>{error}</Text>
+          <PrimaryButton
+            label='Retry'
+            onPress={() => loadTrips()}
+            style={{ marginTop: Spacing[4] }}
           />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyState}>
-            <PlusCircle size={48} color='#d1d5db' />
-            <Text style={styles.emptyText}>No trips in this category</Text>
-            <PrimaryButton
-              label='Publish a Trip'
-              onPress={onPublish}
-              style={styles.emptyButton}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredTrips}
+          keyExtractor={(item) => item.id}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => loadTrips(true)}
+              colors={[Colors.primary]}
+              tintColor={Colors.primary}
             />
-          </View>
-        }
-      />
+          }
+          renderItem={({ item }) => (
+            <MyTripCard
+              from={item.from}
+              to={item.to}
+              departureDate={item.departureDate}
+              availableKg={item.availableKg}
+              status={item.status}
+              pendingRequestsCount={item.pendingRequestsCount}
+              onPress={() => onOpenTrip(item.id)}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyState}>
+              <PlusCircle size={48} color='#d1d5db' />
+              <Text style={styles.emptyText}>
+                {filter === 'ALL'
+                  ? 'No trips published yet'
+                  : `No trips with status "${filter}"`}
+              </Text>
+              {filter === 'ALL' && (
+                <PrimaryButton
+                  label='Publish a Trip'
+                  onPress={onPublish}
+                  style={styles.emptyButton}
+                />
+              )}
+            </View>
+          }
+        />
+      )}
     </SafeAreaView>
   )
 }
@@ -140,6 +188,18 @@ const styles = StyleSheet.create({
   listContent: {
     paddingHorizontal: Spacing[5],
     paddingBottom: Spacing[6],
+  },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing[12],
+  },
+  errorText: {
+    color: Colors.destructive,
+    fontSize: FontSize.base,
+    textAlign: 'center',
+    paddingHorizontal: Spacing[8],
   },
   emptyState: {
     alignItems: 'center',

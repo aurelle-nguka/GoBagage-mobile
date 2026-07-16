@@ -1,10 +1,5 @@
-/**
- * Go Bagage — KycFilterBar
- * Barre de filtres pour la file KYC.
- */
-
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native'
-import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
+import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import type { KycStatus } from '../../../types/user.types'
 
 type Filter = KycStatus | 'ALL'
@@ -53,22 +48,27 @@ export function KycFilterBar({ active, onSelect }: KycFilterBarProps) {
 
 const styles = StyleSheet.create({
   row: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: Spacing[2],
     paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[3],
+    paddingVertical: Spacing[2],
   },
   chip: {
-    paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[2],
-    borderRadius: Radius.full,
+    paddingHorizontal: Spacing[3],
+    paddingVertical: 6,
+    borderRadius: 20,
     borderWidth: 1.5,
     borderColor: '#e5e7eb',
     backgroundColor: Colors.white,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   label: {
     fontSize: FontSize.sm,
     color: Colors.foreground,
     fontWeight: FontWeight.medium,
+    lineHeight: 18,
   },
   labelActive: {
     color: Colors.white,

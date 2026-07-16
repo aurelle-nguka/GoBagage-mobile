@@ -1,9 +1,4 @@
-/**
- * Go Bagage — Page Home (Tab principal)
- */
-
 import { useRouter } from 'expo-router'
-
 import { useAuthStore } from '../../store/auth.store'
 import { HomeScreen } from '../../features/home/screens/HomeScreen'
 
@@ -23,19 +18,12 @@ export default function HomePage() {
       role={role}
       firstName={user?.firstName ?? 'there'}
       onPublish={() => router.push('/(tabs)/publish')}
-      onSearch={(query) =>
-        router.push({
-          pathname: '/(tabs)/search',
-          params: query ? { q: query } : {},
-        })
-      }
+      onSearch={() => router.push('/(tabs)/search')}
       onTripPress={(tripId) => router.push(`/(modals)/trip-requests/${tripId}`)}
-      onParcelTracking={(parcelId) =>
-        router.push(`/(modals)/tracking/${parcelId}`)
+      onParcelTracking={(bookingId) =>
+        router.push(`/(modals)/tracking/${bookingId}`)
       }
-      onNotifications={() => {
-        // TODO: écran de notifications (hors périmètre MVP immédiat)
-      }}
+      onNotifications={() => {}}
     />
   )
 }

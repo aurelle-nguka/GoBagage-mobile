@@ -1,8 +1,3 @@
-/**
- * Go Bagage — LoginScreen
- * Connexion par email + mot de passe. Stocke les tokens et alimente le store.
- */
-
 import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -22,6 +17,11 @@ interface LoginScreenProps {
   onCreateAccount: () => void
 }
 
+interface FieldErrors {
+  email?: string
+  password?: string
+}
+
 export function LoginScreen({
   role,
   onLoginSuccess,
@@ -30,10 +30,28 @@ export function LoginScreen({
 }: LoginScreenProps) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
 
   const { loading, error, submit } = useLogin()
 
+  const validate = (): boolean => {
+    const errors: FieldErrors = {}
+
+    if (!email.trim()) errors.email = 'Email address is required.'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+      errors.email = 'Please enter a valid email address.'
+
+    if (!password) errors.password = 'Password is required.'
+    else if (password.length < 8)
+      errors.password = 'Password must be at least 8 characters.'
+
+    setFieldErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleLogin = async () => {
+    if (!validate()) return
+
     const result = await submit({
       email: email.trim().toLowerCase(),
       password,
@@ -60,19 +78,29 @@ export function LoginScreen({
           <TextField
             label='Email address'
             value={email}
-            onChangeText={setEmail}
+            onChangeText={(v) => {
+              setEmail(v)
+              if (fieldErrors.email)
+                setFieldErrors((e) => ({ ...e, email: undefined }))
+            }}
             placeholder='you@example.com'
             keyboardType='email-address'
             autoCapitalize='none'
+            error={fieldErrors.email}
           />
 
           <View>
             <TextField
               label='Password'
               value={password}
-              onChangeText={setPassword}
+              onChangeText={(v) => {
+                setPassword(v)
+                if (fieldErrors.password)
+                  setFieldErrors((e) => ({ ...e, password: undefined }))
+              }}
               placeholder='Your password'
               isPassword
+              error={fieldErrors.password}
             />
             <TouchableOpacity
               style={styles.forgotButton}

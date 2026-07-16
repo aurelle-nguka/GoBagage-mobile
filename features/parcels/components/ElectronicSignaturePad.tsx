@@ -1,18 +1,28 @@
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
-import { Colors, FontSize, Radius, Spacing } from '../../../theme';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 interface ElectronicSignaturePadProps {
-  signed: boolean;
-  signerName: string;
-  onToggle: () => void;
+  signed: boolean
+  signerName: string
+  onToggle: () => void
+  error?: string
 }
 
-export function ElectronicSignaturePad({ signed, signerName, onToggle }: ElectronicSignaturePadProps) {
+export function ElectronicSignaturePad({
+  signed,
+  signerName,
+  onToggle,
+  error,
+}: ElectronicSignaturePadProps) {
   return (
     <View>
-      <Text style={styles.label}>Electronic Signature</Text>
+      <Text style={styles.label}>Electronic Signature *</Text>
       <TouchableOpacity
-        style={[styles.pad, signed ? styles.padSigned : styles.padEmpty]}
+        style={[
+          styles.pad,
+          signed ? styles.padSigned : styles.padEmpty,
+          error && !signed ? styles.padError : null,
+        ]}
         onPress={onToggle}
         activeOpacity={0.85}
       >
@@ -28,8 +38,9 @@ export function ElectronicSignaturePad({ signed, signerName, onToggle }: Electro
           </>
         )}
       </TouchableOpacity>
+      {error && !signed ? <Text style={styles.errorText}>{error}</Text> : null}
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -57,21 +68,24 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
     backgroundColor: '#e8faf0',
   },
-  signEmoji: {
-    fontSize: 24,
+  padError: {
+    borderWidth: 2,
+    borderStyle: 'dashed',
+    borderColor: Colors.destructive,
+    backgroundColor: '#fef2f2',
   },
-  tapLabel: {
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-  },
+  signEmoji: { fontSize: 24 },
+  tapLabel: { fontSize: FontSize.sm, color: '#9ca3af' },
   signatureName: {
     fontSize: FontSize['2xl'],
     fontStyle: 'italic',
     color: Colors.primary,
     fontWeight: '700',
   },
-  signedLabel: {
-    fontSize: 11,
-    color: Colors.primary,
+  signedLabel: { fontSize: 11, color: Colors.primary },
+  errorText: {
+    fontSize: FontSize.sm,
+    color: Colors.destructive,
+    marginTop: Spacing[1],
   },
-});
+})

@@ -1,40 +1,106 @@
-/**
- * Go Bagage — PaymentMethodSelector
- * Sélection de la méthode de paiement (CDC section 6.4).
- * Aligné sur l'enum PaymentProvider : STRIPE | INTERAC | ORANGE | MTN.
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-
+import Svg, { Rect, Circle, Path, Text as SvgText } from 'react-native-svg'
 import type { PaymentProvider } from '../types/payment.types'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
+import { JSX } from 'react/jsx-runtime'
+
+function StripeIcon() {
+  return (
+    <Svg width={36} height={24} viewBox='0 0 36 24'>
+      <Rect width={36} height={24} rx={4} fill='#635BFF' />
+      <Path
+        d='M18 7c-1.8 0-3.2 1.2-3.2 2.8 0 2.8 3.8 2.4 3.8 4 0 .6-.5 1-1.3 1-.8 0-1.8-.4-2.5-.9v2.2c.7.4 1.6.6 2.5.6 2 0 3.3-1.1 3.3-2.8 0-2.9-3.8-2.5-3.8-4 0-.6.5-.9 1.2-.9.8 0 1.6.3 2.3.8V7.4C19.6 7.1 18.8 7 18 7z'
+        fill='white'
+      />
+    </Svg>
+  )
+}
+
+function OrangeMoneyIcon() {
+  return (
+    <Svg width={36} height={36} viewBox='0 0 36 36'>
+      <Circle cx={18} cy={18} r={18} fill='#FF6600' />
+      <SvgText
+        x={18}
+        y={23}
+        textAnchor='middle'
+        fill='white'
+        fontSize={14}
+        fontWeight='bold'
+      >
+        OM
+      </SvgText>
+    </Svg>
+  )
+}
+
+function MtnMomoIcon() {
+  return (
+    <Svg width={36} height={36} viewBox='0 0 36 36'>
+      <Circle cx={18} cy={18} r={18} fill='#FFCC00' />
+      <SvgText
+        x={18}
+        y={23}
+        textAnchor='middle'
+        fill='#1A1A1A'
+        fontSize={11}
+        fontWeight='bold'
+      >
+        MoMo
+      </SvgText>
+    </Svg>
+  )
+}
+
+function InteracIcon() {
+  return (
+    <Svg width={36} height={24} viewBox='0 0 36 24'>
+      <Rect width={36} height={24} rx={4} fill='#FFD100' />
+      <SvgText
+        x={18}
+        y={16}
+        textAnchor='middle'
+        fill='#1A1A1A'
+        fontSize={9}
+        fontWeight='bold'
+      >
+        Interac
+      </SvgText>
+    </Svg>
+  )
+}
 
 interface PaymentMethodConfig {
   provider: PaymentProvider
   label: string
   sublabel: string
-  icon: string
+  Icon: () => JSX.Element
 }
 
 const PAYMENT_METHODS: PaymentMethodConfig[] = [
   {
     provider: 'STRIPE',
     label: 'Credit / Debit Card',
-    sublabel: 'Powered by Stripe',
-    icon: '💳',
+    sublabel: 'Visa, Mastercard, Amex',
+    Icon: StripeIcon,
   },
   {
-    provider: 'ORANGE',
+    provider: 'ORANGE_MONEY',
     label: 'Orange Money',
-    sublabel: 'Mobile money',
-    icon: '🟠',
+    sublabel: 'Mobile money · Cameroun, CI...',
+    Icon: OrangeMoneyIcon,
   },
-  { provider: 'MTN', label: 'MTN MoMo', sublabel: 'Mobile money', icon: '🟡' },
+  {
+    provider: 'MTN_MOMO',
+    label: 'MTN MoMo',
+    sublabel: 'Mobile money · Cameroun, GH...',
+    Icon: MtnMomoIcon,
+  },
   {
     provider: 'INTERAC',
     label: 'Interac e-Transfer',
-    sublabel: 'Canadian banks',
-    icon: '🇨🇦',
+    sublabel: 'Canadian banks only',
+    Icon: InteracIcon,
   },
 ]
 
@@ -61,7 +127,9 @@ export function PaymentMethodSelector({
               isActive ? styles.rowActive : styles.rowInactive,
             ]}
           >
-            <Text style={styles.icon}>{method.icon}</Text>
+            <View style={styles.iconWrapper}>
+              <method.Icon />
+            </View>
             <View style={styles.labelBlock}>
               <Text style={styles.label}>{method.label}</Text>
               <Text style={styles.sublabel}>{method.sublabel}</Text>
@@ -102,12 +170,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8faf0',
     borderColor: Colors.primary,
   },
-  icon: {
-    fontSize: 28,
+  iconWrapper: {
+    width: 40,
+    height: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  labelBlock: {
-    flex: 1,
-  },
+  labelBlock: { flex: 1 },
   label: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
