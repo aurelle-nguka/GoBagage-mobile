@@ -1,8 +1,9 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { Star, CheckCircle } from 'lucide-react-native'
+import { Star, CheckCircle, Calendar, Weight, Tag } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
-import { PublicUser } from '../../../types/user.types'
+import type { PublicUser } from '../../../types/user.types'
 
 interface TravelerCardProps {
   traveler: PublicUser
@@ -13,6 +14,7 @@ interface TravelerCardProps {
   availableKg: number
   pricePerKg: number
   totalTrips: number
+  bio?: string
   onPress: () => void
 }
 
@@ -25,8 +27,10 @@ export function TravelerCard({
   availableKg,
   pricePerKg,
   totalTrips,
+  bio,
   onPress,
 }: TravelerCardProps) {
+  const { t } = useTranslation()
   const isVerified = traveler.kycStatus === 'VERIFIED'
 
   return (
@@ -44,7 +48,7 @@ export function TravelerCard({
             {isVerified && (
               <View style={styles.verifiedBadge}>
                 <CheckCircle size={10} color={Colors.primary} />
-                <Text style={styles.verifiedText}>Verified</Text>
+                <Text style={styles.verifiedText}>{t('admin.verified', 'Verified')}</Text>
               </View>
             )}
           </View>
@@ -55,9 +59,18 @@ export function TravelerCard({
               {traveler.averageRating.toFixed(1)}
             </Text>
             <Text style={styles.ratingMeta}>
-              ({traveler.totalDeliveries} reviews) · {totalTrips} trips
+              {t('parcel.traveler_meta', '({{count}} reviews) · {{trips}} trips', {
+                count: traveler.totalDeliveries,
+                trips: totalTrips,
+              })}
             </Text>
           </View>
+
+          {bio ? (
+            <Text style={styles.bio} numberOfLines={2}>
+              {bio}
+            </Text>
+          ) : null}
 
           <View style={styles.routeRow}>
             <RouteLabel
@@ -69,9 +82,20 @@ export function TravelerCard({
           </View>
 
           <View style={styles.metaRow}>
-            <Text style={styles.metaText}>📅 {departureDate}</Text>
-            <Text style={styles.metaText}>⚖️ {availableKg} kg left</Text>
-            <Text style={styles.priceText}>${pricePerKg}/kg</Text>
+            <View style={styles.metaItem}>
+              <Calendar size={12} color={Colors.mutedForeground} />
+              <Text style={styles.metaText}>{departureDate}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Weight size={12} color={Colors.mutedForeground} />
+              <Text style={styles.metaText}>
+                {t('parcel.kg_left', '{{value}} kg left', { value: availableKg })}
+              </Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Tag size={12} color={Colors.primary} />
+              <Text style={styles.priceText}>${pricePerKg}/kg</Text>
+            </View>
           </View>
         </View>
       </View>
@@ -151,6 +175,13 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: '#9ca3af',
   },
+  bio: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+    fontStyle: 'italic',
+    lineHeight: FontSize.sm * 1.5,
+    marginTop: 2,
+  },
   routeRow: {
     marginVertical: 2,
   },
@@ -158,6 +189,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: Spacing[3],
+    marginTop: 2,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
   },
   metaText: {
     fontSize: FontSize.sm,

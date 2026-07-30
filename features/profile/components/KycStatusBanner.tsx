@@ -1,10 +1,6 @@
-/**
- * Go Bagage — KycStatusBanner (Profile)
- * Bandeau KYC dans le profil — cliquable pour relancer le flux KYC.
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import { CheckCircle, Clock, XCircle } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { KycStatus } from '../../../types/user.types'
 
@@ -14,7 +10,9 @@ interface KycStatusBannerProps {
   onGoToKyc?: () => void
 }
 
-const STATUS_CONFIG: Record<
+function getStatusConfig(
+  t: (key: string, fallback: string) => string,
+): Record<
   KycStatus,
   {
     bg: string
@@ -24,37 +22,51 @@ const STATUS_CONFIG: Record<
     sublabel: string
     actionLabel?: string
   }
-> = {
-  VERIFIED: {
-    bg: '#e8faf0',
-    border: '#c8f5df',
-    badgeBg: Colors.primary,
-    label: 'Identity Verified ✅',
-    sublabel: 'Your identity has been confirmed.',
-  },
-  PENDING: {
-    bg: '#fff8e8',
-    border: '#ffe0b2',
-    badgeBg: Colors.warning,
-    label: 'Verification Required',
-    sublabel: 'Submit your ID to unlock all features.',
-    actionLabel: 'Verify now →',
-  },
-  UNDER_REVIEW: {
-    bg: '#e8f4fd',
-    border: '#bbdefb',
-    badgeBg: Colors.secondary,
-    label: 'Under Review',
-    sublabel: 'Documents submitted — usually 1–24h.',
-  },
-  REJECTED: {
-    bg: '#fef2f2',
-    border: '#fecaca',
-    badgeBg: Colors.destructive,
-    label: 'Verification Failed',
-    sublabel: 'Documents rejected. Please resubmit.',
-    actionLabel: 'Resubmit →',
-  },
+> {
+  return {
+    VERIFIED: {
+      bg: '#e8faf0',
+      border: '#c8f5df',
+      badgeBg: Colors.primary,
+      label: t('profile.kyc_status.verified_label', 'Identity Verified'),
+      sublabel: t(
+        'profile.kyc_status.verified_sublabel',
+        'Your identity has been confirmed.',
+      ),
+    },
+    PENDING: {
+      bg: '#fff8e8',
+      border: '#ffe0b2',
+      badgeBg: Colors.warning,
+      label: t('profile.kyc_status.pending_label', 'Verification Required'),
+      sublabel: t(
+        'profile.kyc_status.pending_sublabel',
+        'Submit your ID to unlock all features.',
+      ),
+      actionLabel: t('profile.kyc_status.pending_action', 'Verify now →'),
+    },
+    UNDER_REVIEW: {
+      bg: '#e8f4fd',
+      border: '#bbdefb',
+      badgeBg: Colors.secondary,
+      label: t('profile.kyc_status.under_review_label', 'Under Review'),
+      sublabel: t(
+        'profile.kyc_status.under_review_sublabel',
+        'Documents submitted — usually 1–24h.',
+      ),
+    },
+    REJECTED: {
+      bg: '#fef2f2',
+      border: '#fecaca',
+      badgeBg: Colors.destructive,
+      label: t('profile.kyc_status.rejected_label', 'Verification Failed'),
+      sublabel: t(
+        'profile.kyc_status.rejected_sublabel',
+        'Documents rejected. Please resubmit.',
+      ),
+      actionLabel: t('profile.kyc_status.rejected_action', 'Resubmit →'),
+    },
+  }
 }
 
 export function KycStatusBanner({
@@ -62,7 +74,8 @@ export function KycStatusBanner({
   rejectionReason,
   onGoToKyc,
 }: KycStatusBannerProps) {
-  const config = STATUS_CONFIG[status]
+  const { t } = useTranslation()
+  const config = getStatusConfig(t)[status]
   const Icon =
     status === 'VERIFIED'
       ? CheckCircle
@@ -83,7 +96,9 @@ export function KycStatusBanner({
         <Text style={styles.sublabel}>{config.sublabel}</Text>
         {status === 'REJECTED' && rejectionReason && (
           <View style={styles.reasonBox}>
-            <Text style={styles.reasonLabel}>Reason :</Text>
+            <Text style={styles.reasonLabel}>
+              {t('profile.kyc_status.reason_label', 'Reason :')}
+            </Text>
             <Text style={styles.reasonText}>{rejectionReason}</Text>
           </View>
         )}

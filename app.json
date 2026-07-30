@@ -18,7 +18,12 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true
+      "usesCleartextTraffic": true,
+      "statusBar": {
+        "translucent": false,
+        "backgroundColor": "#00C853",
+        "barStyle": "light-content"
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -34,7 +39,8 @@
           "merchantIdentifier": "merchant.com.gobagage",
           "enableGooglePay": false
         }
-      ]
+      ],
+      "expo-localization"
     ]
   }
 }

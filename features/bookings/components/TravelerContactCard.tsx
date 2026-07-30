@@ -1,12 +1,6 @@
-/**
- * Go Bagage — TravelerContactCard
- * Carte voyageur avec actions chat + appel.
- * Note CDC 6.5 : les coordonnées personnelles ne sont visibles qu'après réservation acceptée —
- * le bouton "Phone" affiché ici doit rester désactivé/masqué tant que ce n'est pas le cas en amont.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { MessageCircle, Phone } from 'lucide-react-native'
+import { MessageCircle, Phone, Star } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 interface TravelerContactCardProps {
@@ -28,9 +22,13 @@ export function TravelerContactCard({
   onChat,
   onCall,
 }: TravelerContactCardProps) {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Your Traveler</Text>
+      <Text style={styles.title}>
+        {t('tracking.your_traveler', 'Your Traveler')}
+      </Text>
       <View style={styles.row}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{initials}</Text>
@@ -38,10 +36,14 @@ export function TravelerContactCard({
 
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
-          <Text style={styles.meta}>
-            ⭐ {rating.toFixed(1)} · {reviewCount} reviews{' '}
-            {verified ? '· Verified ✅' : ''}
-          </Text>
+          <View style={styles.metaRow}>
+            <Star size={12} color={Colors.warning} fill={Colors.warning} />
+            <Text style={styles.meta}>
+              {rating.toFixed(1)} · {reviewCount}{' '}
+              {t('tracking.reviews', 'reviews')}
+              {verified ? ` · ${t('profile.kyc_verified')}` : ''}
+            </Text>
+          </View>
         </View>
 
         <View style={styles.actions}>
@@ -85,11 +87,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
   avatar: {
     width: 48,
     height: 48,
@@ -103,22 +101,15 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.primary,
   },
-  info: {
-    flex: 1,
-  },
+  info: { flex: 1 },
   name: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  meta: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: Spacing[2],
-  },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  meta: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  actions: { flexDirection: 'row', gap: Spacing[2] },
   chatButton: {
     width: 40,
     height: 40,

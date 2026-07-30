@@ -1,9 +1,3 @@
-/**
- * Go Bagage — TrackingScreen
- * Suivi en temps réel du colis (CDC section 6.3 — "Suivi en temps réel du statut du colis").
- * Migré depuis Tracking.tsx (maquette web) → React Native.
- */
-
 import {
   View,
   Text,
@@ -12,7 +6,8 @@ import {
   StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ArrowLeft } from 'lucide-react-native'
+import { ArrowLeft, Router } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { BookingStatus } from '../types/booking.type'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { TrackingMapPlaceholder } from '../components/TrackingMapPlaceholder'
@@ -20,6 +15,7 @@ import { TrackingTimeline } from '../components/TrackingTimeline'
 import { PackageDetailsCard } from '../components/PackageDetailsCard'
 import { TravelerContactCard } from '../components/TravelerContactCard'
 import { ConfirmDeliveryButton } from '../components/ConfirmDeliveryButton'
+import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
 interface TrackingScreenProps {
   from: string
@@ -46,32 +42,31 @@ interface TrackingScreenProps {
   onConfirmDelivery: () => void
 }
 
-// TODO: remplacer par features/bookings/hooks/useBookingTracking(bookingId)
-const TIMELINE_STEPS = [
+const TIMELINE_STEPS = (t: (key: string) => string) => [
   {
     status: 'ACCEPTED' as BookingStatus,
-    label: 'Booking confirmed',
-    sublabel: 'Jun 13, 2026 at 10:32 AM',
+    label: t('tracking.step_confirmed'),
+    sublabel: t('tracking.step_confirmed_sub'),
   },
   {
     status: 'PICKED_UP' as BookingStatus,
-    label: 'Package picked up',
-    sublabel: 'Jun 16, 2026 · Montreal Airport',
+    label: t('tracking.step_pickup'),
+    sublabel: t('tracking.step_pickup_sub'),
   },
   {
     status: 'IN_TRANSIT' as BookingStatus,
-    label: 'In transit',
-    sublabel: 'Currently in flight — ETA Jun 18',
+    label: t('tracking.step_transit'),
+    sublabel: t('tracking.step_transit_sub'),
   },
   {
     status: 'DELIVERED' as BookingStatus,
-    label: 'Delivered to recipient',
-    sublabel: 'Pending arrival',
+    label: t('tracking.step_delivered'),
+    sublabel: t('tracking.step_delivered_sub'),
   },
   {
     status: 'CONFIRMED' as BookingStatus,
-    label: 'Payment released',
-    sublabel: 'After delivery confirmation',
+    label: t('tracking.step_released'),
+    sublabel: t('tracking.step_released_sub'),
   },
 ]
 
@@ -88,8 +83,10 @@ export function TrackingScreen({
   onCall,
   onConfirmDelivery,
 }: TrackingScreenProps) {
+  const { t } = useTranslation()
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -98,14 +95,16 @@ export function TrackingScreen({
           <ArrowLeft size={22} color={Colors.white} />
         </TouchableOpacity>
         <View style={styles.headerTextBlock}>
-          <Text style={styles.headerTitle}>Live Tracking</Text>
+          <Text style={styles.headerTitle}>
+            {t('tracking.title', 'Live Tracking')}
+          </Text>
           <Text style={styles.headerSubtitle}>
-            {from} → {to} · {departureDate}
+            <RouteLabel from={from} to={to} /> . {departureDate}
           </Text>
         </View>
         <View style={styles.liveBadge}>
           <View style={styles.liveDot} />
-          <Text style={styles.liveText}>Live</Text>
+          <Text style={styles.liveText}>{t('tracking.live', 'Live')}</Text>
         </View>
       </View>
 
@@ -114,19 +113,17 @@ export function TrackingScreen({
           from={from}
           to={to}
           progressPercent={progressPercent}
-          statusLabel={`🔄 In Transit — ${progressPercent}% complete`}
+          statusLabel={t('tracking.in_transit', { percent: progressPercent })}
         />
 
         <View style={styles.content}>
-          <TrackingTimeline steps={TIMELINE_STEPS} currentStatus={status} />
-
+          <TrackingTimeline steps={TIMELINE_STEPS(t)} currentStatus={status} />
           <PackageDetailsCard
             description={parcel.description}
             category={parcel.category}
             weightKg={parcel.weightKg}
             recipientName={parcel.recipientName}
           />
-
           <TravelerContactCard
             initials={traveler.initials}
             name={traveler.name}
@@ -136,7 +133,6 @@ export function TrackingScreen({
             onChat={onChat}
             onCall={onCall}
           />
-
           <ConfirmDeliveryButton
             status={status}
             onConfirm={onConfirmDelivery}
@@ -148,10 +144,7 @@ export function TrackingScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -161,23 +154,14 @@ const styles = StyleSheet.create({
     paddingTop: Spacing[4],
     paddingBottom: Spacing[4],
   },
-  headerTextBlock: {
-    flex: 1,
-  },
+  headerTextBlock: { flex: 1 },
   headerTitle: {
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
     color: Colors.white,
   },
-  headerSubtitle: {
-    fontSize: FontSize.sm,
-    color: 'rgba(255,255,255,0.8)',
-  },
-  liveBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[2],
-  },
+  headerSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.8)' },
+  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: Spacing[2] },
   liveDot: {
     width: 8,
     height: 8,
@@ -189,11 +173,6 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: FontWeight.semibold,
   },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: Spacing[5],
-    paddingTop: Spacing[5],
-  },
+  scroll: { flex: 1 },
+  content: { paddingHorizontal: Spacing[5], paddingTop: Spacing[5] },
 })

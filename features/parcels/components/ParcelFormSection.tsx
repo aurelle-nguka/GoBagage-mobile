@@ -3,13 +3,17 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
 
 interface ParcelFormSectionProps {
   title: string;
+  icon?: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function ParcelFormSection({ title, children }: ParcelFormSectionProps) {
+export function ParcelFormSection({ title, icon, children }: ParcelFormSectionProps) {
   return (
     <View style={styles.section}>
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.titleRow}>
+        {icon}
+        <Text style={styles.title}>{title}</Text>
+      </View>
       <View style={styles.card}>{children}</View>
     </View>
   );
@@ -19,11 +23,16 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: Spacing[5],
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: Spacing[3],
+  },
   title: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
     color: Colors.mutedForeground,
-    marginBottom: Spacing[3],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },

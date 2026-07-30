@@ -1,8 +1,3 @@
-/**
- * Go Bagage — SenderDashboard
- * Vue expéditeur : recherche de corridor, colis récents avec vrais bookings.
- */
-
 import { useState, useCallback } from 'react'
 import {
   View,
@@ -13,18 +8,13 @@ import {
 } from 'react-native'
 import { Search, Package } from 'lucide-react-native'
 import { useFocusEffect } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { RecentParcelCard } from './RecentParcelCard'
 import { PopularRouteChip } from './PopularRouterChip'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 import apiClient from '../../../shared/services/api.client'
-
-const POPULAR_ROUTES = [
-  { from: 'Montreal', to: 'Douala' },
-  { from: 'Toronto', to: 'Abidjan' },
-  { from: 'Paris', to: 'Lagos' },
-  { from: 'Montreal', to: 'Paris' },
-]
+import { useCorridors } from '../../../features/corridors/hooks/useCorridors'
 
 type ParcelStatus = 'In Transit' | 'Pending' | 'Delivered' | 'Confirmed'
 
@@ -62,15 +52,20 @@ function mapStatus(status: string): ParcelStatus {
 interface SenderDashboardProps {
   onSearch: (query?: string) => void
   onTracking: (bookingId: string) => void
+  onSeeAllActivity: () => void
+  refreshing?: boolean
 }
 
 export function SenderDashboard({
   onSearch,
   onTracking,
+  onSeeAllActivity,
+  refreshing = false,
 }: SenderDashboardProps) {
-  const [searchQuery, setSearchQuery] = useState('')
+  const { t } = useTranslation()
   const [parcels, setParcels] = useState<RecentParcelItem[]>([])
   const [loading, setLoading] = useState(true)
+  const { corridors } = useCorridors()
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -83,7 +78,6 @@ export function SenderDashboard({
       const mapped: RecentParcelItem[] = raw.slice(0, 5).map((b: any) => {
         const traveler = b.traveler ?? b.trip?.traveler
         const corridor = b.trip?.corridor
-
         return {
           id: String(b.id),
           from: corridor?.departureCity ?? 'Unknown',
@@ -99,7 +93,6 @@ export function SenderDashboard({
 
       setParcels(mapped)
     } catch {
-      // silencieux sur le dashboard
     } finally {
       setLoading(false)
     }
@@ -113,34 +106,31 @@ export function SenderDashboard({
 
   return (
     <>
-      {/* Recherche */}
       <View style={styles.searchCard}>
-        <Text style={styles.searchTitle}>Find a corridor</Text>
-
+        <Text style={styles.searchTitle}>{t('home.find_corridor')}</Text>
         <View style={styles.searchRow}>
           <View style={styles.searchInputWrapper}>
             <Search size={16} color='#9ca3af' />
             <Text style={styles.searchInput} onPress={() => onSearch()}>
-              {searchQuery || 'Montreal - Douala'}
+              {t('search.placeholder')}
             </Text>
           </View>
           <TouchableOpacity
             style={styles.searchButton}
-            onPress={() => onSearch(searchQuery)}
+            onPress={() => onSearch()}
             activeOpacity={0.85}
           >
-            <Text style={styles.searchButtonText}>Search</Text>
+            <Text style={styles.searchButtonText}>{t('common.search')}</Text>
           </TouchableOpacity>
         </View>
-
         <View style={styles.popularSection}>
-          <Text style={styles.popularLabel}>Popular routes</Text>
+          <Text style={styles.popularLabel}>{t('home.popular_routes')}</Text>
           <View style={styles.popularChips}>
-            {POPULAR_ROUTES.map((route, i) => (
+            {corridors.slice(0, 4).map((corridor) => (
               <PopularRouteChip
-                key={i}
-                from={route.from}
-                to={route.to}
+                key={corridor.id}
+                from={corridor.departureCity}
+                to={corridor.arrivalCity}
                 onPress={() => onSearch()}
               />
             ))}
@@ -148,11 +138,10 @@ export function SenderDashboard({
         </View>
       </View>
 
-      {/* Colis récents */}
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>Recent Parcels</Text>
-        <TouchableOpacity>
-          <Text style={styles.seeAll}>See all</Text>
+        <Text style={styles.sectionTitle}>{t('home.recent_parcels')}</Text>
+        <TouchableOpacity onPress={onSeeAllActivity}>
+          <Text style={styles.seeAll}>{t('home.see_all')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -178,9 +167,9 @@ export function SenderDashboard({
       ) : (
         <View style={styles.emptyState}>
           <Package size={48} color='#d1d5db' />
-          <Text style={styles.emptyText}>No parcels yet</Text>
+          <Text style={styles.emptyText}>{t('home.no_parcels')}</Text>
           <PrimaryButton
-            label='Send your first parcel'
+            label={t('home.send_first')}
             onPress={() => onSearch()}
             style={styles.emptyButton}
           />
@@ -208,10 +197,7 @@ const styles = StyleSheet.create({
     color: Colors.foreground,
     marginBottom: Spacing[3],
   },
-  searchRow: {
-    flexDirection: 'row',
-    gap: Spacing[2],
-  },
+  searchRow: { flexDirection: 'row', gap: Spacing[2] },
   searchInputWrapper: {
     flex: 1,
     flexDirection: 'row',
@@ -222,11 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.xl,
     paddingVertical: Spacing[3],
   },
-  searchInput: {
-    flex: 1,
-    fontSize: FontSize.base,
-    color: '#9ca3af',
-  },
+  searchInput: { flex: 1, fontSize: FontSize.base, color: '#9ca3af' },
   searchButton: {
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing[4],
@@ -240,16 +222,8 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
   },
   popularSection: { marginTop: Spacing[3] },
-  popularLabel: {
-    fontSize: 11,
-    color: '#9ca3af',
-    marginBottom: Spacing[2],
-  },
-  popularChips: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: Spacing[2],
-  },
+  popularLabel: { fontSize: 11, color: '#9ca3af', marginBottom: Spacing[2] },
+  popularChips: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing[2] },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -266,17 +240,11 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
   },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: Spacing[12],
-  },
+  emptyState: { alignItems: 'center', paddingVertical: Spacing[12] },
   emptyText: {
     color: '#9ca3af',
     fontSize: FontSize.base,
     marginTop: Spacing[3],
   },
-  emptyButton: {
-    marginTop: Spacing[4],
-    paddingHorizontal: Spacing[6],
-  },
+  emptyButton: { marginTop: Spacing[4], paddingHorizontal: Spacing[6] },
 })

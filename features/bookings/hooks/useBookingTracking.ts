@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getBooking, confirmDelivery } from '../api/bookings.api';
 import { BookingDTO, BookingStatus } from '../types/booking.type';
 
@@ -49,6 +50,7 @@ const STATUS_PROGRESS: Record<BookingStatus, number> = {
 };
 
 export function useBookingTracking(bookingId: string): UseBookingTrackingResult {
+  const { t } = useTranslation();
   const [data,       setData]       = useState<TrackingData | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [error,      setError]      = useState('');
@@ -65,7 +67,7 @@ export function useBookingTracking(bookingId: string): UseBookingTrackingResult 
       console.log(JSON.stringify(booking));
       setData(mapBookingToTracking(booking));
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Failed to load tracking.');
+      setError(err?.response?.data?.message ?? t('tracking.errors.load_failed', 'Failed to load tracking.'));
     } finally {
       setLoading(false);
     }
@@ -80,7 +82,7 @@ export function useBookingTracking(bookingId: string): UseBookingTrackingResult 
       setTick((t) => t + 1);
       return true;
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Failed to confirm delivery.');
+      setError(err?.response?.data?.message ?? t('tracking.errors.confirm_failed', 'Failed to confirm delivery.'));
       return false;
     } finally {
       setConfirming(false);

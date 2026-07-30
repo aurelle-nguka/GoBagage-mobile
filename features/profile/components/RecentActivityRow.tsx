@@ -1,16 +1,14 @@
-/**
- * Go Bagage — RecentActivityRow
- * Ligne d'historique : trajet effectué ou colis envoyé, avec montant +/-.
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { Plane, Package } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
+import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 import { formatCAD } from '../../../shared/utils/currency.utils'
 
 export interface ActivityItem {
   id: string
   type: 'trip' | 'parcel'
-  label: string
+  from: string
+  to: string
   amount: number
   date: string
   status: string
@@ -27,20 +25,18 @@ export function RecentActivityRow({
 }: RecentActivityRowProps) {
   const isPositive = activity.amount >= 0
   const isTrip = activity.type === 'trip'
+  const Icon = isTrip ? Plane : Package
+  const iconColor = isTrip ? Colors.primary : Colors.secondary
+  const iconBg = isTrip ? '#e8faf0' : '#e8f4fd'
 
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.85}>
-      <View
-        style={[
-          styles.iconBox,
-          { backgroundColor: isTrip ? '#e8faf0' : '#e8f4fd' },
-        ]}
-      >
-        <Text style={styles.emoji}>{isTrip ? '✈️' : '📦'}</Text>
+      <View style={[styles.iconBox, { backgroundColor: iconBg }]}>
+        <Icon size={18} color={iconColor} />
       </View>
 
       <View style={styles.info}>
-        <Text style={styles.label}>{activity.label}</Text>
+        <RouteLabel from={activity.from} to={activity.to} size='sm' />
         <Text style={styles.meta}>
           {activity.date} · {activity.status}
         </Text>
@@ -81,20 +77,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 18,
-  },
-  info: {
-    flex: 1,
-  },
-  label: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.semibold,
-    color: Colors.foreground,
-  },
+  info: { flex: 1 },
   meta: {
     fontSize: FontSize.sm,
     color: Colors.mutedForeground,
+    marginTop: 2,
   },
   amount: {
     fontSize: FontSize.base,

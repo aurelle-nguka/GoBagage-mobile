@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { verifyOtp, sendOtp } from '../api/auth.api';
 import { OTP_LENGTH } from '../../../shared/constants/app.constants';
 import { getApiErrorMessage } from '../../../shared/utils/api.error.utils';
@@ -17,6 +18,7 @@ interface UseOtpVerifyResult {
 }
 
 export function useOtpVerify(): UseOtpVerifyResult {
+  const { t } = useTranslation();
   const [loading, setLoading]     = useState(false);
   const [resending, setResending] = useState(false);
   const [error, setError]         = useState('');
@@ -25,7 +27,12 @@ export function useOtpVerify(): UseOtpVerifyResult {
     const codeStr = code.join('');
 
     if (codeStr.length < OTP_LENGTH) {
-      setError(`Please enter the ${OTP_LENGTH}-digit code.`);
+      setError(
+        t('auth.errors.otp_incomplete', {
+          defaultValue: 'Please enter the {{length}}-digit code.',
+          length: OTP_LENGTH,
+        }),
+      );
       return false;
     }
 
@@ -40,7 +47,7 @@ export function useOtpVerify(): UseOtpVerifyResult {
       });
       return response.success;
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return false;
     } finally {
       setLoading(false);
@@ -53,7 +60,7 @@ export function useOtpVerify(): UseOtpVerifyResult {
     try {
       await sendOtp({ phone, purpose: 'PHONE_VERIFICATION' });
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
     } finally {
       setResending(false);
     }

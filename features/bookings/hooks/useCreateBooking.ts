@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createParcel, signParcelDeclaration, createBooking } from '../api/bookings.api';
 import { BookingDTO, CreateParcelRequest } from '../types/booking.type';
 import { getApiErrorMessage } from '../../../shared/utils/api.error.utils';
@@ -19,6 +20,7 @@ interface UseCreateBookingResult {
 }
 
 export function useCreateBooking(): UseCreateBookingResult {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
   const [step,    setStep]    = useState<UseCreateBookingResult['step']>('idle');
@@ -52,7 +54,7 @@ export function useCreateBooking(): UseCreateBookingResult {
       return booking;
     } catch (err) {
       console.log('❌ Booking error:', err);
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       setStep('idle');
       return null;
     } finally {

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   getActiveCorridors,
   createCorridor,
@@ -20,6 +21,7 @@ interface UseAdminCorridorsResult {
 }
 
 export function useAdminCorridors(): UseAdminCorridorsResult {
+  const { t } = useTranslation();
   const [corridors, setCorridors] = useState<CorridorResponse[]>([]);
   const [loading, setLoading]     = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -34,7 +36,7 @@ export function useAdminCorridors(): UseAdminCorridorsResult {
       const data = await getActiveCorridors();
       setCorridors(data);
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -49,7 +51,7 @@ export function useAdminCorridors(): UseAdminCorridorsResult {
       setCorridors((prev) => [newCorridor, ...prev]);
       return true;
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return false;
     }
   };
@@ -60,7 +62,7 @@ export function useAdminCorridors(): UseAdminCorridorsResult {
       setCorridors((prev) => prev.map((c) => (c.id === id ? updated : c)));
       return true;
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return false;
     }
   };
@@ -71,7 +73,7 @@ export function useAdminCorridors(): UseAdminCorridorsResult {
       setCorridors((prev) => prev.map((c) => (c.id === id ? updated : c)));
       return true;
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return false;
     }
   };

@@ -1,11 +1,13 @@
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
 import { TrackingScreen } from '../../../features/bookings/screens/TrackingScreen'
 import { useBookingTracking } from '../../../features/bookings/hooks/useBookingTracking'
 import { Colors, FontSize, Spacing } from '../../../theme'
 
 export default function TrackingPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
@@ -23,7 +25,9 @@ export default function TrackingPage() {
   if (error || !data) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error || 'Booking not found.'}</Text>
+        <Text style={styles.errorText}>
+          {error || t('booking.errors.not_found', 'Booking not found.')}
+        </Text>
       </SafeAreaView>
     )
   }

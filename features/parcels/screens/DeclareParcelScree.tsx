@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { Package } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { SearchHeader } from '../components/SearchHeader'
 import { SelectedTravelerSummary } from '../components/SelectedTravelerSummary'
 import { ParcelFormSection } from '../components/ParcelFormSection'
@@ -50,6 +52,7 @@ export function DeclareParcelScreen({
   onBack,
   onSuccess,
 }: DeclareParcelScreenProps) {
+  const { t } = useTranslation()
   const [description, setDescription] = useState('')
   const [weight, setWeight] = useState('')
   const [category, setCategory] = useState<ParcelCategory>('CLOTHING')
@@ -60,53 +63,78 @@ export function DeclareParcelScreen({
   const [declared, setDeclared] = useState(false)
   const [signed, setSigned] = useState(false)
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
+  const [otherDetails, setOtherDetails] = useState('')
 
   const { loading, error: bookingError, step, submit } = useCreateBooking()
 
   const getLoadingLabel = () => {
     switch (step) {
       case 'creating_parcel':
-        return 'Creating parcel...'
+        return t('parcel.loading.creating_parcel', 'Creating parcel...')
       case 'signing':
-        return 'Signing declaration...'
+        return t('parcel.loading.signing', 'Signing declaration...')
       case 'booking':
-        return 'Booking trip...'
+        return t('parcel.loading.booking', 'Booking trip...')
       default:
-        return 'Processing...'
+        return t('parcel.loading.processing', 'Processing...')
     }
   }
 
   const validate = (): boolean => {
     const errors: FieldErrors = {}
 
-    if (!description.trim()) errors.description = 'Description is required.'
+    if (!description.trim())
+      errors.description = t('parcel.errors.description_required', 'Description is required.')
     else if (description.trim().length < 10)
-      errors.description = 'Description must be at least 10 characters.'
+      errors.description = t(
+        'parcel.errors.description_min',
+        'Description must be at least 10 characters.',
+      )
 
-    if (!weight) errors.weight = 'Weight is required.'
+    if (!weight) errors.weight = t('parcel.errors.weight_required', 'Weight is required.')
     else if (isNaN(Number(weight)) || Number(weight) < 0.1)
-      errors.weight = 'Weight must be at least 0.1 kg.'
+      errors.weight = t('parcel.errors.weight_min', 'Weight must be at least 0.1 kg.')
     else if (Number(weight) > traveler.availableKg)
-      errors.weight = `Max available weight is ${traveler.availableKg} kg.`
+      errors.weight = t('parcel.errors.weight_max', 'Max available weight is {{max}} kg.', {
+        max: traveler.availableKg,
+      })
 
     if (!recipientName.trim())
-      errors.recipientName = 'Recipient name is required.'
+      errors.recipientName = t('parcel.errors.name_required', 'Recipient name is required.')
     else if (recipientName.trim().length < 2)
-      errors.recipientName = 'Name must be at least 2 characters.'
+      errors.recipientName = t('parcel.errors.name_min', 'Name must be at least 2 characters.')
 
     if (!recipientPhone.trim())
-      errors.recipientPhone = 'Recipient phone is required.'
+      errors.recipientPhone = t('parcel.errors.phone_required', 'Recipient phone is required.')
     else if (!/^\+[1-9]\d{7,14}$/.test(recipientPhone.trim()))
-      errors.recipientPhone = 'Use international format: +237650255873'
+      errors.recipientPhone = t(
+        'parcel.errors.phone_invalid',
+        'Use international format: +237650255873',
+      )
 
     if (!recipientAddress.trim())
-      errors.recipientAddress = 'Recipient address is required.'
+      errors.recipientAddress = t(
+        'parcel.errors.address_required',
+        'Recipient address is required.',
+      )
     else if (recipientAddress.trim().length < 10)
-      errors.recipientAddress = 'Address must be at least 10 characters.'
+      errors.recipientAddress = t(
+        'parcel.errors.address_min',
+        'Address must be at least 10 characters.',
+      )
 
-    if (!declared) errors.declared = 'You must confirm the declaration.'
+    if (!declared)
+      errors.declared = t('parcel.errors.declaration_required', 'You must confirm the declaration.')
 
-    if (!signed) errors.signed = 'Electronic signature is required.'
+    if (!signed)
+      errors.signed = t('parcel.errors.signature_required', 'Electronic signature is required.')
+
+    if (category === 'OTHER' && !otherDetails.trim()) {
+      errors.description = t(
+        'parcel.errors.other_required',
+        'Please describe the content when selecting "Other".',
+      )
+    }
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -115,9 +143,14 @@ export function DeclareParcelScreen({
   const handleSubmit = async () => {
     if (!validate()) return
 
+    const finalDescription =
+      category === 'OTHER' && otherDetails.trim()
+        ? `${description} (${otherDetails.trim()})`
+        : description
+
     const booking = await submit({
       parcel: {
-        description: description.trim(),
+        description: finalDescription,
         estimatedWeightKg: Number(weight),
         category,
         recipientName: recipientName.trim(),
@@ -132,10 +165,10 @@ export function DeclareParcelScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <SearchHeader
-        title='Declare Your Parcel'
-        subtitle={`via ${traveler.name}`}
+        title={t('parcel.declare', 'Declare Your Parcel')}
+        subtitle={t('parcel.via_traveler', 'via {{name}}', { name: traveler.name })}
         onBack={onBack}
       />
 
@@ -153,10 +186,13 @@ export function DeclareParcelScreen({
           pricePerKg={traveler.pricePerKg}
         />
 
-        <ParcelFormSection title='📦 Parcel Details'>
+        <ParcelFormSection
+          title={t('parcel.details', 'Parcel Details')}
+          icon={<Package size={14} color={Colors.mutedForeground} />}
+        >
           <View>
             <Text style={styles.fieldLabel}>
-              Description * (min. 10 characters)
+              {t('parcel.description_min', 'Description * (min. 10 characters)')}
             </Text>
             <TextInput
               value={description}
@@ -165,7 +201,10 @@ export function DeclareParcelScreen({
                 if (fieldErrors.description)
                   setFieldErrors((e) => ({ ...e, description: undefined }))
               }}
-              placeholder='e.g. Clothing items, family gifts, documents'
+              placeholder={t(
+                'parcel.description_placeholder',
+                'e.g. Clothing items, family gifts, documents',
+              )}
               placeholderTextColor='#9ca3af'
               style={[
                 styles.textInput,
@@ -174,12 +213,12 @@ export function DeclareParcelScreen({
               multiline
             />
             {fieldErrors.description ? (
-              <Text style={styles.fieldError}>⚠ {fieldErrors.description}</Text>
+              <Text style={styles.fieldError}>{fieldErrors.description}</Text>
             ) : null}
           </View>
 
           <View>
-            <Text style={styles.fieldLabel}>Weight (kg) *</Text>
+            <Text style={styles.fieldLabel}>{`${t('parcel.weight', 'Weight (kg)')} *`}</Text>
             <TextInput
               value={weight}
               onChangeText={(v) => {
@@ -187,7 +226,7 @@ export function DeclareParcelScreen({
                 if (fieldErrors.weight)
                   setFieldErrors((e) => ({ ...e, weight: undefined }))
               }}
-              placeholder='e.g. 3.5'
+              placeholder={t('parcel.weight_placeholder', 'e.g. 3.5')}
               placeholderTextColor='#9ca3af'
               keyboardType='numeric'
               style={[
@@ -196,19 +235,35 @@ export function DeclareParcelScreen({
               ]}
             />
             {fieldErrors.weight ? (
-              <Text style={styles.fieldError}>⚠ {fieldErrors.weight}</Text>
+              <Text style={styles.fieldError}>{fieldErrors.weight}</Text>
             ) : (
               <Text style={styles.maxWeightHint}>
-                Max {traveler.availableKg} kg available on this trip
+                {t(
+                  'parcel.max_weight_hint',
+                  'Max {{max}} kg available on this trip',
+                  { max: traveler.availableKg },
+                )}
               </Text>
             )}
           </View>
 
-          <ParcelCategoryPicker selected={category} onSelect={setCategory} />
+          <ParcelCategoryPicker
+            selected={category}
+            onSelect={setCategory}
+            otherDetails={otherDetails}
+            onOtherDetailsChange={setOtherDetails}
+            otherDetailsError={
+              category === 'OTHER' &&
+              !otherDetails.trim() &&
+              fieldErrors.description
+                ? t('parcel.errors.other_details_required', 'Please describe the content.')
+                : undefined
+            }
+          />
           <PhotoUploader photos={photos} onChange={setPhotos} />
         </ParcelFormSection>
 
-        <ParcelFormSection title='👤 Recipient Details'>
+        <ParcelFormSection title={t('parcel.recipient', 'Recipient Details')}>
           <RecipientForm
             name={recipientName}
             phone={recipientPhone}
@@ -236,7 +291,7 @@ export function DeclareParcelScreen({
           />
         </ParcelFormSection>
 
-        <ParcelFormSection title='📋 Legal Declaration'>
+        <ParcelFormSection title={t('parcel.declaration', 'Legal Declaration')}>
           <DeclarationCheckbox
             checked={declared}
             onToggle={() => {
@@ -259,7 +314,7 @@ export function DeclareParcelScreen({
         {bookingError ? <ErrorBanner message={bookingError} /> : null}
 
         <PrimaryButton
-          label='Continue to Payment'
+          label={t('parcel.continue', 'Continue to Payment')}
           loadingLabel={getLoadingLabel()}
           loading={loading}
           onPress={handleSubmit}

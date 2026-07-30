@@ -5,20 +5,21 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { ParcelCategory } from '../../../types/common.types'
 
-const CATEGORY_LABELS: Record<ParcelCategory, string> = {
-  CLOTHING: 'Clothing',
-  FOOD: 'Food',
-  ELECTRONICS: 'Electronics',
-  COSMETICS: 'Cosmetics',
-  DOCUMENTS: 'Documents',
-  BOOKS: 'Books',
-  OTHER: 'Other',
+const CATEGORY_KEYS: Record<ParcelCategory, { key: string; fallback: string }> = {
+  CLOTHING: { key: 'parcel.categories.clothing', fallback: 'Clothing' },
+  FOOD: { key: 'parcel.categories.food', fallback: 'Food' },
+  ELECTRONICS: { key: 'parcel.categories.electronics', fallback: 'Electronics' },
+  COSMETICS: { key: 'parcel.categories.cosmetics', fallback: 'Cosmetics' },
+  DOCUMENTS: { key: 'parcel.categories.documents', fallback: 'Documents' },
+  BOOKS: { key: 'parcel.categories.books', fallback: 'Books' },
+  OTHER: { key: 'parcel.categories.other', fallback: 'Other' },
 }
 
-const ALL_CATEGORIES = Object.keys(CATEGORY_LABELS) as ParcelCategory[]
+const ALL_CATEGORIES = Object.keys(CATEGORY_KEYS) as ParcelCategory[]
 
 interface CategorySelectorProps {
   selected: ParcelCategory[]
@@ -29,6 +30,8 @@ export function CategorySelector({
   selected,
   onToggle,
 }: CategorySelectorProps) {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.row}>
       {ALL_CATEGORIES.map((category) => {
@@ -44,7 +47,7 @@ export function CategorySelector({
             ]}
           >
             <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
-              {CATEGORY_LABELS[category]}
+              {t(CATEGORY_KEYS[category].key, CATEGORY_KEYS[category].fallback)}
             </Text>
           </TouchableOpacity>
         )

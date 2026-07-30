@@ -1,10 +1,15 @@
-import { Platform } from 'react-native'
+import { Platform, Dimensions } from 'react-native'
 import { Tabs } from 'expo-router'
 import { Home, PlusCircle, Search, Map, User } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
 import { Colors } from '../../theme'
 
+const { height } = Dimensions.get('window')
+const isSmallScreen = height < 700
+
 export default function TabsLayout() {
+  const { t } = useTranslation()
   const { user } = useAuthStore()
 
   const isSender = user?.roles.includes('SENDER') ?? false
@@ -15,8 +20,9 @@ export default function TabsLayout() {
   const showPublish = isTraveler || isBoth
   const showTrips = isTraveler || isBoth
 
-  const tabBarHeight = Platform.OS === 'ios' ? 83 : 65
-  const tabBarPaddingBottom = Platform.OS === 'ios' ? 28 : 8
+  const tabBarHeight = Platform.OS === 'ios' ? 83 : isSmallScreen ? 58 : 62
+  const tabBarPaddingBottom = Platform.OS === 'ios' ? 28 : 2
+  const tabBarPaddingTop = 4
 
   return (
     <Tabs
@@ -31,7 +37,7 @@ export default function TabsLayout() {
           borderTopWidth: 1,
           height: tabBarHeight,
           paddingBottom: tabBarPaddingBottom,
-          paddingTop: 8,
+          paddingTop: tabBarPaddingTop,
           elevation: 8,
           shadowOpacity: 0.08,
           shadowRadius: 4,
@@ -47,17 +53,16 @@ export default function TabsLayout() {
       <Tabs.Screen
         name='index'
         options={{
-          title: 'Home',
+          title: t('nav.home'),
           tabBarIcon: ({ color, size }) => (
             <Home color={color} size={size - 2} />
           ),
         }}
       />
-
       <Tabs.Screen
         name='search'
         options={{
-          title: 'Search',
+          title: t('nav.search'),
           tabBarIcon: ({ color, size }) => (
             <Search color={color} size={size - 2} />
           ),
@@ -65,11 +70,10 @@ export default function TabsLayout() {
           href: showSearch ? undefined : null,
         }}
       />
-
       <Tabs.Screen
         name='publish'
         options={{
-          title: 'Publish',
+          title: t('nav.publish'),
           tabBarIcon: ({ color, size }) => (
             <PlusCircle color={color} size={size - 2} />
           ),
@@ -77,11 +81,10 @@ export default function TabsLayout() {
           href: showPublish ? undefined : null,
         }}
       />
-
       <Tabs.Screen
         name='trips'
         options={{
-          title: 'My Trips',
+          title: t('nav.my_trips'),
           tabBarIcon: ({ color, size }) => (
             <Map color={color} size={size - 2} />
           ),
@@ -89,11 +92,10 @@ export default function TabsLayout() {
           href: showTrips ? undefined : null,
         }}
       />
-
       <Tabs.Screen
         name='profile'
         options={{
-          title: 'Profile',
+          title: t('nav.profile'),
           tabBarIcon: ({ color, size }) => (
             <User color={color} size={size - 2} />
           ),

@@ -1,5 +1,6 @@
 import { TouchableOpacity, View, Text, Image, StyleSheet } from 'react-native';
 import { Camera, CheckCircle } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors } from '../../../theme/colors';
 import { Radius, Spacing } from '../../../theme/spacing';
 import { FontSize, FontWeight } from '../../../theme/typography';
@@ -11,6 +12,7 @@ interface IdUploadCardProps {
 }
 
 export function IdUploadCard({ label, uploadedUri, onPress }: IdUploadCardProps) {
+  const { t } = useTranslation();
   const isUploaded = Boolean(uploadedUri);
 
   return (
@@ -30,7 +32,9 @@ export function IdUploadCard({ label, uploadedUri, onPress }: IdUploadCardProps)
       <View style={styles.textBlock}>
         <Text style={styles.label}>{label}</Text>
         <Text style={[styles.status, { color: isUploaded ? Colors.primary : '#9ca3af' }]}>
-          {isUploaded ? 'Uploaded successfully' : 'Tap to upload photo'}
+          {isUploaded
+            ? t('kyc.upload_success', 'Uploaded successfully')
+            : t('kyc.tap_to_upload', 'Tap to upload photo')}
         </Text>
       </View>
 

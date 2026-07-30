@@ -5,18 +5,31 @@
 
 import { View, Text, StyleSheet } from 'react-native'
 import { Shield } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 export function EscrowBadge() {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.banner}>
       <Shield size={22} color={Colors.primary} style={styles.icon} />
       <View style={styles.textBlock}>
-        <Text style={styles.title}>Payment held in escrow</Text>
+        <Text style={styles.title}>
+          {t('payment.escrow_title', 'Payment held in escrow')}
+        </Text>
         <Text style={styles.description}>
-          Your payment is secured by Go Bagage. The traveler is only paid{' '}
-          <Text style={styles.bold}>after you confirm delivery</Text>. Full
-          refund if anything goes wrong.
+          {t(
+            'payment.escrow_description_prefix',
+            'Your payment is secured by Go Bagage. The traveler is only paid',
+          )}{' '}
+          <Text style={styles.bold}>
+            {t('payment.escrow_description_bold', 'after you confirm delivery')}
+          </Text>
+          {t(
+            'payment.escrow_description_suffix',
+            '. Full refund if anything goes wrong.',
+          )}
         </Text>
       </View>
     </View>

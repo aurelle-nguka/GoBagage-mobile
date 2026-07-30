@@ -1,9 +1,6 @@
-/**
- * Go Bagage — ProfileStatsRow
- * Ligne de 3 statistiques rapides (trajets, colis envoyés, revenus).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
+import { Plane, Package, DollarSign } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { formatCAD } from '../../../shared/utils/currency.utils'
 
@@ -18,24 +15,25 @@ export function ProfileStatsRow({
   parcelsSentCount,
   totalEarnings,
 }: ProfileStatsRowProps) {
+  const { t } = useTranslation()
   return (
     <View style={styles.row}>
       <StatBox
-        emoji='✈️'
+        icon={<Plane size={20} color='#00C853' />}
         value={String(tripsCount)}
-        label='Trips'
+        label={t('profile.trips', 'Trips')}
         backgroundColor='#e8faf0'
       />
       <StatBox
-        emoji='📦'
+        icon={<Package size={20} color='#2196F3' />}
         value={String(parcelsSentCount)}
-        label='Parcels sent'
+        label={t('profile.parcels_sent', 'Parcels sent')}
         backgroundColor='#e8f4fd'
       />
       <StatBox
-        emoji='💰'
+        icon={<DollarSign size={20} color='#FF9800' />}
         value={formatCAD(totalEarnings)}
-        label='Earnings'
+        label={t('profile.earnings', 'Earnings')}
         backgroundColor='#fff8e8'
         small
       />
@@ -44,13 +42,13 @@ export function ProfileStatsRow({
 }
 
 function StatBox({
-  emoji,
+  icon,
   value,
   label,
   backgroundColor,
   small = false,
 }: {
-  emoji: string
+  icon: React.ReactNode
   value: string
   label: string
   backgroundColor: string
@@ -58,7 +56,7 @@ function StatBox({
 }) {
   return (
     <View style={[styles.box, { backgroundColor }]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+      {icon}
       <Text style={[styles.value, small && styles.valueSmall]}>{value}</Text>
       <Text style={styles.label}>{label}</Text>
     </View>
@@ -76,9 +74,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius['2xl'],
     paddingVertical: Spacing[3],
     alignItems: 'center',
-  },
-  emoji: {
-    fontSize: 22,
+    gap: 4,
   },
   value: {
     fontSize: FontSize.xl,
