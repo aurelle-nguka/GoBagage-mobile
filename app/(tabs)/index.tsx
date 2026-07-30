@@ -23,6 +23,8 @@ export default function HomePage() {
       onParcelTracking={(bookingId) =>
         router.push(`/(modals)/tracking/${bookingId}`)
       }
+      onSeeAllTrips={() => router.push('/(tabs)/trips')}
+      onSeeAllActivity={() => router.push('/(modals)/activity')}
       onNotifications={() => {}}
     />
   )

@@ -1,5 +1,16 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { CheckCircle, Star } from 'lucide-react-native'
+import {
+  CheckCircle,
+  Star,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Package,
+  Plane,
+  PackageCheck,
+  Ban,
+} from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { BookingStatus } from '../../bookings/types/booking.type'
 import { formatCAD } from '../../../shared/utils/currency.utils'
@@ -18,16 +29,26 @@ interface BookingRequestCardProps {
   onPress: () => void
 }
 
-const STATUS_LABELS: Partial<Record<BookingStatus, string>> = {
-  PENDING: '⏳ Pending payment',
-  AWAITING_ACCEPTANCE: '⏳ Awaiting your response',
-  ACCEPTED: '✅ Accepted',
-  REJECTED: '❌ Declined',
-  PICKED_UP: '📦 Picked up',
-  IN_TRANSIT: '✈️ In transit',
-  DELIVERED: '📬 Delivered',
-  CONFIRMED: '✅ Confirmed',
-  CANCELLED: '🚫 Cancelled',
+const STATUS_CONFIG: Partial<
+  Record<BookingStatus, { key: string; fallback: string; Icon: any }>
+> = {
+  PENDING: { key: 'booking.status.pending', fallback: 'Pending payment', Icon: Clock },
+  AWAITING_ACCEPTANCE: {
+    key: 'booking.status.awaiting_acceptance',
+    fallback: 'Awaiting your response',
+    Icon: Clock,
+  },
+  ACCEPTED: { key: 'booking.status.accepted', fallback: 'Accepted', Icon: CheckCircle2 },
+  REJECTED: { key: 'booking.status.rejected', fallback: 'Declined', Icon: XCircle },
+  PICKED_UP: { key: 'booking.status.picked_up', fallback: 'Picked up', Icon: Package },
+  IN_TRANSIT: { key: 'booking.status.in_transit', fallback: 'In transit', Icon: Plane },
+  DELIVERED: {
+    key: 'booking.status.delivered',
+    fallback: 'Delivered',
+    Icon: PackageCheck,
+  },
+  CONFIRMED: { key: 'booking.status.confirmed', fallback: 'Confirmed', Icon: CheckCircle2 },
+  CANCELLED: { key: 'booking.status.cancelled', fallback: 'Cancelled', Icon: Ban },
 }
 
 const STATUS_COLORS: Partial<Record<BookingStatus, string>> = {
@@ -55,7 +76,9 @@ export function BookingRequestCard({
   onReject,
   onPress,
 }: BookingRequestCardProps) {
+  const { t } = useTranslation()
   const showActions = status === 'AWAITING_ACCEPTANCE' && (onAccept || onReject)
+  const statusConfig = STATUS_CONFIG[status]
 
   return (
     <TouchableOpacity
@@ -76,7 +99,7 @@ export function BookingRequestCard({
           <View style={styles.ratingRow}>
             <Star size={11} color={Colors.warning} fill={Colors.warning} />
             <Text style={styles.ratingText}>
-              {senderRating > 0 ? senderRating.toFixed(1) : 'New'}
+              {senderRating > 0 ? senderRating.toFixed(1) : t('trip.new', 'New')}
             </Text>
           </View>
         </View>
@@ -85,8 +108,9 @@ export function BookingRequestCard({
       </View>
 
       <View style={styles.parcelRow}>
+        <Package size={13} color={Colors.mutedForeground} />
         <Text style={styles.parcelText}>
-          📦 {parcelDescription} · {weightKg} kg
+          {parcelDescription} · {weightKg} kg
         </Text>
       </View>
 
@@ -98,7 +122,7 @@ export function BookingRequestCard({
               onPress={onReject}
               activeOpacity={0.85}
             >
-              <Text style={styles.rejectLabel}>Decline</Text>
+              <Text style={styles.rejectLabel}>{t('booking.decline', 'Decline')}</Text>
             </TouchableOpacity>
           )}
           {onAccept && (
@@ -107,19 +131,25 @@ export function BookingRequestCard({
               onPress={onAccept}
               activeOpacity={0.85}
             >
-              <Text style={styles.acceptLabel}>Accept</Text>
+              <Text style={styles.acceptLabel}>{t('booking.accept', 'Accept')}</Text>
             </TouchableOpacity>
           )}
         </View>
       ) : (
         <View style={styles.statusRow}>
+          {statusConfig && (
+            <statusConfig.Icon
+              size={12}
+              color={STATUS_COLORS[status] ?? Colors.mutedForeground}
+            />
+          )}
           <Text
             style={[
               styles.statusLabel,
               { color: STATUS_COLORS[status] ?? Colors.mutedForeground },
             ]}
           >
-            {STATUS_LABELS[status] ?? status}
+            {statusConfig ? t(statusConfig.key, statusConfig.fallback) : status}
           </Text>
         </View>
       )}
@@ -183,7 +213,12 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.primary,
   },
-  parcelRow: { marginBottom: Spacing[3] },
+  parcelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginBottom: Spacing[3],
+  },
   parcelText: {
     fontSize: FontSize.sm,
     color: Colors.mutedForeground,
@@ -218,6 +253,9 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.semibold,
   },
   statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     paddingTop: Spacing[2],
     borderTopWidth: 1,
     borderTopColor: '#f3f4f6',

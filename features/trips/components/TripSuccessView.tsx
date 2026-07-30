@@ -5,6 +5,8 @@
 
 import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { CheckCircle2 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface TripSuccessViewProps {
@@ -13,16 +15,23 @@ interface TripSuccessViewProps {
 }
 
 export function TripSuccessView({ origin, destination }: TripSuccessViewProps) {
+  const { t } = useTranslation()
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.iconCircle}>
-        <Text style={styles.emoji}>✅</Text>
+        <CheckCircle2 size={48} color={Colors.primary} />
       </View>
-      <Text style={styles.title}>Trip Published!</Text>
+      <Text style={styles.title}>{t('trip.published_title', 'Trip Published!')}</Text>
       <Text style={styles.description}>
-        Your trip from <Text style={styles.bold}>{origin}</Text> to{' '}
-        <Text style={styles.bold}>{destination}</Text> is now live. Senders can
-        find and book you.
+        {t('trip.published_desc_prefix', 'Your trip from')}{' '}
+        <Text style={styles.bold}>{origin}</Text>{' '}
+        {t('trip.published_desc_to', 'to')}{' '}
+        <Text style={styles.bold}>{destination}</Text>{' '}
+        {t(
+          'trip.published_desc_suffix',
+          'is now live. Senders can find and book you.',
+        )}
       </Text>
     </SafeAreaView>
   )
@@ -44,9 +53,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing[6],
-  },
-  emoji: {
-    fontSize: 48,
   },
   title: {
     fontSize: FontSize['2xl'],

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useConfirmPayment } from '@stripe/stripe-react-native';
 import { initiatePayment } from '../api/payments.api';
 import { getApiErrorMessage } from '../../../shared/utils/api.error.utils';
@@ -10,6 +11,7 @@ interface UseStripePaymentResult {
 }
 
 export function useStripePayment(): UseStripePaymentResult {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
 
@@ -33,7 +35,7 @@ export function useStripePayment(): UseStripePaymentResult {
 
       const clientSecret = response.stripeClientSecret;
       if (!clientSecret) {
-        setError('No client secret received from server.');
+        setError(t('payment.errors.no_client_secret', 'No client secret received from server.'));
         return false;
       }
       console.log('✅ stripeClientSecret received');
@@ -45,7 +47,7 @@ export function useStripePayment(): UseStripePaymentResult {
 
       if (stripeError) {
         console.log('❌ Stripe error:', stripeError.message);
-        setError(stripeError.message ?? 'Payment failed. Please try again.');
+        setError(stripeError.message ?? t('payment.errors.payment_failed', 'Payment failed. Please try again.'));
         return false;
       }
 
@@ -53,7 +55,7 @@ export function useStripePayment(): UseStripePaymentResult {
       return true;
     } catch (err) {
       console.log('❌ Payment error:', err);
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return false;
     } finally {
       setLoading(false);

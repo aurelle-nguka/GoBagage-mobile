@@ -1,6 +1,8 @@
 import { View } from 'react-native'
 import { StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { TextField } from '../../../shared/components/ui/TextField'
+import { PhoneField } from '../../../shared/components/ui/PhoneField'
 import { Spacing } from '../../../theme'
 
 interface RecipientFormErrors {
@@ -28,28 +30,26 @@ export function RecipientForm({
   onChangeAddress,
   errors = {},
 }: RecipientFormProps) {
+  const { t } = useTranslation()
   return (
     <View style={styles.container}>
       <TextField
-        label='Full Name *'
+        label={`${t('parcel.recipient_name', 'Full Name')} *`}
         value={name}
         onChangeText={onChangeName}
-        placeholder='Jean-Baptiste Mbeki'
+        placeholder={t('parcel.recipient_name_placeholder', 'Jean-Baptiste Mbeki')}
         error={errors.name}
       />
-      <TextField
-        label='Phone Number *'
+      <PhoneField
         value={phone}
         onChangeText={onChangePhone}
-        placeholder='+237 6XX XXX XXX'
-        keyboardType='phone-pad'
         error={errors.phone}
       />
       <TextField
-        label='Full Address *'
+        label={`${t('parcel.recipient_address', 'Full Address')} *`}
         value={address}
         onChangeText={onChangeAddress}
-        placeholder='Street, City, Country'
+        placeholder={t('parcel.recipient_address_placeholder', 'Street, City, Country')}
         error={errors.address}
       />
     </View>

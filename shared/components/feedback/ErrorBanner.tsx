@@ -1,5 +1,6 @@
 
 import { View, Text, StyleSheet } from 'react-native';
+import { AlertTriangle } from 'lucide-react-native';
 import { Colors, FontSize, Radius, Spacing } from '../../../theme';
 
 interface ErrorBannerProps {
@@ -9,7 +10,7 @@ interface ErrorBannerProps {
 export function ErrorBanner({ message }: ErrorBannerProps) {
   return (
     <View style={styles.banner}>
-      <Text style={styles.emoji}>⚠️</Text>
+      <AlertTriangle size={16} color={Colors.destructive} />
       <Text style={styles.text}>{message}</Text>
     </View>
   );
@@ -26,9 +27,6 @@ const styles = StyleSheet.create({
     borderRadius: Radius.xl,
     padding: Spacing[3],
     marginBottom: Spacing[4],
-  },
-  emoji: {
-    fontSize: 16,
   },
   text: {
     flex: 1,

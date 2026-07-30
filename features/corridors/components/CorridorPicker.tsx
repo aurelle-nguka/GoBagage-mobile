@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ChevronDown, Search, X } from 'lucide-react-native'
+import { ChevronDown, Search, X, Check } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { CorridorResponse } from '../types/corridor.types'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
@@ -25,13 +26,16 @@ interface CorridorPickerProps {
 }
 
 export function CorridorPicker({
-  label = 'Corridor',
+  label,
   corridors,
   loading = false,
   selected,
   onSelect,
-  placeholder = 'Select a corridor',
+  placeholder,
 }: CorridorPickerProps) {
+  const { t } = useTranslation()
+  const resolvedLabel = label ?? t('trip.corridor', 'Corridor')
+  const resolvedPlaceholder = placeholder ?? t('trip.select_corridor', 'Select a corridor')
   const [modalVisible, setModalVisible] = useState(false)
   const [query, setQuery] = useState('')
 
@@ -56,7 +60,7 @@ export function CorridorPicker({
 
   return (
     <View>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {resolvedLabel ? <Text style={styles.label}>{resolvedLabel}</Text> : null}
 
       <TouchableOpacity
         style={styles.selector}
@@ -79,7 +83,7 @@ export function CorridorPicker({
             />
           </View>
         ) : (
-          <Text style={styles.placeholder}>{placeholder}</Text>
+          <Text style={styles.placeholder}>{resolvedPlaceholder}</Text>
         )}
         <ChevronDown size={18} color={Colors.mutedForeground} />
       </TouchableOpacity>
@@ -92,7 +96,7 @@ export function CorridorPicker({
       >
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Select Corridor</Text>
+            <Text style={styles.modalTitle}>{t('corridor.select_title', 'Select Corridor')}</Text>
             <TouchableOpacity
               onPress={() => {
                 setModalVisible(false)
@@ -109,7 +113,7 @@ export function CorridorPicker({
             <TextInput
               value={query}
               onChangeText={setQuery}
-              placeholder='Search city or country...'
+              placeholder={t('corridor.search_placeholder', 'Search city or country...')}
               placeholderTextColor='#9ca3af'
               style={styles.searchInput}
               autoFocus
@@ -152,18 +156,22 @@ export function CorridorPicker({
 
                     {item.basePricePerKg && (
                       <Text style={styles.corridorPrice}>
-                        Base: ${item.basePricePerKg}/kg
+                        {t('corridor.base_price', 'Base: ${{price}}/kg', {
+                          price: item.basePricePerKg,
+                        })}
                       </Text>
                     )}
                   </View>
-                  {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                  {isSelected && <Check size={20} color={Colors.primary} strokeWidth={2.5} />}
                 </TouchableOpacity>
               )
             }}
             ListEmptyComponent={
               <View style={styles.emptyState}>
                 <Text style={styles.emptyText}>
-                  {query ? 'No corridor found' : 'No active corridors'}
+                  {query
+                    ? t('corridor.no_results', 'No corridor found')
+                    : t('corridor.no_active', 'No active corridors')}
                 </Text>
               </View>
             }
@@ -260,11 +268,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: FontWeight.medium,
     marginTop: 2,
-  },
-  checkmark: {
-    fontSize: FontSize.lg,
-    color: Colors.primary,
-    fontWeight: FontWeight.bold,
   },
   emptyState: {
     alignItems: 'center',

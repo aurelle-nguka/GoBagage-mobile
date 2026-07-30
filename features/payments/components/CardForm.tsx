@@ -6,6 +6,7 @@
  */
 
 import { View, Text, TextInput, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors } from '../../../theme/colors'
 import { FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
@@ -37,10 +38,12 @@ export function CardForm({
   onChangeExpiry,
   onChangeCvv,
 }: CardFormProps) {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.card}>
       <View>
-        <Text style={styles.label}>Card Number</Text>
+        <Text style={styles.label}>{t('payment.card_number', 'Card Number')}</Text>
         <TextInput
           value={cardNumber}
           onChangeText={(text) => onChangeCardNumber(formatCardNumber(text))}
@@ -53,7 +56,7 @@ export function CardForm({
 
       <View style={styles.row}>
         <View style={styles.half}>
-          <Text style={styles.label}>Expiry</Text>
+          <Text style={styles.label}>{t('payment.expiry', 'Expiry')}</Text>
           <TextInput
             value={expiry}
             onChangeText={(text) => onChangeExpiry(formatExpiry(text))}
@@ -64,7 +67,7 @@ export function CardForm({
           />
         </View>
         <View style={styles.half}>
-          <Text style={styles.label}>CVV</Text>
+          <Text style={styles.label}>{t('payment.cvv', 'CVV')}</Text>
           <TextInput
             value={cvv}
             onChangeText={(text) =>

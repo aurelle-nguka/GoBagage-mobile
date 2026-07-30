@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { register } from '../api/auth.api';
 import type { RegisterDto } from '../types/auth.types';
 import { getFirstZodError, registerSchema } from '../../../shared/utils/validation.utils';
@@ -11,6 +12,7 @@ interface UseRegisterResult {
 }
 
 export function useRegister(): UseRegisterResult {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -33,7 +35,7 @@ export function useRegister(): UseRegisterResult {
       validation.error.issues.forEach((issue, i) => {
         console.log(`  [${i}] field=${issue.path.join('.')} message=${issue.message}`);
       });
-      const msg = getFirstZodError(validation) ?? 'Validation error';
+      const msg = getFirstZodError(validation) ?? t('common.errors.validation_error', 'Validation error');
       setError(msg);
       return null;
     }
@@ -56,7 +58,7 @@ export function useRegister(): UseRegisterResult {
       console.log('  code:', err?.code);
       console.log('  status:', err?.response?.status);
       console.log('  data:', JSON.stringify(err?.response?.data));
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return null;
     } finally {
       setLoading(false);

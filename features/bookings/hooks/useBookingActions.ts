@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   acceptBooking,
   rejectBooking,
@@ -23,6 +24,7 @@ interface UseBookingActionsResult {
 }
 
 export function useBookingActions(): UseBookingActionsResult {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error,   setError]   = useState('');
 
@@ -33,7 +35,7 @@ export function useBookingActions(): UseBookingActionsResult {
       const result = await fn();
       return result;
     } catch (err) {
-      setError(getApiErrorMessage(err));
+      setError(getApiErrorMessage(err, t));
       return null;
     } finally {
       setLoading(false);

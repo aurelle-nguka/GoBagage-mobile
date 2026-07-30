@@ -4,21 +4,49 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import {
+  Clock,
+  Smile,
+  PackageCheck,
+  MessageCircle,
+  Briefcase,
+} from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 export interface ReviewBadgeOption {
   id: string
-  emoji: string
+  Icon: typeof Clock
   label: string
 }
 
-const REVIEW_BADGES: ReviewBadgeOption[] = [
-  { id: 'ontime', emoji: '⏱️', label: 'On time' },
-  { id: 'friendly', emoji: '😊', label: 'Friendly' },
-  { id: 'careful', emoji: '🧤', label: 'Careful with package' },
-  { id: 'communicative', emoji: '💬', label: 'Communicative' },
-  { id: 'professional', emoji: '💼', label: 'Professional' },
-]
+function getReviewBadges(
+  t: (key: string, fallback: string) => string,
+): ReviewBadgeOption[] {
+  return [
+    { id: 'ontime', Icon: Clock, label: t('review.badges.on_time', 'On time') },
+    {
+      id: 'friendly',
+      Icon: Smile,
+      label: t('review.badges.friendly', 'Friendly'),
+    },
+    {
+      id: 'careful',
+      Icon: PackageCheck,
+      label: t('review.badges.careful', 'Careful with package'),
+    },
+    {
+      id: 'communicative',
+      Icon: MessageCircle,
+      label: t('review.badges.communicative', 'Communicative'),
+    },
+    {
+      id: 'professional',
+      Icon: Briefcase,
+      label: t('review.badges.professional', 'Professional'),
+    },
+  ]
+}
 
 interface ReviewBadgeSelectorProps {
   selected: string[]
@@ -29,13 +57,17 @@ export function ReviewBadgeSelector({
   selected,
   onToggle,
 }: ReviewBadgeSelectorProps) {
+  const { t } = useTranslation()
+  const reviewBadges = getReviewBadges(t)
+
   return (
     <View style={styles.section}>
       <Text style={styles.title}>
-        What stood out? <Text style={styles.optional}>(optional)</Text>
+        {t('review.badges_prompt', 'What stood out?')}{' '}
+        <Text style={styles.optional}>({t('common.optional', 'optional')})</Text>
       </Text>
       <View style={styles.row}>
-        {REVIEW_BADGES.map((badge) => {
+        {reviewBadges.map((badge) => {
           const isActive = selected.includes(badge.id)
           return (
             <TouchableOpacity
@@ -47,7 +79,10 @@ export function ReviewBadgeSelector({
                 isActive ? styles.chipActive : styles.chipInactive,
               ]}
             >
-              <Text style={styles.emoji}>{badge.emoji}</Text>
+              <badge.Icon
+                size={14}
+                color={isActive ? Colors.white : Colors.foreground}
+              />
               <Text
                 style={[styles.chipLabel, isActive && styles.chipLabelActive]}
               >
@@ -101,9 +136,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     elevation: 3,
-  },
-  emoji: {
-    fontSize: 14,
   },
   chipLabel: {
     fontSize: FontSize.sm,

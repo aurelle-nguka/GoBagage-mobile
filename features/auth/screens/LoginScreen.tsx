@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { Plane } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { useLogin } from '../hooks/useLogin'
 import { TextField } from '../../../shared/components/ui/TextField'
@@ -23,11 +25,11 @@ interface FieldErrors {
 }
 
 export function LoginScreen({
-  role,
   onLoginSuccess,
   onForgotPassword,
   onCreateAccount,
 }: LoginScreenProps) {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({})
@@ -37,13 +39,13 @@ export function LoginScreen({
   const validate = (): boolean => {
     const errors: FieldErrors = {}
 
-    if (!email.trim()) errors.email = 'Email address is required.'
+    if (!email.trim()) errors.email = t('auth.errors.email_required')
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
-      errors.email = 'Please enter a valid email address.'
+      errors.email = t('auth.errors.email_invalid')
 
-    if (!password) errors.password = 'Password is required.'
+    if (!password) errors.password = t('auth.errors.password_required')
     else if (password.length < 8)
-      errors.password = 'Password must be at least 8 characters.'
+      errors.password = t('auth.errors.password_min')
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -51,7 +53,6 @@ export function LoginScreen({
 
   const handleLogin = async () => {
     if (!validate()) return
-
     const result = await submit({
       email: email.trim().toLowerCase(),
       password,
@@ -60,7 +61,7 @@ export function LoginScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
@@ -68,22 +69,26 @@ export function LoginScreen({
       >
         <View style={styles.logoBlock}>
           <View style={styles.logoCircle}>
-            <Text style={styles.logoEmoji}>✈️</Text>
+            <Plane size={36} color={Colors.primary} />
           </View>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Log in to continue to Go Bagage</Text>
+          <Text style={styles.title}>
+            {t('auth.welcome_back', 'Welcome back')}
+          </Text>
+          <Text style={styles.subtitle}>
+            {t('auth.login_subtitle', 'Log in to continue to Go Bagage')}
+          </Text>
         </View>
 
         <View style={styles.form}>
           <TextField
-            label='Email address'
+            label={t('auth.email')}
             value={email}
             onChangeText={(v) => {
               setEmail(v)
               if (fieldErrors.email)
                 setFieldErrors((e) => ({ ...e, email: undefined }))
             }}
-            placeholder='you@example.com'
+            placeholder={t('auth.email_placeholder')}
             keyboardType='email-address'
             autoCapitalize='none'
             error={fieldErrors.email}
@@ -91,14 +96,14 @@ export function LoginScreen({
 
           <View>
             <TextField
-              label='Password'
+              label={t('auth.password')}
               value={password}
               onChangeText={(v) => {
                 setPassword(v)
                 if (fieldErrors.password)
                   setFieldErrors((e) => ({ ...e, password: undefined }))
               }}
-              placeholder='Your password'
+              placeholder={t('auth.password_placeholder', 'Your password')}
               isPassword
               error={fieldErrors.password}
             />
@@ -107,15 +112,15 @@ export function LoginScreen({
               onPress={onForgotPassword}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Text style={styles.forgotText}>Forgot password?</Text>
+              <Text style={styles.forgotText}>{t('auth.forgot_password')}</Text>
             </TouchableOpacity>
           </View>
 
           {error ? <ErrorBanner message={error} /> : null}
 
           <PrimaryButton
-            label='Log In'
-            loadingLabel='Logging in...'
+            label={t('auth.login')}
+            loadingLabel={t('auth.loading.login')}
             loading={loading}
             onPress={handleLogin}
             style={styles.submitButton}
@@ -124,7 +129,7 @@ export function LoginScreen({
 
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
+          <Text style={styles.dividerText}>{t('common.or', 'or')}</Text>
           <View style={styles.dividerLine} />
         </View>
 
@@ -133,7 +138,7 @@ export function LoginScreen({
           onPress={onCreateAccount}
           activeOpacity={0.85}
         >
-          <Text style={styles.createText}>Create an account</Text>
+          <Text style={styles.createText}>{t('auth.register')}</Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>
     </SafeAreaView>
@@ -159,7 +164,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing[4],
   },
-  logoEmoji: { fontSize: 36 },
   title: {
     fontSize: FontSize['3xl'],
     fontWeight: FontWeight.bold,

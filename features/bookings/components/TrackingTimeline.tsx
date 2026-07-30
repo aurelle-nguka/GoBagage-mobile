@@ -1,12 +1,8 @@
-/**
- * Go Bagage — TrackingTimeline
- * Stepper de suivi du colis, aligné sur le workflow réel de BookingStatus (CDC section 10.2) :
- * PENDING → ACCEPTED → PICKED_UP → IN_TRANSIT → DELIVERED → CONFIRMED
- */
-
 import { View, Text, StyleSheet } from 'react-native'
-import { BookingStatus } from '../types/booking.type'
+import { CheckCircle, RefreshCw, Clock } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
+import { BookingStatus } from '../types/booking.type'
 
 interface TimelineStep {
   status: BookingStatus
@@ -31,11 +27,14 @@ export function TrackingTimeline({
   steps,
   currentStatus,
 }: TrackingTimelineProps) {
+  const { t } = useTranslation()
   const currentIndex = STEPS_ORDER.indexOf(currentStatus)
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Shipment Status</Text>
+      <Text style={styles.title}>
+        {t('tracking.shipment_status', 'Shipment Status')}
+      </Text>
 
       {steps.map((step, idx) => {
         const stepIndex = STEPS_ORDER.indexOf(step.status)
@@ -53,9 +52,13 @@ export function TrackingTimeline({
                   isCurrent && styles.iconCircleCurrent,
                 ]}
               >
-                <Text style={styles.iconText}>
-                  {isDone ? '✅' : isCurrent ? '🔄' : '⏳'}
-                </Text>
+                {isDone ? (
+                  <CheckCircle size={16} color={Colors.white} />
+                ) : isCurrent ? (
+                  <RefreshCw size={16} color={Colors.warning} />
+                ) : (
+                  <Clock size={16} color='#9ca3af' />
+                )}
               </View>
               {!isLast && (
                 <View
@@ -107,13 +110,8 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  row: {
-    flexDirection: 'row',
-    gap: Spacing[3],
-  },
-  connectorColumn: {
-    alignItems: 'center',
-  },
+  row: { flexDirection: 'row', gap: Spacing[3] },
+  connectorColumn: { alignItems: 'center' },
   iconCircle: {
     width: 36,
     height: 36,
@@ -122,45 +120,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconCircleDone: {
-    backgroundColor: Colors.primary,
-  },
+  iconCircleDone: { backgroundColor: Colors.primary },
   iconCircleCurrent: {
     backgroundColor: '#fff8e8',
     borderWidth: 2,
     borderColor: Colors.warning,
   },
-  iconText: {
-    fontSize: 16,
-  },
-  connectorLine: {
-    width: 2,
-    flex: 1,
-    minHeight: 24,
-    marginVertical: 4,
-  },
-  textColumn: {
-    flex: 1,
-    paddingBottom: Spacing[4],
-  },
-  stepLabel: {
-    fontSize: FontSize.base,
-    marginBottom: 2,
-  },
-  stepLabelDone: {
-    fontWeight: FontWeight.semibold,
-    color: Colors.primary,
-  },
-  stepLabelCurrent: {
-    fontWeight: FontWeight.semibold,
-    color: Colors.warning,
-  },
-  stepLabelPending: {
-    fontWeight: FontWeight.normal,
-    color: '#9ca3af',
-  },
-  stepSublabel: {
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-  },
+  connectorLine: { width: 2, flex: 1, minHeight: 24, marginVertical: 4 },
+  textColumn: { flex: 1, paddingBottom: Spacing[4] },
+  stepLabel: { fontSize: FontSize.base, marginBottom: 2 },
+  stepLabelDone: { fontWeight: FontWeight.semibold, color: Colors.primary },
+  stepLabelCurrent: { fontWeight: FontWeight.semibold, color: Colors.warning },
+  stepLabelPending: { fontWeight: FontWeight.normal, color: '#9ca3af' },
+  stepSublabel: { fontSize: FontSize.sm, color: '#9ca3af' },
 })

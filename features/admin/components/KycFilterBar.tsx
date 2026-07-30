@@ -1,16 +1,9 @@
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import type { KycStatus } from '../../../types/user.types'
 
 type Filter = KycStatus | 'ALL'
-
-const FILTERS: { id: Filter; label: string; color: string }[] = [
-  { id: 'ALL', label: 'All', color: Colors.foreground },
-  { id: 'PENDING', label: 'Pending', color: Colors.warning },
-  { id: 'UNDER_REVIEW', label: 'Under Review', color: Colors.secondary },
-  { id: 'VERIFIED', label: 'Verified', color: Colors.primary },
-  { id: 'REJECTED', label: 'Rejected', color: Colors.destructive },
-]
 
 interface KycFilterBarProps {
   active: Filter
@@ -18,6 +11,20 @@ interface KycFilterBarProps {
 }
 
 export function KycFilterBar({ active, onSelect }: KycFilterBarProps) {
+  const { t } = useTranslation()
+
+  const FILTERS: { id: Filter; label: string; color: string }[] = [
+    { id: 'ALL', label: t('admin.all', 'All'), color: Colors.foreground },
+    { id: 'PENDING', label: t('admin.pending'), color: Colors.warning },
+    {
+      id: 'UNDER_REVIEW',
+      label: t('admin.under_review'),
+      color: Colors.secondary,
+    },
+    { id: 'VERIFIED', label: t('admin.verified'), color: Colors.primary },
+    { id: 'REJECTED', label: t('admin.rejected'), color: Colors.destructive },
+  ]
+
   return (
     <ScrollView
       horizontal
@@ -50,9 +57,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing[2],
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[2],
+    gap: Spacing[1],
+    paddingVertical: 0,
+    paddingHorizontal: Spacing[1],
   },
   chip: {
     paddingHorizontal: Spacing[3],

@@ -1,96 +1,107 @@
-/**
- * Go Bagage — OnboardingScreen
- * 3 slides d'introduction + sélection du rôle utilisateur.
- * Migré depuis la maquette web (Onboarding.tsx) → React Native.
- */
-
-import { useState, useRef } from 'react';
+import { useState } from 'react'
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Dimensions,
-  ScrollView,
-  Animated,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Package, TrendingUp, Shield, ChevronRight } from 'lucide-react-native';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+} from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  Package,
+  TrendingUp,
+  Shield,
+  ChevronRight,
+  ArrowRight,
+  Plane,
+} from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
+const { width: SCREEN_WIDTH } = Dimensions.get('window')
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-
-const SLIDES = [
-  {
-    Icon: Package,
-    color: Colors.primary,
-    title: 'Send packages\nwith travelers',
-    description:
-      'Connect with real travelers flying your route. Your parcels travel safely with verified people — faster and cheaper than traditional shipping.',
-    bg: '#e8faf0',
-  },
-  {
-    Icon: TrendingUp,
-    color: Colors.secondary,
-    title: 'Earn from\nempty luggage',
-    description:
-      'Travelling internationally? Monetize your unused luggage allowance. Set your price, choose what you carry, and earn on every trip.',
-    bg: '#e8f4fd',
-  },
-  {
-    Icon: Shield,
-    color: Colors.warning,
-    title: 'Secure escrow\npayment',
-    description:
-      'Payments are held safely in escrow until delivery is confirmed. No risk for senders, guaranteed payment for travelers.',
-    bg: '#fff8e8',
-  },
-] as const;
-
-type OnboardingStep = 'slides' | 'role';
-
-type RoleChoice = 'TRAVELER' | 'SENDER' | 'BOTH';
+type OnboardingStep = 'slides' | 'role'
+type RoleChoice = 'TRAVELER' | 'SENDER' | 'BOTH'
 
 interface OnboardingScreenProps {
-  onComplete: (role: RoleChoice) => void;
+  onComplete: (role: RoleChoice) => void
 }
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
-  const [step, setStep] = useState<OnboardingStep>('slides');
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [step, setStep] = useState<OnboardingStep>('slides')
+  const [slideIndex, setSlideIndex] = useState(0)
 
   const handleNext = () => {
-    if (slideIndex < SLIDES.length - 1) {
-      setSlideIndex(slideIndex + 1);
-    } else {
-      setStep('role');
-    }
-  };
-
-  if (step === 'role') {
-    return <RoleSelector onSelect={onComplete} />;
+    if (slideIndex < 2) setSlideIndex(slideIndex + 1)
+    else setStep('role')
   }
 
-  return <SlidesView slideIndex={slideIndex} onNext={handleNext} onSkip={() => setStep('role')} />;
+  if (step === 'role') return <RoleSelector onSelect={onComplete} />
+
+  return (
+    <SlidesView
+      slideIndex={slideIndex}
+      onNext={handleNext}
+      onSkip={() => setStep('role')}
+    />
+  )
 }
 
-interface SlidesViewProps {
-  slideIndex: number;
-  onNext: () => void;
-  onSkip: () => void;
-}
+function SlidesView({
+  slideIndex,
+  onNext,
+  onSkip,
+}: {
+  slideIndex: number
+  onNext: () => void
+  onSkip: () => void
+}) {
+  const { t } = useTranslation()
+  const isLast = slideIndex === 2
 
-function SlidesView({ slideIndex, onNext, onSkip }: SlidesViewProps) {
-  const { Icon, color, title, description, bg } = SLIDES[slideIndex];
-  const isLast = slideIndex === SLIDES.length - 1;
+  const SLIDES = [
+    {
+      Icon: Package,
+      color: Colors.primary,
+      title: t('onboarding.slide1_title', 'Send packages\nwith travelers'),
+      description: t(
+        'onboarding.slide1_desc',
+        'Connect with real travelers flying your route. Your parcels travel safely with verified people — faster and cheaper than traditional shipping.',
+      ),
+      bg: '#e8faf0',
+    },
+    {
+      Icon: TrendingUp,
+      color: Colors.secondary,
+      title: t('onboarding.slide2_title', 'Earn from\nempty luggage'),
+      description: t(
+        'onboarding.slide2_desc',
+        'Travelling internationally? Monetize your unused luggage allowance. Set your price, choose what you carry, and earn on every trip.',
+      ),
+      bg: '#e8f4fd',
+    },
+    {
+      Icon: Shield,
+      color: Colors.warning,
+      title: t('onboarding.slide3_title', 'Secure escrow\npayment'),
+      description: t(
+        'onboarding.slide3_desc',
+        'Payments are held safely in escrow until delivery is confirmed. No risk for senders, guaranteed payment for travelers.',
+      ),
+      bg: '#fff8e8',
+    },
+  ]
+
+  const { Icon, color, title, description, bg } = SLIDES[slideIndex]
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Skip */}
       <View style={styles.skipRow}>
-        <TouchableOpacity onPress={onSkip} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
-          <Text style={styles.skipText}>Skip</Text>
+        <TouchableOpacity
+          onPress={onSkip}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.skipText}>{t('common.skip', 'Skip')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -98,14 +109,13 @@ function SlidesView({ slideIndex, onNext, onSkip }: SlidesViewProps) {
         <View style={[styles.iconContainer, { backgroundColor: bg }]}>
           <Icon size={56} color={color} strokeWidth={1.5} />
         </View>
-
         <Text style={styles.slideTitle}>{title}</Text>
         <Text style={styles.slideDescription}>{description}</Text>
       </View>
 
       <View style={styles.footer}>
         <View style={styles.dotsRow}>
-          {SLIDES.map((_, i) => (
+          {[0, 1, 2].map((i) => (
             <View
               key={i}
               style={[
@@ -122,32 +132,29 @@ function SlidesView({ slideIndex, onNext, onSkip }: SlidesViewProps) {
           activeOpacity={0.85}
         >
           <Text style={styles.primaryButtonText}>
-            {isLast ? 'Get Started' : 'Next'}
+            {isLast
+              ? t('common.get_started', 'Get Started')
+              : t('common.next', 'Next')}
           </Text>
           <ChevronRight size={20} color={Colors.white} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
-  );
+  )
 }
 
+function RoleSelector({ onSelect }: { onSelect: (role: RoleChoice) => void }) {
+  const { t } = useTranslation()
 
-interface RoleSelectorProps {
-  onSelect: (role: RoleChoice) => void;
-}
-
-function RoleSelector({ onSelect }: RoleSelectorProps) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.roleContent}>
         <View style={styles.roleHeader}>
           <View style={styles.roleIconContainer}>
-            <Text style={styles.planeEmoji}>✈️</Text>
+            <Plane size={32} color={Colors.primary} />
           </View>
-          <Text style={styles.roleTitle}>Welcome to Go Bagage</Text>
-          <Text style={styles.roleSubtitle}>
-            How would you like to use the platform?
-          </Text>
+          <Text style={styles.roleTitle}>{t('onboarding.title')}</Text>
+          <Text style={styles.roleSubtitle}>{t('onboarding.subtitle')}</Text>
         </View>
 
         <View style={styles.roleButtons}>
@@ -156,9 +163,11 @@ function RoleSelector({ onSelect }: RoleSelectorProps) {
             onPress={() => onSelect('SENDER')}
             activeOpacity={0.85}
           >
-            <Text style={styles.rolePrimaryButtonTitle}>I'm a Sender</Text>
+            <Text style={styles.rolePrimaryButtonTitle}>
+              {t('onboarding.sender')}
+            </Text>
             <Text style={styles.rolePrimaryButtonSubtitle}>
-              I want to send parcels with travelers
+              {t('onboarding.sender_subtitle')}
             </Text>
           </TouchableOpacity>
 
@@ -167,9 +176,11 @@ function RoleSelector({ onSelect }: RoleSelectorProps) {
             onPress={() => onSelect('TRAVELER')}
             activeOpacity={0.85}
           >
-            <Text style={styles.roleOutlineButtonTitle}>I'm a Traveler</Text>
+            <Text style={styles.roleOutlineButtonTitle}>
+              {t('onboarding.traveler')}
+            </Text>
             <Text style={styles.roleOutlineButtonSubtitle}>
-              I want to earn from my luggage
+              {t('onboarding.traveler_subtitle')}
             </Text>
           </TouchableOpacity>
 
@@ -178,26 +189,30 @@ function RoleSelector({ onSelect }: RoleSelectorProps) {
             onPress={() => onSelect('BOTH')}
             activeOpacity={0.7}
           >
-            <Text style={styles.roleTextButtonLabel}>I'm Both →</Text>
+            <View
+              style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
+            >
+              <Text style={styles.roleTextButtonLabel}>
+                {t('onboarding.both')}
+              </Text>
+              <ArrowRight size={14} color={Colors.primary} />
+            </View>
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* CGU */}
       <Text style={styles.legalText}>
-        By continuing you agree to our Terms of Service &amp; Privacy Policy
+        {t(
+          'onboarding.legal',
+          'By continuing you agree to our Terms of Service & Privacy Policy',
+        )}
       </Text>
     </SafeAreaView>
-  );
+  )
 }
 
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
-
+  container: { flex: 1, backgroundColor: Colors.background },
   skipRow: {
     alignItems: 'flex-end',
     paddingHorizontal: Spacing[6],
@@ -246,18 +261,9 @@ const styles = StyleSheet.create({
     gap: Spacing[2],
     marginBottom: Spacing[8],
   },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-  },
-  dotActive: {
-    width: 24,
-    backgroundColor: Colors.primary,
-  },
-  dotInactive: {
-    width: 8,
-    backgroundColor: '#d1d5db',
-  },
+  dot: { height: 8, borderRadius: 4 },
+  dotActive: { width: 24, backgroundColor: Colors.primary },
+  dotInactive: { width: 8, backgroundColor: '#d1d5db' },
   primaryButton: {
     backgroundColor: Colors.primary,
     borderRadius: Radius.xl,
@@ -272,7 +278,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.semibold,
   },
-
   roleContent: {
     flex: 1,
     paddingHorizontal: Spacing[6],
@@ -291,9 +296,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: Spacing[4],
   },
-  planeEmoji: {
-    fontSize: 32,
-  },
   roleTitle: {
     fontSize: FontSize['4xl'],
     fontWeight: FontWeight.bold,
@@ -307,9 +309,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: FontSize.md * 1.5,
   },
-  roleButtons: {
-    gap: Spacing[4],
-  },
+  roleButtons: { gap: Spacing[4] },
   rolePrimaryButton: {
     backgroundColor: Colors.primary,
     borderRadius: Radius.xl,
@@ -325,7 +325,6 @@ const styles = StyleSheet.create({
   rolePrimaryButtonSubtitle: {
     color: 'rgba(255,255,255,0.85)',
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.normal,
     marginTop: 2,
   },
   roleOutlineButton: {
@@ -345,7 +344,6 @@ const styles = StyleSheet.create({
   roleOutlineButtonSubtitle: {
     color: Colors.mutedForeground,
     fontSize: FontSize.sm,
-    fontWeight: FontWeight.normal,
     marginTop: 2,
   },
   roleTextButton: {
@@ -364,4 +362,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing[6],
     paddingBottom: Spacing[6],
   },
-});
+})

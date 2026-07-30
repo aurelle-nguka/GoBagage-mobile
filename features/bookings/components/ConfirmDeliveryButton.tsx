@@ -1,12 +1,8 @@
-/**
- * Go Bagage — ConfirmDeliveryButton
- * Bouton de confirmation de réception (CDC étape 7 du parcours, POST /bookings/{id}/confirm).
- * Reste désactivé tant que le statut n'est pas DELIVERED.
- */
-
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
-import { BookingStatus } from '../types/booking.type'
+import { useTranslation } from 'react-i18next'
+import { CheckCircle, Clock } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
+import { BookingStatus } from '../types/booking.type'
 
 interface ConfirmDeliveryButtonProps {
   status: BookingStatus
@@ -17,6 +13,7 @@ export function ConfirmDeliveryButton({
   status,
   onConfirm,
 }: ConfirmDeliveryButtonProps) {
+  const { t } = useTranslation()
   const isEnabled = status === 'DELIVERED'
 
   return (
@@ -29,6 +26,11 @@ export function ConfirmDeliveryButton({
       disabled={!isEnabled}
       activeOpacity={0.85}
     >
+      {isEnabled ? (
+        <CheckCircle size={18} color={Colors.white} />
+      ) : (
+        <Clock size={18} color='#9ca3af' />
+      )}
       <Text
         style={[
           styles.label,
@@ -36,8 +38,11 @@ export function ConfirmDeliveryButton({
         ]}
       >
         {isEnabled
-          ? '✅ Confirm Delivery'
-          : '⏳ Confirm Delivery (available on arrival)'}
+          ? t('tracking.confirm_delivery', 'Confirm Delivery')
+          : t(
+              'tracking.confirm_delivery_pending',
+              'Confirm Delivery (available on arrival)',
+            )}
       </Text>
     </TouchableOpacity>
   )
@@ -45,25 +50,17 @@ export function ConfirmDeliveryButton({
 
 const styles = StyleSheet.create({
   button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: Spacing[2],
     paddingVertical: Spacing[4],
     borderRadius: Radius.xl,
-    alignItems: 'center',
     marginBottom: Spacing[6],
   },
-  buttonDisabled: {
-    backgroundColor: '#f3f4f6',
-  },
-  buttonEnabled: {
-    backgroundColor: Colors.primary,
-  },
-  label: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.semibold,
-  },
-  labelDisabled: {
-    color: '#9ca3af',
-  },
-  labelEnabled: {
-    color: Colors.white,
-  },
+  buttonDisabled: { backgroundColor: '#f3f4f6' },
+  buttonEnabled: { backgroundColor: Colors.primary },
+  label: { fontSize: FontSize.base, fontWeight: FontWeight.semibold },
+  labelDisabled: { color: '#9ca3af' },
+  labelEnabled: { color: Colors.white },
 })

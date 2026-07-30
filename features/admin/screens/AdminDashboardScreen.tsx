@@ -13,6 +13,7 @@ import {
   AlertTriangle,
   TrendingUp,
 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { AdminHeader } from '../components/AdminHeader'
 import { KpiCard } from '../components/KpiCard copy'
@@ -38,8 +39,10 @@ export function AdminDashboardScreen({
   onGoToCorridors,
   onLogout,
 }: AdminDashboardScreenProps) {
+  const { t } = useTranslation()
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <AdminHeader adminName={adminName} onLogout={onLogout} />
 
       <ScrollView
@@ -55,39 +58,47 @@ export function AdminDashboardScreen({
           />
         }
       >
-        <Text style={styles.sectionTitle}>Overview</Text>
+        <Text style={styles.sectionTitle}>{t('admin.overview')}</Text>
         <View style={styles.kpiGrid}>
           <KpiCard
-            emoji='👥'
-            label='Total Users'
+            icon={<Users size={20} color={Colors.secondary} />}
+            label={t('admin.total_users')}
             value={totalUsers > 0 ? totalUsers : '—'}
-            subtitle={totalUsers > 0 ? 'Registered users' : 'Coming soon'}
+            subtitle={
+              totalUsers > 0
+                ? t('admin.registered_users', 'Registered users')
+                : t('admin.coming_soon')
+            }
             backgroundColor='#e8f4fd'
           />
           <KpiCard
-            emoji='✈️'
-            label='Active Trips'
+            icon={<FileCheck size={20} color={Colors.primary} />}
+            label={t('admin.active_trips')}
             value='—'
-            subtitle='Coming soon'
+            subtitle={t('admin.coming_soon')}
             backgroundColor='#e8faf0'
           />
           <KpiCard
-            emoji='💰'
-            label='Revenue'
+            icon={<TrendingUp size={20} color={Colors.warning} />}
+            label={t('admin.revenue')}
             value='—'
-            subtitle='Coming soon'
+            subtitle={t('admin.coming_soon')}
             backgroundColor='#fff8e8'
           />
           <KpiCard
-            emoji='🪪'
-            label='KYC Pending'
+            icon={<AlertTriangle size={20} color={Colors.destructive} />}
+            label={t('admin.kyc_pending')}
             value={pendingKycCount}
-            subtitle={pendingKycCount > 0 ? 'Needs review' : 'All clear'}
+            subtitle={
+              pendingKycCount > 0
+                ? t('admin.needs_review', 'Needs review')
+                : t('admin.all_clear')
+            }
             backgroundColor={pendingKycCount > 0 ? '#fef2f2' : '#e8faf0'}
           />
         </View>
 
-        <Text style={styles.sectionTitle}>Quick Actions</Text>
+        <Text style={styles.sectionTitle}>{t('admin.quick_actions')}</Text>
 
         <TouchableOpacity
           style={styles.actionCard}
@@ -98,11 +109,11 @@ export function AdminDashboardScreen({
             <FileCheck size={24} color={Colors.warning} />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={styles.actionTitle}>KYC Review Queue</Text>
+            <Text style={styles.actionTitle}>{t('admin.kyc_queue')}</Text>
             <Text style={styles.actionSubtitle}>
               {pendingKycCount > 0
-                ? `${pendingKycCount} document${pendingKycCount > 1 ? 's' : ''} awaiting review`
-                : 'No pending documents'}
+                ? t('admin.kyc_queue_subtitle', { count: pendingKycCount })
+                : t('admin.kyc_queue_empty')}
             </Text>
           </View>
           {pendingKycCount > 0 && (
@@ -115,7 +126,8 @@ export function AdminDashboardScreen({
         <View style={styles.comingSoonCard}>
           <Users size={20} color='#9ca3af' />
           <Text style={styles.comingSoonText}>
-            User Management — Coming soon
+            {t('admin.user_management', 'User Management')} —{' '}
+            {t('admin.coming_soon')}
           </Text>
         </View>
 
@@ -128,16 +140,18 @@ export function AdminDashboardScreen({
             <TrendingUp size={24} color={Colors.secondary} />
           </View>
           <View style={styles.actionInfo}>
-            <Text style={styles.actionTitle}>Corridors Management</Text>
+            <Text style={styles.actionTitle}>{t('admin.corridors')}</Text>
             <Text style={styles.actionSubtitle}>
-              Activate, deactivate and configure routes
+              {t('admin.corridors_subtitle')}
             </Text>
           </View>
         </TouchableOpacity>
 
         <View style={styles.comingSoonCard}>
           <AlertTriangle size={20} color='#9ca3af' />
-          <Text style={styles.comingSoonText}>Disputes — Coming soon</Text>
+          <Text style={styles.comingSoonText}>
+            {t('admin.disputes', 'Disputes')} — {t('admin.coming_soon')}
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -145,15 +159,9 @@ export function AdminDashboardScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
-  scrollContent: {
-    paddingHorizontal: Spacing[5],
-    paddingVertical: Spacing[5],
-  },
+  scrollContent: { paddingHorizontal: Spacing[5], paddingVertical: Spacing[5] },
   sectionTitle: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.bold,
@@ -224,8 +232,5 @@ const styles = StyleSheet.create({
     marginBottom: Spacing[3],
     opacity: 0.5,
   },
-  comingSoonText: {
-    fontSize: FontSize.base,
-    color: '#9ca3af',
-  },
+  comingSoonText: { fontSize: FontSize.base, color: '#9ca3af' },
 })

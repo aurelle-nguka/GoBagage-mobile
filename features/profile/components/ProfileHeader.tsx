@@ -1,29 +1,30 @@
-/**
- * Go Bagage — ProfileHeader
- * Header vert avec avatar, badge vérifié, nom, ancienneté et note moyenne.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { ArrowLeft, CheckCircle, Star } from 'lucide-react-native'
+import { ArrowLeft, CheckCircle, Pencil, Star } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface ProfileHeaderProps {
   initials: string
   name: string
+  bio?: string
   memberSince: string
   averageRating: number
   isVerified: boolean
   onBack: () => void
+  onEdit: () => void
 }
 
 export function ProfileHeader({
   initials,
   name,
+  bio,
   memberSince,
   averageRating,
   isVerified,
   onBack,
+  onEdit,
 }: ProfileHeaderProps) {
+  const { t } = useTranslation()
   return (
     <View style={styles.header}>
       <View style={styles.topRow}>
@@ -33,8 +34,13 @@ export function ProfileHeader({
         >
           <ArrowLeft size={22} color='rgba(255,255,255,0.9)' />
         </TouchableOpacity>
-        <Text style={styles.topTitle}>Profile</Text>
-        <View style={styles.spacer} />
+        <Text style={styles.topTitle}>{t('profile.title', 'Profile')}</Text>
+        <TouchableOpacity
+          onPress={onEdit}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Pencil size={18} color='rgba(255,255,255,0.9)' />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.profileRow}>
@@ -55,7 +61,12 @@ export function ProfileHeader({
 
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
-          <Text style={styles.memberSince}>Member since {memberSince}</Text>
+          {bio ? <Text style={styles.bio}>{bio}</Text> : null}
+          <Text style={styles.memberSince}>
+            {t('profile.member_since', 'Member since {{date}}', {
+              date: memberSince,
+            })}
+          </Text>
           <View style={styles.ratingRow}>
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
@@ -66,7 +77,9 @@ export function ProfileHeader({
               />
             ))}
             <Text style={styles.ratingValue}>
-              {averageRating.toFixed(1)} avg
+              {t('profile.rating_avg', '{{value}} avg', {
+                value: averageRating.toFixed(1),
+              })}
             </Text>
           </View>
         </View>
@@ -152,5 +165,11 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontSize: FontSize.sm,
     marginLeft: 4,
+  },
+  bio: {
+    color: 'rgba(255,255,255,0.75)',
+    fontSize: FontSize.sm,
+    fontStyle: 'italic',
+    marginTop: 2,
   },
 })

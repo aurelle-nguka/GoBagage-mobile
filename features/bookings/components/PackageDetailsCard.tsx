@@ -1,9 +1,6 @@
-/**
- * Go Bagage — PackageDetailsCard
- * Récapitulatif du colis suivi.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
+import { Package } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 interface PackageDetailsCardProps {
@@ -19,19 +16,25 @@ export function PackageDetailsCard({
   weightKg,
   recipientName,
 }: PackageDetailsCardProps) {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>Package Details</Text>
+      <Text style={styles.title}>
+        {t('tracking.package_details', 'Package Details')}
+      </Text>
       <View style={styles.row}>
         <View style={styles.iconBox}>
-          <Text style={styles.emoji}>📦</Text>
+          <Package size={32} color={Colors.primary} />
         </View>
         <View style={styles.info}>
           <Text style={styles.description}>{description}</Text>
           <Text style={styles.meta}>
-            Category: {category} · {weightKg} kg
+            {t('parcel.category')}: {category} · {weightKg} kg
           </Text>
-          <Text style={styles.recipient}>Recipient: {recipientName}</Text>
+          <Text style={styles.recipient}>
+            {t('tracking.recipient', 'Recipient')}: {recipientName}
+          </Text>
         </View>
       </View>
     </View>
@@ -58,11 +61,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
   iconBox: {
     width: 64,
     height: 64,
@@ -71,23 +70,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  emoji: {
-    fontSize: 32,
-  },
-  info: {
-    flex: 1,
-  },
+  info: { flex: 1 },
   description: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
     color: Colors.foreground,
   },
-  meta: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
-  recipient: {
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-  },
+  meta: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  recipient: { fontSize: FontSize.sm, color: '#9ca3af' },
 })

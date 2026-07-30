@@ -5,6 +5,7 @@
 
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import { Paperclip, Send } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 interface ChatInputProps {
@@ -20,6 +21,7 @@ export function ChatInput({
   onSend,
   onAttach,
 }: ChatInputProps) {
+  const { t } = useTranslation()
   const canSend = value.trim().length > 0
 
   return (
@@ -36,7 +38,7 @@ export function ChatInput({
         <TextInput
           value={value}
           onChangeText={onChangeText}
-          placeholder='Write a message...'
+          placeholder={t('messaging.input_placeholder', 'Write a message...')}
           placeholderTextColor='#9ca3af'
           style={styles.input}
           onSubmitEditing={canSend ? onSend : undefined}

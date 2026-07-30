@@ -1,23 +1,46 @@
-/**
- * Go Bagage — MyTripCard
- */
-
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { ChevronRight } from 'lucide-react-native'
+import {
+  ChevronRight,
+  Calendar,
+  Weight,
+  Inbox,
+  Edit2,
+} from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { TripStatus } from '../types/trip.types'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
 const STATUS_CONFIG: Record<
   TripStatus,
-  { label: string; bg: string; color: string }
+  { key: string; fallback: string; bg: string; color: string }
 > = {
-  OPEN: { label: 'Open', bg: '#f3f4f6', color: Colors.mutedForeground },
-  BOOKED: { label: 'Booked', bg: '#e8faf0', color: Colors.primary },
-  IN_TRANSIT: { label: 'In Transit', bg: '#e8f4fd', color: Colors.secondary },
-  DELIVERED: { label: 'Delivered', bg: '#fff8e8', color: Colors.warning },
-  COMPLETED: { label: 'Completed', bg: '#e8faf0', color: Colors.primary },
-  CANCELLED: { label: 'Cancelled', bg: '#fef2f2', color: Colors.destructive },
+  OPEN: { key: 'trip.open', fallback: 'Open', bg: '#f3f4f6', color: Colors.mutedForeground },
+  BOOKED: { key: 'trip.booked', fallback: 'Booked', bg: '#e8faf0', color: Colors.primary },
+  IN_TRANSIT: {
+    key: 'trip.in_transit',
+    fallback: 'In Transit',
+    bg: '#e8f4fd',
+    color: Colors.secondary,
+  },
+  DELIVERED: {
+    key: 'trip.delivered',
+    fallback: 'Delivered',
+    bg: '#fff8e8',
+    color: Colors.warning,
+  },
+  COMPLETED: {
+    key: 'trip.completed',
+    fallback: 'Completed',
+    bg: '#e8faf0',
+    color: Colors.primary,
+  },
+  CANCELLED: {
+    key: 'trip.cancelled',
+    fallback: 'Cancelled',
+    bg: '#fef2f2',
+    color: Colors.destructive,
+  },
 }
 
 interface MyTripCardProps {
@@ -28,6 +51,7 @@ interface MyTripCardProps {
   status: TripStatus
   pendingRequestsCount: number
   onPress: () => void
+  onEdit?: () => void
 }
 
 export function MyTripCard({
@@ -38,35 +62,57 @@ export function MyTripCard({
   status,
   pendingRequestsCount,
   onPress,
+  onEdit,
 }: MyTripCardProps) {
+  const { t } = useTranslation()
   const config = STATUS_CONFIG[status]
+  const canEdit = status === 'OPEN'
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.headerRow}>
         <RouteLabel from={from} to={to} size='md' />
-        <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
-          <Text style={[styles.statusText, { color: config.color }]}>
-            {config.label}
-          </Text>
+        <View style={styles.headerRight}>
+          {canEdit && onEdit && (
+            <TouchableOpacity
+              onPress={onEdit}
+              style={styles.editButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Edit2 size={14} color={Colors.primary} />
+            </TouchableOpacity>
+          )}
+          <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
+            <Text style={[styles.statusText, { color: config.color }]}>
+              {t(config.key, config.fallback)}
+            </Text>
+          </View>
         </View>
       </View>
 
       <View style={styles.metaRow}>
-        <Text style={styles.metaText}>📅 {departureDate}</Text>
-        <Text style={styles.metaText}>⚖️ {availableKg} kg available</Text>
+        <View style={styles.metaItem}>
+          <Calendar size={13} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>{departureDate}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Weight size={13} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>
+            {t('trip.kg_available', '{{value}} kg available', { value: availableKg })}
+          </Text>
+        </View>
       </View>
 
       <View style={styles.footerRow}>
         {pendingRequestsCount > 0 ? (
           <View style={styles.requestsBadge}>
+            <Inbox size={12} color={Colors.warning} />
             <Text style={styles.requestsText}>
-              📩 {pendingRequestsCount} pending request
-              {pendingRequestsCount > 1 ? 's' : ''}
+              {t('trip.pending_requests', { count: pendingRequestsCount })}
             </Text>
           </View>
         ) : (
-          <Text style={styles.noRequestsText}>No requests yet</Text>
+          <Text style={styles.noRequestsText}>{t('trip.no_requests', 'No requests yet')}</Text>
         )}
         <ChevronRight size={16} color='#d1d5db' />
       </View>
@@ -92,6 +138,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     marginBottom: Spacing[3],
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  editButton: {
+    width: 28,
+    height: 28,
+    borderRadius: Radius.full,
+    backgroundColor: '#e8faf0',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   statusBadge: {
     paddingHorizontal: Spacing[2],
     paddingVertical: 4,
@@ -106,6 +165,11 @@ const styles = StyleSheet.create({
     gap: Spacing[4],
     marginBottom: Spacing[3],
   },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   metaText: {
     fontSize: FontSize.sm,
     color: Colors.mutedForeground,
@@ -119,6 +183,9 @@ const styles = StyleSheet.create({
     borderTopColor: '#f3f4f6',
   },
   requestsBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#fff8e8',
     paddingHorizontal: Spacing[3],
     paddingVertical: 4,

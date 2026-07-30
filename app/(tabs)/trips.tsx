@@ -8,6 +8,12 @@ export default function TripsPage() {
     <MyTripsScreen
       onPublish={() => router.push('/(tabs)/publish')}
       onOpenTrip={(tripId) => router.push(`/(modals)/trip-requests/${tripId}`)}
+      onEditTrip={(tripId) =>
+        router.push({
+          pathname: '/(modals)/edit-trip',
+          params: { tripId },
+        })
+      }
     />
   )
 }

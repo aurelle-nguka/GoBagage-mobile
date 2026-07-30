@@ -7,6 +7,8 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { Plane } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { SearchHeader } from '../components/SearchHeader'
 import { TravelerCard } from '../components/TravelerCard'
 import type { PublicUser } from '../../../types/user.types'
@@ -24,6 +26,7 @@ interface TravelerResult {
   availableKg: number
   pricePerKg: number
   totalTrips: number
+  bio?: string
 }
 
 interface ResultsScreenProps {
@@ -43,6 +46,7 @@ export function ResultsScreen({
   onClearSearch,
   onSelectTraveler,
 }: ResultsScreenProps) {
+  const { t } = useTranslation()
   const [results, setResults] = useState<TravelerResult[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -86,39 +90,43 @@ export function ResultsScreen({
             availableKg: trip.availableKg ?? 0,
             pricePerKg: trip.pricePerKg ?? trip.fixedPrice ?? 0,
             totalTrips: traveler?.totalDeliveries ?? 0,
+            bio: trip.traveler?.bio ?? undefined,
           }
         })
 
         setResults(mapped)
       } catch (err: any) {
-        setError(err?.response?.data?.message ?? 'Failed to load trips.')
+        setError(
+          err?.response?.data?.message ??
+            t('search.errors.load_failed', 'Failed to load trips.'),
+        )
       } finally {
         setLoading(false)
       }
     }
 
     fetchTrips()
-  }, [corridorId])
+  }, [corridorId, t])
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <SearchHeader
-        title='Available Travelers'
-        subtitle='Select a traveler for your parcel'
+        title={t('search.results_title', 'Available Travelers')}
+        subtitle={t('search.results_subtitle', 'Select a traveler for your parcel')}
         onBack={onBack}
       />
 
       <View style={styles.corridorBanner}>
         <RouteLabel from={from} to={to} size='md' />
         <Text style={styles.changeText} onPress={onClearSearch}>
-          Change
+          {t('search.change', 'Change')}
         </Text>
       </View>
 
       {loading ? (
         <View style={styles.centered}>
           <ActivityIndicator size='large' color={Colors.primary} />
-          <Text style={styles.loadingText}>Searching travelers...</Text>
+          <Text style={styles.loadingText}>{t('search.loading', 'Searching travelers...')}</Text>
         </View>
       ) : error ? (
         <View style={styles.centered}>
@@ -132,7 +140,7 @@ export function ResultsScreen({
           contentContainerStyle={styles.listContent}
           ListHeaderComponent={
             <Text style={styles.resultCount}>
-              {results.length} traveler{results.length !== 1 ? 's' : ''} found
+              {t('search.found', { count: results.length })}
             </Text>
           }
           renderItem={({ item }) => (
@@ -145,16 +153,19 @@ export function ResultsScreen({
               availableKg={item.availableKg}
               pricePerKg={item.pricePerKg}
               totalTrips={item.totalTrips}
+              bio={item.bio}
               onPress={() => onSelectTraveler(item)}
             />
           )}
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Text style={styles.emptyEmoji}>✈️</Text>
-              <Text style={styles.emptyTitle}>No travelers found</Text>
+              <Plane size={48} color='#d1d5db' style={styles.emptyIcon} />
+              <Text style={styles.emptyTitle}>{t('search.no_results', 'No travelers found')}</Text>
               <Text style={styles.emptySubtitle}>
-                No trips available on this corridor yet.{'\n'}
-                Try another corridor or check back later.
+                {t(
+                  'search.no_results_subtitle',
+                  'No trips available on this corridor yet.\nTry another corridor or check back later.',
+                )}
               </Text>
             </View>
           }
@@ -211,7 +222,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: Spacing[8],
   },
-  emptyEmoji: { fontSize: 48, marginBottom: Spacing[3] },
+  emptyIcon: { marginBottom: Spacing[3] },
   emptyTitle: {
     fontSize: FontSize.xl,
     fontWeight: '700',

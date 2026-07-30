@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { ArrowLeft, Lock } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { CardField, type CardFieldInput } from '@stripe/stripe-react-native'
 import type { PaymentProvider } from '../types/payment.types'
 import {
@@ -41,10 +42,10 @@ export function PaymentScreen({
   onBack,
   onSuccess,
 }: PaymentScreenProps) {
+  const { t } = useTranslation()
   const [selectedMethod, setSelectedMethod] =
     useState<PaymentProvider>('STRIPE')
   const [cardComplete, setCardComplete] = useState(false)
-
   const { loading, error, pay } = useStripePayment()
 
   const subtotalBase = weightKg * pricePerKg
@@ -52,18 +53,18 @@ export function PaymentScreen({
 
   const handlePay = async () => {
     if (selectedMethod === 'STRIPE' && !cardComplete) {
-      Alert.alert('Incomplete card', 'Please fill in all card details.')
+      Alert.alert(
+        t('payment.card_incomplete', 'Incomplete card'),
+        t('payment.card_incomplete_msg', 'Please fill in all card details.'),
+      )
       return
     }
-
     const success = await pay(bookingId)
-    if (success) {
-      onSuccess(selectedMethod)
-    }
+    if (success) onSuccess(selectedMethod)
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -72,10 +73,10 @@ export function PaymentScreen({
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>Secure Payment</Text>
+          <Text style={styles.headerTitle}>{t('payment.title')}</Text>
           <View style={styles.sslRow}>
             <Lock size={11} color={Colors.primary} />
-            <Text style={styles.sslText}>256-bit SSL encryption</Text>
+            <Text style={styles.sslText}>{t('payment.ssl')}</Text>
           </View>
         </View>
       </View>
@@ -99,7 +100,7 @@ export function PaymentScreen({
 
         <EscrowBadge />
 
-        <Text style={styles.sectionTitle}>Payment Method</Text>
+        <Text style={styles.sectionTitle}>{t('payment.method')}</Text>
         <PaymentMethodSelector
           selected={selectedMethod}
           onSelect={setSelectedMethod}
@@ -107,7 +108,7 @@ export function PaymentScreen({
 
         {selectedMethod === 'STRIPE' && (
           <View style={styles.cardSection}>
-            <Text style={styles.cardLabel}>Card Information</Text>
+            <Text style={styles.cardLabel}>{t('payment.card_details')}</Text>
             <CardField
               postalCodeEnabled={false}
               placeholders={{ number: '4242 4242 4242 4242' }}
@@ -121,42 +122,39 @@ export function PaymentScreen({
                 fontSize: 16,
               }}
               style={styles.cardField}
-              onCardChange={(cardDetails) => {
+              onCardChange={(cardDetails: CardFieldInput.Details) => {
                 setCardComplete(cardDetails.complete)
               }}
             />
             {!cardComplete && (
               <Text style={styles.cardHint}>
-                Enter your card number, expiry date and CVV
+                {t(
+                  'payment.card_hint',
+                  'Enter your card number, expiry date and CVV',
+                )}
               </Text>
             )}
             <View style={styles.securityRow}>
               <Lock size={12} color='#9ca3af' />
               <Text style={styles.securityText}>
-                Your card details are encrypted by Stripe and never stored on
-                our servers.
+                {t(
+                  'payment.security_text',
+                  'Your card details are encrypted by Stripe and never stored on our servers.',
+                )}
               </Text>
             </View>
-            <Text style={styles.testHint}>
-              🧪 Test: 4242 4242 4242 4242 · 12/34 · 123
-            </Text>
+            <Text style={styles.testHint}>{t('payment.test_card')}</Text>
           </View>
         )}
 
-        {selectedMethod === 'ORANGE_MONEY' && (
+        {(selectedMethod === 'ORANGE_MONEY' ||
+          selectedMethod === 'MTN_MOMO') && (
           <View style={styles.momoInfo}>
             <Text style={styles.momoText}>
-              📱 After confirming, you will receive a prompt on your Orange
-              Money phone to authorize the payment.
-            </Text>
-          </View>
-        )}
-
-        {selectedMethod === 'MTN_MOMO' && (
-          <View style={styles.momoInfo}>
-            <Text style={styles.momoText}>
-              📱 After confirming, you will receive a prompt on your MTN MoMo
-              phone to authorize the payment.
+              {t(
+                'payment.momo_info',
+                'After confirming, you will receive a prompt on your mobile money phone to authorize the payment.',
+              )}
             </Text>
           </View>
         )}
@@ -164,16 +162,14 @@ export function PaymentScreen({
         {error ? <ErrorBanner message={error} /> : null}
 
         <PrimaryButton
-          label={`🔒 Pay ${formatCAD(total)} Securely`}
-          loadingLabel='Processing payment...'
+          label={t('payment.pay', { amount: formatCAD(total) })}
+          loadingLabel={t('payment.processing')}
           loading={loading}
           onPress={handlePay}
           style={styles.payButton}
         />
 
-        <Text style={styles.footerText}>
-          Protected by Go Bagage Buyer Guarantee · Cancel anytime before pickup
-        </Text>
+        <Text style={styles.footerText}>{t('payment.footer')}</Text>
       </ScrollView>
     </SafeAreaView>
   )
@@ -216,6 +212,17 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
+  cardSection: {
+    backgroundColor: Colors.white,
+    borderRadius: Radius['2xl'],
+    padding: Spacing[4],
+    marginBottom: Spacing[4],
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
   cardLabel: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
@@ -223,10 +230,22 @@ const styles = StyleSheet.create({
     marginBottom: Spacing[2],
     marginTop: Spacing[4],
   },
-  cardField: {
-    width: '100%',
-    height: 52,
-    borderRadius: Radius.xl,
+  cardField: { width: '100%', height: 52, borderRadius: Radius.xl },
+  cardHint: { fontSize: FontSize.sm, color: '#9ca3af', marginTop: Spacing[2] },
+  securityRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: Spacing[2],
+    marginTop: Spacing[3],
+    paddingTop: Spacing[3],
+    borderTopWidth: 1,
+    borderTopColor: '#f3f4f6',
+  },
+  securityText: {
+    flex: 1,
+    fontSize: FontSize.sm,
+    color: '#9ca3af',
+    lineHeight: FontSize.sm * 1.5,
   },
   testHint: {
     fontSize: FontSize.sm,
@@ -260,36 +279,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     color: '#9ca3af',
     marginBottom: Spacing[6],
-  },
-  cardSection: {
-    backgroundColor: Colors.white,
-    borderRadius: Radius['2xl'],
-    padding: Spacing[4],
-    marginBottom: Spacing[4],
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 1,
-  },
-  cardHint: {
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-    marginTop: Spacing[2],
-  },
-  securityRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing[2],
-    marginTop: Spacing[3],
-    paddingTop: Spacing[3],
-    borderTopWidth: 1,
-    borderTopColor: '#f3f4f6',
-  },
-  securityText: {
-    flex: 1,
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-    lineHeight: FontSize.sm * 1.5,
   },
 })

@@ -8,6 +8,7 @@ import {
 } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
 import { Upload, X } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import {
   PARCEL_PHOTOS_MAX,
   PARCEL_PHOTOS_MIN,
@@ -20,14 +21,18 @@ interface PhotoUploaderProps {
 }
 
 export function PhotoUploader({ photos, onChange }: PhotoUploaderProps) {
+  const { t } = useTranslation()
   const canAddMore = photos.length < PARCEL_PHOTOS_MAX
 
   const handleAddPhoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (status !== 'granted') {
       Alert.alert(
-        'Permission required',
-        'Go Bagage needs access to your photos to add parcel pictures.',
+        t('kyc.permission_title', 'Permission required'),
+        t(
+          'parcel.errors.photo_permission_desc',
+          'Go Bagage needs access to your photos to add parcel pictures.',
+        ),
       )
       return
     }
@@ -49,7 +54,10 @@ export function PhotoUploader({ photos, onChange }: PhotoUploaderProps) {
   return (
     <View>
       <Text style={styles.label}>
-        Photos ({PARCEL_PHOTOS_MIN} min, {PARCEL_PHOTOS_MAX} max)
+        {t('parcel.photos_label', 'Photos ({{min}} min, {{max}} max)', {
+          min: PARCEL_PHOTOS_MIN,
+          max: PARCEL_PHOTOS_MAX,
+        })}
       </Text>
       <View style={styles.row}>
         {photos.map((uri, i) => (
@@ -72,7 +80,7 @@ export function PhotoUploader({ photos, onChange }: PhotoUploaderProps) {
             activeOpacity={0.8}
           >
             <Upload size={16} color='#9ca3af' />
-            <Text style={styles.addLabel}>Add</Text>
+            <Text style={styles.addLabel}>{t('parcel.add', 'Add')}</Text>
           </TouchableOpacity>
         )}
       </View>

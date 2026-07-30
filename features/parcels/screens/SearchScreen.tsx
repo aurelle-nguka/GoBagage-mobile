@@ -8,6 +8,8 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
+import { Plane, ArrowRight, Check } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { SearchHeader } from '../components/SearchHeader'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
@@ -15,19 +17,14 @@ import { CorridorPicker } from '../../../features/corridors/components/CorridorP
 import { useCorridors } from '../../../features/corridors/hooks/useCorridors'
 import type { CorridorResponse } from '../../../features/corridors/types/corridor.types'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
-import { ArrowRight } from 'lucide-react-native'
 
 interface SearchScreenProps {
-  initialQuery?: string
   onBack: () => void
   onSearch: (corridorId: string, corridor: CorridorResponse) => void
 }
 
-export function SearchScreen({
-  initialQuery = '',
-  onBack,
-  onSearch,
-}: SearchScreenProps) {
+export function SearchScreen({ onBack, onSearch }: SearchScreenProps) {
+  const { t } = useTranslation()
   const { corridors, loading, error } = useCorridors()
   const [selectedCorridor, setSelectedCorridor] =
     useState<CorridorResponse | null>(null)
@@ -38,10 +35,10 @@ export function SearchScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <SearchHeader
-        title='Find a Traveler'
-        subtitle='Select a corridor to search'
+        title={t('search.title')}
+        subtitle={t('search.subtitle')}
         onBack={onBack}
       />
 
@@ -51,18 +48,18 @@ export function SearchScreen({
         showsVerticalScrollIndicator={false}
       >
         <CorridorPicker
-          label='Select a corridor *'
+          label={`${t('common.select')} ${t('trip.corridor')} *`}
           corridors={corridors}
           loading={loading}
           selected={selectedCorridor}
           onSelect={setSelectedCorridor}
-          placeholder='e.g. Montreal → Douala'
+          placeholder={t('search.placeholder')}
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
         <PrimaryButton
-          label='🔍 Search Travelers'
+          label={t('search.button')}
           onPress={handleSearch}
           disabled={!selectedCorridor}
           style={styles.searchButton}
@@ -70,7 +67,7 @@ export function SearchScreen({
 
         {!loading && corridors.length > 0 && (
           <>
-            <Text style={styles.sectionLabel}>Popular corridors</Text>
+            <Text style={styles.sectionLabel}>{t('search.popular')}</Text>
             {corridors.slice(0, 5).map((corridor) => (
               <PopularCorridorItem
                 key={corridor.id}
@@ -80,6 +77,8 @@ export function SearchScreen({
                   setSelectedCorridor(corridor)
                   onSearch(String(corridor.id), corridor)
                 }}
+                selectedLabel={t('common.selected', 'Selected')}
+                selectLabel={t('common.select')}
               />
             ))}
           </>
@@ -88,7 +87,7 @@ export function SearchScreen({
         {loading && (
           <View style={styles.loadingState}>
             <ActivityIndicator size='small' color={Colors.primary} />
-            <Text style={styles.loadingText}>Loading corridors...</Text>
+            <Text style={styles.loadingText}>{t('search.loading')}</Text>
           </View>
         )}
       </ScrollView>
@@ -100,17 +99,24 @@ function PopularCorridorItem({
   corridor,
   isSelected,
   onPress,
+  selectedLabel,
+  selectLabel,
 }: {
   corridor: CorridorResponse
   isSelected: boolean
   onPress: () => void
+  selectedLabel: string
+  selectLabel: string
 }) {
   return (
     <View
       style={[styles.corridorRow, isSelected && styles.corridorRowSelected]}
     >
       <View style={styles.corridorLeft}>
-        <Text style={styles.corridorEmoji}>✈️</Text>
+        <Plane
+          size={20}
+          color={isSelected ? Colors.primary : Colors.mutedForeground}
+        />
         <View style={styles.corridorInfo}>
           <RouteLabel
             from={corridor.departureCity}
@@ -134,10 +140,13 @@ function PopularCorridorItem({
         )}
         <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
           {isSelected ? (
-            <Text style={styles.selectTextSelected}>✓ Selected</Text>
+            <View style={styles.selectRow}>
+              <Check size={12} color={Colors.primary} strokeWidth={2.5} />
+              <Text style={styles.selectTextSelected}>{selectedLabel}</Text>
+            </View>
           ) : (
             <View style={styles.selectRow}>
-              <Text style={styles.selectText}>Select</Text>
+              <Text style={styles.selectText}>{selectLabel}</Text>
               <ArrowRight
                 size={12}
                 color={Colors.mutedForeground}
@@ -152,10 +161,7 @@ function PopularCorridorItem({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: Spacing[5],
@@ -167,12 +173,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     textAlign: 'center',
   },
-  searchButton: {
-    marginTop: Spacing[2],
-  },
-  searchButtonDisabled: {
-    opacity: 0.5,
-  },
+  searchButton: { marginTop: Spacing[2] },
   sectionLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
@@ -203,17 +204,8 @@ const styles = StyleSheet.create({
     gap: Spacing[3],
     flex: 1,
   },
-  corridorEmoji: { fontSize: 20 },
   corridorInfo: { flex: 1 },
-  corridorSub: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-    marginTop: 2,
-  },
-  corridorRight: {
-    alignItems: 'flex-end',
-    gap: 4,
-  },
+  corridorRight: { alignItems: 'flex-end', gap: 4 },
   priceText: {
     fontSize: FontSize.sm,
     color: Colors.primary,
@@ -224,10 +216,7 @@ const styles = StyleSheet.create({
     color: Colors.mutedForeground,
     fontWeight: FontWeight.medium,
   },
-  selectTextSelected: {
-    color: Colors.primary,
-    fontWeight: FontWeight.bold,
-  },
+  selectTextSelected: { color: Colors.primary, fontWeight: FontWeight.bold },
   loadingState: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -235,13 +224,6 @@ const styles = StyleSheet.create({
     gap: Spacing[2],
     paddingVertical: Spacing[6],
   },
-  loadingText: {
-    fontSize: FontSize.base,
-    color: Colors.mutedForeground,
-  },
-  selectRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
+  loadingText: { fontSize: FontSize.base, color: Colors.mutedForeground },
+  selectRow: { flexDirection: 'row', alignItems: 'center', gap: 4 },
 })
