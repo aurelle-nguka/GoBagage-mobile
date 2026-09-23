@@ -15,6 +15,7 @@ import { ArrowLeft, CheckCircle, XCircle, ZoomIn } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { KycQueueItem } from '../types/admin.types'
+import { toAbsoluteFileUrl } from '../../../shared/utils/url.utils'
 
 interface KycReviewScreenProps {
   item: KycQueueItem
@@ -34,6 +35,9 @@ export function KycReviewScreen({
   const [rejectModalVisible, setRejectModal] = useState(false)
   const [rejectNote, setRejectNote] = useState('')
   const [zoomedImage, setZoomedImage] = useState<string | null>(null)
+
+  const frontImageUrl = toAbsoluteFileUrl(item.frontDocumentUrl)
+  const backImageUrl = toAbsoluteFileUrl(item.backDocumentUrl)
 
   const fullName = `${item.userFirstName} ${item.userLastName}`
   const submittedAt = new Intl.DateTimeFormat(i18n.language, {
@@ -112,16 +116,12 @@ export function KycReviewScreen({
 
         <Text style={styles.docLabel}>{t('kyc.front')}</Text>
         <TouchableOpacity
-          onPress={() => setZoomedImage(item.frontDocumentUrl)}
+          onPress={() => frontImageUrl && setZoomedImage(frontImageUrl)}
           activeOpacity={0.9}
         >
           <View style={styles.imageWrapper}>
             <Image
-              source={{
-                uri: item.frontDocumentUrl?.startsWith('http')
-                  ? item.frontDocumentUrl
-                  : `https://outlying-tweezers-unscathed.ngrok-free.dev${item.frontDocumentUrl}`,
-              }}
+              source={{ uri: frontImageUrl }}
               style={styles.docImage}
               resizeMode='contain'
             />
@@ -134,16 +134,16 @@ export function KycReviewScreen({
           </View>
         </TouchableOpacity>
 
-        {item.backDocumentUrl && (
+        {backImageUrl && (
           <>
             <Text style={styles.docLabel}>{t('kyc.back')}</Text>
             <TouchableOpacity
-              onPress={() => setZoomedImage(item.backDocumentUrl!)}
+              onPress={() => setZoomedImage(backImageUrl)}
               activeOpacity={0.9}
             >
               <View style={styles.imageWrapper}>
                 <Image
-                  source={{ uri: item.backDocumentUrl }}
+                  source={{ uri: backImageUrl }}
                   style={styles.docImage}
                   resizeMode='contain'
                 />

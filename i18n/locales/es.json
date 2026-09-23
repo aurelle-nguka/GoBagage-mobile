@@ -28,7 +28,7 @@
     "have_account": "¿Ya tienes cuenta?",
     "logout": "Cerrar sesión",
     "logout_confirm": "¿Estás seguro de que quieres cerrar sesión?",
-    "logout_confirm_admin": "¿Estás seguro de que quieres salir del panel de administración?",
+    "logout_confirm_admin": "¿Está seguro de que desea cerrar la sesión de administrador?",
     "send_reset": "Enviar enlace de restablecimiento",
     "check_email": "Revisa tu correo",
     "welcome_back": "Bienvenido de vuelta",
@@ -55,15 +55,34 @@
     "verify_code": "Verificar código",
     "verifying": "Verificando...",
     "resend_in": "Reenviar código en",
+    "enter_reset_code": "Ingresar código de restablecimiento",
+    "already_have_code": "¿Ya tienes un código? Ingrésalo",
+    "reset_password_title": "Nueva contraseña",
+    "reset_password_subtitle": "Ingresa el código que recibiste por correo electrónico y define una nueva contraseña.",
+    "reset_token_label": "Código de restablecimiento",
+    "reset_token_placeholder": "Pega el código recibido por correo",
+    "new_password": "Nueva contraseña",
+    "new_password_placeholder": "••••••••",
+    "confirm_password": "Confirmar contraseña",
+    "confirm_password_placeholder": "••••••••",
+    "reset_password_submit": "Restablecer contraseña",
+    "password_reset_success_title": "¡Contraseña restablecida!",
+    "password_reset_success_desc": "Tu contraseña se ha restablecido exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.",
     "loading": {
       "login": "Iniciando sesión...",
       "register": "Creando cuenta...",
-      "sending": "Enviando..."
+      "sending": "Enviando...",
+      "resetting": "Restableciendo..."
     },
     "errors": {
       "email_required": "El correo electrónico es obligatorio.",
       "email_invalid": "Por favor ingresa un correo electrónico válido.",
+      "token_required": "El código de restablecimiento es obligatorio.",
       "password_required": "La contraseña es obligatoria.",
+      "password_too_short": "La contraseña debe tener al menos 8 caracteres.",
+      "confirm_password_required": "Por favor confirma tu contraseña.",
+      "passwords_must_match": "Las contraseñas no coinciden.",
+      "invalid_form": "Por favor revisa los errores en el formulario.",
       "password_min": "La contraseña debe tener al menos 8 caracteres.",
       "password_uppercase": "La contraseña debe contener al menos 1 mayúscula.",
       "password_number": "La contraseña debe contener al menos 1 número.",
@@ -76,42 +95,6 @@
       "phone_invalid": "Usa el formato internacional: +237650255873",
       "otp_incomplete": "Por favor ingresa el código de {{length}} dígitos."
     }
-  },
-  "kyc": {
-    "title": "Verificar identidad",
-    "subtitle": "Selecciona tu tipo de documento y sube ambos lados.",
-    "document_type": "Tipo de documento",
-    "cni": "Cédula de Identidad Nacional",
-    "passport": "Pasaporte",
-    "front": "Frente",
-    "back": "Reverso",
-    "submit": "Enviar documentos",
-    "skip": "Omitir por ahora",
-    "verified": "Identidad ya verificada",
-    "update": "Actualizar mis documentos de todas formas",
-    "loading": "Enviando...",
-    "pending_title": "Verificación pendiente",
-    "pending_desc": "Nuestro equipo está revisando tus documentos. Esto suele tardar entre 1 y 24 horas.",
-    "pending_status": "Verificación pendiente",
-    "submitted_success": "Documentos enviados con éxito",
-    "continue_app": "Continuar a la app",
-    "verified_desc": "Tu identidad ha sido verificada con éxito.",
-    "update_title": "Actualizar tus documentos",
-    "update_warning": "Estás actualizando tus documentos ya verificados. Esto requerirá una nueva revisión.",
-    "upload_photos": "Subir fotos",
-    "info_text": "Tus documentos están encriptados y solo se usan para verificación de identidad.",
-    "id_card": "Cédula de Identidad",
-    "permission_title": "Permiso requerido",
-    "permission_desc": "Go Bagage necesita acceso a tus fotos.",
-    "errors": {
-      "doc_type_required": "Por favor selecciona un tipo de documento.",
-      "front_required": "Por favor sube el frente de tu documento.",
-      "back_required": "Por favor sube el reverso de tu documento."
-    },
-    "upload_success": "Subido con éxito",
-    "tap_to_upload": "Toca para subir una foto",
-    "cni_desc": "Cédula de Identidad Nacional",
-    "passport_desc": "Pasaporte internacional válido"
   },
   "nav": {
     "home": "Inicio",
@@ -295,13 +278,21 @@
     "method_orange_sublabel": "Dinero móvil · Camerún, Costa de Marfil...",
     "method_momo_label": "MTN MoMo",
     "method_momo_sublabel": "Dinero móvil · Camerún, Ghana...",
-    "method_interac_label": "Interac e-Transfer",
-    "method_interac_sublabel": "Solo bancos canadienses",
     "traveler_fallback": "Tu viajero",
     "errors": {
       "no_client_secret": "No se recibió el secreto de cliente del servidor.",
-      "payment_failed": "El pago falló. Por favor, inténtalo de nuevo."
-    }
+      "payment_failed": "El pago falló. Por favor, inténtalo de nuevo.",
+      "mobile_money_failed": "El pago no fue aprobado. Por favor, inténtalo de nuevo."
+    },
+    "phone_required": "Número de teléfono requerido",
+    "phone_required_msg": "Por favor ingresa el número de teléfono de Mobile Money.",
+    "mobile_money_phone_label": "Número de teléfono Mobile Money",
+    "mobile_money_phone_placeholder": "+237 6XX XXX XXX",
+    "mobile_money_waiting_title": "Revisa tu teléfono",
+    "mobile_money_waiting_text": "Aprueba la solicitud de pago enviada a tu teléfono para continuar.",
+    "mobile_money_timeout_title": "Todavía esperando",
+    "mobile_money_timeout_text": "Aún no hemos recibido una confirmación. Puedes verificar de nuevo, o volver más tarde — te notificaremos en cuanto se confirme.",
+    "check_again": "Verificar de nuevo"
   },
   "tracking": {
     "title": "Seguimiento en Vivo",
@@ -327,10 +318,28 @@
     "errors": {
       "load_failed": "No se pudo cargar el seguimiento.",
       "confirm_failed": "No se pudo confirmar la entrega."
-    }
+    },
+    "step_pending_release": "Pago pendiente de liberación",
+    "step_pending_release_sub": "Se liberará al viajero en un plazo de 24h",
+    "payment_held_notice": "El pago se conserva de forma segura y se liberará al viajero en un plazo de 24h. Aún puedes reportar un problema durante este período."
   },
   "profile": {
     "title": "Perfil",
+    "avatar": {
+      "title": "Foto de perfil",
+      "camera": "Cámara",
+      "gallery": "Galería",
+      "delete": "Eliminar",
+      "permission_camera_title": "Acceso a la cámara requerido",
+      "permission_camera_desc": "Permita el acceso a la cámara para tomar una foto de perfil.",
+      "permission_gallery_title": "Acceso a fotos requerido",
+      "permission_gallery_desc": "Permita el acceso a sus fotos para elegir una foto de perfil.",
+      "delete_confirm_title": "Eliminar foto",
+      "delete_confirm_desc": "¿Estás seguro de que deseas eliminar tu foto de perfil?",
+      "error_title": "Error",
+      "error_upload": "No se pudo actualizar la foto de perfil.",
+      "error_delete": "No se pudo eliminar la foto de perfil."
+    },
     "edit": "Editar Perfil",
     "edit_subtitle": "Actualizar información personal",
     "member_since": "Miembro desde {{date}}",
@@ -369,14 +378,16 @@
       "verified_sublabel": "Tu identidad ha sido confirmada.",
       "pending_label": "Verificación Requerida",
       "pending_sublabel": "Envía tu identificación para desbloquear todas las funciones.",
-      "pending_action": "Verificar ahora →",
+      "pending_action": "Verificar ahora",
       "under_review_label": "En Revisión",
       "under_review_sublabel": "Documentos enviados — normalmente 1–24 h.",
       "rejected_label": "Verificación Fallida",
       "rejected_sublabel": "Documentos rechazados. Por favor, vuelve a enviarlos.",
-      "rejected_action": "Reenviar →",
+      "rejected_action": "Reenviar",
       "reason_label": "Motivo:"
-    }
+    },
+    "rate_action": "Calificar",
+    "payouts": "Mis ganancias"
   },
   "search": {
     "title": "Encontrar un Viajero",
@@ -490,7 +501,7 @@
       "rejected_title": "Verificación fallida",
       "rejected_subtitle": "Tus documentos fueron rechazados. Por favor, envía fotos claras nuevamente.",
       "verified_title": "Verificado",
-      "verify_cta": "Verificar mi identidad →"
+      "verify_cta": "Verificar mi identidad"
     },
     "errors": {
       "invalid_request": "Solicitud inválida. Por favor verifica tu información.",
@@ -506,62 +517,176 @@
     }
   },
   "admin": {
-    "title": "ADMIN",
+    "title": "Administración",
     "greeting": "Hola, {{name}}",
     "overview": "Resumen",
-    "total_users": "Total Usuarios",
-    "active_trips": "Viajes Activos",
-    "revenue": "Ingresos",
-    "kyc_pending": "KYC Pendiente",
-    "quick_actions": "Acciones Rápidas",
-    "kyc_queue": "Cola de Revisión KYC",
-    "kyc_queue_subtitle": "{{count}} documento esperando revisión",
-    "kyc_queue_empty": "No hay documentos pendientes",
-    "corridors": "Gestión de Corredores",
-    "corridors_subtitle": "Activar, desactivar y configurar rutas",
-    "coming_soon": "Próximamente",
-    "all_clear": "¡Todo despejado!",
-    "no_kyc": "No hay documentos KYC en esta categoría.",
-    "approve": "Aprobar",
-    "reject": "Rechazar",
-    "verified": "Verificado",
-    "rejected": "Rechazado",
-    "under_review": "En Revisión",
-    "pending": "Pendiente",
+    "total_users": "Usuarios totales",
     "registered_users": "Usuarios registrados",
-    "needs_review": "Necesita revisión",
+    "active_trips": "Viajes activos",
+    "open_trips": "Viajes abiertos",
+    "revenue": "Saldo de comisiones",
+    "available_balance": "Saldo disponible",
+    "kyc_pending": "KYC pendiente",
+    "needs_review": "Por revisar",
+    "all_clear": "¡Todo al día!",
+    "quick_actions": "Acciones rápidas",
+    "kyc_queue": "Cola de KYC",
+    "kyc_queue_subtitle": "{{count}} documento(s) pendiente(s)",
+    "kyc_queue_empty": "No hay documentos pendientes",
     "user_management": "Gestión de usuarios",
-    "disputes": "Disputas",
-    "kyc_review": "Revisión KYC",
     "user_info": "Información del usuario",
+    "corridors": "Viajes y Rutas",
+    "corridors_subtitle": "Estadísticas de rutas y volúmenes",
+    "coming_soon": "Próximamente",
+    "all": "Todos",
     "full_name": "Nombre completo",
     "email": "Correo electrónico",
+    "phone": "Teléfono",
+    "role": "Rol",
+    "status": "Estado",
+    "status_label": "Estado",
+    "kyc_review": "Revisión KYC",
+    "no_kyc": "No hay documentos KYC pendientes",
+    "documents": "documento(s)",
+    "identity_docs": "Documentos de identidad",
     "doc_type": "Tipo de documento",
     "submitted": "Enviado el",
-    "status_label": "Estado",
-    "identity_docs": "Documentos de identidad",
     "tap_zoom": "Toca para ampliar",
     "tap_close": "Toca para cerrar",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "reject_kyc": "Rechazar KYC",
+    "reject_subtitle": "Por favor, indique el motivo del rechazo del documento.",
+    "reject_placeholder": "Ej. Documento ilegible, fecha vencida...",
+    "confirm_reject": "Confirmar rechazo",
     "already_approved": "Ya aprobado",
     "already_rejected": "Ya rechazado",
-    "reject_kyc": "Rechazar KYC",
-    "reject_subtitle": "Por favor proporciona una razón. El usuario será notificado.",
-    "reject_placeholder": "ej. Documento borroso, ID vencido...",
-    "confirm_reject": "Confirmar rechazo",
-    "documents": "documento",
-    "all": "Todos",
+    "pending": "Pendiente",
+    "verified": "Verificado",
+    "rejected": "Rechazado",
+    "under_review": "En revisión",
+    "not_submitted": "No enviado",
+    "users": {
+      "count": "{{count}} usuario",
+      "count_plural": "{{count}} usuarios",
+      "search_placeholder": "Buscar por nombre o correo...",
+      "no_results": "No se encontraron usuarios",
+      "status_active": "Activo",
+      "status_suspended": "Suspendido",
+      "suspension_reason_label": "Motivo de la suspensión",
+      "last_login": "Último inicio de sesión: {{date}}",
+      "never": "Nunca",
+      "suspend_button": "Suspender cuenta",
+      "suspend_trigger_subtitle": "Desactivar temporalmente el acceso del usuario",
+      "suspend_subtitle": "Indique un motivo (opcional). El usuario será notificado.",
+      "suspend_reason_placeholder": "Ej. Actividad sospechosa, violación de reglas...",
+      "suspend_confirm": "Confirmar suspensión",
+      "reactivate_button": "Reactivar cuenta",
+      "reactivate_confirm_title": "Reactivar cuenta",
+      "reactivate_confirm_msg": "¿Está seguro de que desea reactivar la cuenta de este usuario?",
+      "errors": {
+        "load_failed": "Error al cargar usuarios.",
+        "load_detail_failed": "Error al cargar detalles del usuario.",
+        "suspend_failed": "Error al suspender usuario.",
+        "reactivate_failed": "Error al reactivar usuario."
+      }
+    },
+    "disputes": {
+      "title": "Disputas y Reportes",
+      "dashboard_subtitle": "Revisar y resolver problemas reportados",
+      "detail_title": "Detalle de la disputa",
+      "count": "{{count}} disputa",
+      "count_plural": "{{count}} disputas",
+      "no_results": "No se encontraron disputas",
+      "status_open": "Abierta",
+      "status_under_investigation": "En investigación",
+      "status_decided": "Decidida",
+      "status_closed": "Cerrada",
+      "investigate_button": "Iniciar investigación",
+      "decide_label": "Tomar decisión",
+      "release_funds": "Liberar fondos al viajero",
+      "refund_sender": "Reembolsar al remitente",
+      "note_label": "Nota explicativa (opcional)",
+      "note_placeholder": "Explique los motivos de su decisión...",
+      "confirm_decision": "Confirmar decisión",
+      "close_note_label": "Nota de cierre (opcional)",
+      "close_note_placeholder": "Observaciones finales...",
+      "close_button": "Cerrar disputa",
+      "closed_label": "Esta disputa está cerrada definitivamente.",
+      "errors": {
+        "load_failed": "Error al cargar disputas.",
+        "load_detail_failed": "Error al cargar detalle de disputa.",
+        "investigate_failed": "Error al iniciar investigación.",
+        "decide_failed": "Error al registrar decisión.",
+        "close_failed": "Error al cerrar disputa."
+      }
+    },
+    "payouts": {
+      "title": "Saldo y Retiros",
+      "subtitle": "{{amount}} disponible"
+    },
     "errors": {
-      "load_kyc_failed": "No se pudo cargar la cola de KYC.",
-      "approve_failed": "No se pudo aprobar el KYC.",
-      "reject_failed": "No se pudo rechazar el KYC."
+      "load_stats_failed": "Error al cargar estadísticas del panel.",
+      "load_kyc_failed": "Error al cargar cola de KYC.",
+      "approve_failed": "Error al aprobar KYC.",
+      "reject_failed": "Error al rechazar KYC."
     }
   },
   "language": {
     "subtitle": "Selecciona tu idioma preferido"
   },
   "messaging": {
-    "input_placeholder": "Escribe un mensaje...",
-    "privacy_notice": "Tus datos de contacto permanecen ocultos. Mantén toda la coordinación en este chat."
+    "inbox_title": "Mensajes",
+    "empty_title": "Aún no hay conversaciones",
+    "empty_subtitle": "Cuando reserves o aceptes el transporte de un paquete, tus conversaciones aparecerán aquí.",
+    "privacy_notice": "Por tu seguridad, los datos de contacto directo están protegidos antes de la confirmación.",
+    "type_placeholder": "Escribe tu mensaje...",
+    "preview": {
+      "caption_placeholder": "Añadir un comentario...",
+      "send": "Enviar"
+    },
+    "options": {
+      "view_contact": "Ver contacto",
+      "media_links": "Archivos y enlaces",
+      "open_dispute": "Declarar una disputa",
+      "report_user": "Reportar usuario"
+    },
+    "contact": {
+      "title": "Info. del contacto",
+      "unknown": "Usuario",
+      "identity_verified": "Identidad verificada (KYC)",
+      "identity_pending": "Identidad no certificada",
+      "call_action": "Llamar al contacto",
+      "trip_section": "Viaje asociado",
+      "route": "Ruta",
+      "departure_date": "Fecha de salida",
+      "booking_ref": "Reserva #",
+      "booking_trip": "Reserva en curso",
+      "security_title": "Garantía y Seguridad GoBagage",
+      "security_desc": "Tus mensajes y pagos están protegidos. Nunca compartas tus datos bancarios fuera de la plataforma."
+    },
+    "media": {
+      "title": "Archivos y enlaces",
+      "items_count": "elementos",
+      "tab_photos": "Fotos",
+      "tab_audios": "Notas de voz",
+      "you": "Tú",
+      "empty_photos_title": "No hay fotos compartidas",
+      "empty_photos_sub": "Las fotos compartidas en esta conversación aparecerán aquí.",
+      "empty_audios_title": "No hay notas de voz",
+      "empty_audios_sub": "Las notas de voz enviadas en esta conversación aparecerán aquí."
+    },
+    "voice": {
+      "recording": "Grabando...",
+      "permission_desc": "Permite el acceso al micrófono para enviar notas de voz.",
+      "start_error": "No se pudo iniciar la grabación de audio.",
+      "send_error": "Error al enviar la nota de voz."
+    },
+    "errors": {
+      "conversation_not_found": "Conversación no encontrada.",
+      "load_failed": "Error al cargar la conversación.",
+      "send_failed": "Error al enviar el mensaje."
+    }
   },
   "review": {
     "delivery_confirmed_title": "Entrega Confirmada",
@@ -624,5 +749,269 @@
       "fill_required": "Por favor completa todos los campos obligatorios.",
       "load_failed": "No se pudieron cargar los corredores."
     }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "empty": "No hay notificaciones por el momento",
+    "types": {
+      "NEW_USER_REGISTERED": {
+        "title": "Nuevo usuario registrado",
+        "body": "{{name}} ({{email}}) acaba de crear una cuenta."
+      },
+      "KYC_SUBMITTED": {
+        "title": "Documento KYC enviado",
+        "body": "{{name}} envió un documento ({{docType}}) para verificación."
+      },
+      "DISPUTE_OPENED": {
+        "title": "Nueva disputa abierta",
+        "body": "Disputa #{{disputeId}} abierta para la reserva #{{bookingId}}. Motivo: {{reason}}"
+      },
+      "DISPUTE": {
+        "title": "Disputa abierta",
+        "body": "Se ha abierto una disputa para la reserva #{{bookingId}}."
+      },
+      "REPORT_FILED": {
+        "title": "Nuevo reporte recibido",
+        "body": "Reporte #{{reportId}} recibido ({{targetType}}). Motivo: {{reason}}"
+      },
+      "KYC_APPROVED": {
+        "title": "KYC aprobado",
+        "body": "¡Su verificación de identidad fue aprobada con éxito!"
+      },
+      "KYC_REJECTED": {
+        "title": "KYC rechazado",
+        "body": "Su documento fue rechazado: {{reason}}"
+      },
+      "BOOKING_CREATED": {
+        "title": "Reserva creada",
+        "body": "Reserva #{{bookingId}} creada."
+      },
+      "BOOKING_ACCEPTED": {
+        "title": "Reserva aceptada",
+        "body": "Su reserva #{{bookingId}} ha sido aceptada."
+      },
+      "BOOKING_REJECTED": {
+        "title": "Reserva rechazada",
+        "body": "Su reserva #{{bookingId}} fue rechazada: {{reason}}"
+      },
+      "BOOKING_CONFIRMED": {
+        "title": "Reserva confirmada",
+        "body": "Su reserva #{{bookingId}} está confirmada."
+      },
+      "BOOKING_CANCELLED": {
+        "title": "Reserva cancelada",
+        "body": "La reserva #{{bookingId}} ha sido cancelada."
+      },
+      "PARCEL_PICKED_UP": {
+        "title": "Paquete recogido",
+        "body": "Su paquete ha sido recogido por el viajero."
+      },
+      "PARCEL_IN_TRANSIT": {
+        "title": "Paquete en tránsito",
+        "body": "Su paquete está en camino."
+      },
+      "PARCEL_DELIVERED": {
+        "title": "Paquete entregado",
+        "body": "¡Su paquete ha sido entregado!"
+      },
+      "PAYMENT_RELEASED": {
+        "title": "Pago liberado",
+        "body": "El pago ha sido transferido a su cuenta."
+      },
+      "PAYMENT_REFUNDED": {
+        "title": "Pago reembolsado",
+        "body": "El reembolso ha sido procesado."
+      },
+      "NEW_MESSAGE": {
+        "title": "Nuevo mensaje",
+        "body": "Tiene un nuevo mensaje de {{senderName}}."
+      },
+      "NEW_BOOKING_REQUEST": {
+        "title": "Nueva solicitud de reserva",
+        "body": "Ha recibido una nueva solicitud de transporte de paquete."
+      },
+      "DELIVERY_REMINDER": {
+        "title": "Recordatorio de entrega",
+        "body": "No olvide confirmar la entrega de la reserva #{{bookingId}}."
+      },
+      "ACCOUNT_SUSPENDED": {
+        "title": "Cuenta suspendida",
+        "body": "Su cuenta ha sido suspendida temporalmente.",
+        "body_with_reason": "Su cuenta ha sido suspendida por: {{reason}}"
+      },
+      "ACCOUNT_REACTIVATED": {
+        "title": "Cuenta reactivada",
+        "body": "Su cuenta ha sido reactivada exitosamente."
+      },
+      "PAYMENT_FAILED": {
+        "title": "Pago fallido",
+        "body": "Su pago para la reserva #{{bookingId}} falló. Intente de nuevo."
+      }
+    }
+  },
+  "disputes": {
+    "title": "Reportar un problema",
+    "subtitle": "Cuéntanos qué salió mal con esta reserva. Nuestro equipo investigará y tomará medidas.",
+    "reason_label": "¿Qué pasó?",
+    "description_label": "Detalles adicionales (opcional)",
+    "description_placeholder": "Describe lo que pasó...",
+    "submit_button": "Enviar reporte",
+    "submitted_title": "Reporte enviado",
+    "submitted_subtitle": "Nuestro equipo revisará su reporte y le responderá a la brevedad.",
+    "report_link": "Reportar un problema con esta reserva",
+    "reasons": {
+      "PARCEL_DAMAGED": "Paquete dañado",
+      "PARCEL_LOST": "Paquete perdido",
+      "NOT_DELIVERED": "No entregado",
+      "WRONG_ITEM": "Artículo incorrecto",
+      "TRAVELER_UNRESPONSIVE": "Viajero no responde",
+      "OTHER": "Otro motivo"
+    },
+    "errors": {
+      "reason_required": "Por favor, seleccione un motivo."
+    }
+  },
+  "subscription": {
+    "title": "Go Bagage Premium",
+    "status_active": "Premium activo",
+    "status_free": "Plan Gratuito",
+    "days_remaining": "{{count}} días restantes",
+    "renews_on": "Termina el {{date}}",
+    "launch_offer_title": "Oferta de lanzamiento",
+    "launch_offer_subtitle": "{{count}} plazas restantes · Termina el {{date}}",
+    "promo_placeholder": "Ingresa el código promocional",
+    "apply_promo": "Aplicar",
+    "choose_method": "Elige un método de pago",
+    "subscribe_button": "Suscribirse — $35 CAD/año",
+    "cancel_button": "Cancelar suscripción",
+    "cancel_confirm_title": "Cancelar suscripción",
+    "cancel_confirm_msg": "¿Estás seguro de que quieres cancelar tu suscripción Premium?"
+  },
+  "payouts": {
+    "title": "Mis ganancias",
+    "balance_available": "Saldo disponible",
+    "withdraw_button": "Retirar",
+    "amount_label": "Monto a retirar (CAD)",
+    "amount_placeholder": "0,00",
+    "provider_label": "Elige un método de retiro",
+    "provider_orange": "Orange Money",
+    "provider_mtn": "MTN MoMo",
+    "provider_interac": "Interac",
+    "provider_bank": "Transferencia bancaria",
+    "phone_label": "Número de teléfono",
+    "phone_placeholder": "+237 6XX XXX XXX",
+    "details_label": "Datos bancarios",
+    "details_placeholder": "Nombre del titular, IBAN/número de cuenta, banco",
+    "history_title": "Historial de retiros",
+    "no_history": "Aún no hay retiros",
+    "status_pending": "Pendiente",
+    "status_processing": "En proceso",
+    "status_completed": "Completado",
+    "status_failed": "Fallido",
+    "success_message": "Retiro de {{amount}} enviado con éxito",
+    "failure_message": "Retiro fallido: {{reason}}"
+  },
+  "roles": {
+    "traveler": "Viajero",
+    "sender": "Remitente",
+    "both": "Viajero & Remitente",
+    "admin": "Administrador"
+  },
+  "kyc": {
+    "title": "Verificación de Identidad",
+    "title_update": "Actualizar mis documentos",
+    "subtitle": "Seleccione su tipo de documento y suba ambos lados.",
+    "verified_title": "Identidad ya verificada",
+    "verified_desc": "Su identidad ha sido verificada con éxito. No necesita enviar nuevos documentos a menos que su identificación haya expirado.",
+    "update_anyway": "Actualizar mis documentos de todos modos",
+    "go_back": "Volver",
+    "update_warning": "⚠️ Está actualizando sus documentos ya verificados. Esto requerirá una nueva revisión por nuestro equipo.",
+    "doc_type": "Tipo de documento",
+    "cni_label": "Documento Nacional de Identidad",
+    "cni_desc": "DNI válido",
+    "passport_label": "Pasaporte",
+    "passport_desc": "Pasaporte internacional válido",
+    "upload_section": "Fotos del documento",
+    "encryption_notice": "Sus documentos están encriptados y solo se utilizan para la verificación de identidad.",
+    "front_cni": "Frente del DNI *",
+    "back_cni": "Dorso del DNI *",
+    "front_passport": "Página de identidad del Pasaporte *",
+    "back_passport": "Página 2 del Pasaporte *",
+    "front_error": "Por favor suba el frente de su documento.",
+    "back_error": "Por favor suba el dorso de su documento.",
+    "doc_type_error": "Por favor seleccione un tipo de documento.",
+    "submit": "Enviar documentos",
+    "submitting": "Enviando...",
+    "skip": "Omitir por ahora",
+    "permission_photos": "Go Bagage necesita acceso a sus fotos para subir su documento de identidad.",
+    "pending": {
+      "title": "Verificación en curso",
+      "desc": "Nuestro equipo está revisando sus documentos. Esto suele tardar entre 1h y 24h. Le notificaremos tan pronto como su perfil sea verificado.",
+      "banner_title": "Verificación pendiente",
+      "banner_sub": "Documentos enviados con éxito",
+      "continue_btn": "Continuar a la aplicación"
+    },
+    "statuses": {
+      "pending": "Pendiente de verificación",
+      "under_review": "En revisión",
+      "verified": "Identidad verificada",
+      "rejected": "Verificación rechazada"
+    }
+  },
+  "tracking": {
+    "title": "Seguimiento en Vivo",
+    "live": "En Vivo",
+    "complete": "completado",
+    "shipment_status": "Estado del Envío",
+    "package_details": "Detalles del Paquete",
+    "category": "Categoría",
+    "recipient": "Destinatario",
+    "your_traveler": "Tu Viajero",
+    "reviews": "opiniones",
+    "confirm_delivery": "✅ Confirmar Recepción",
+    "confirm_delivery_pending": "⏳ Confirmar Recepción (disponible a la llegada)",
+    "not_found": "Reserva no encontrada.",
+    "step_accepted": "Reserva confirmada",
+    "step_accepted_sub": "Solicitud aceptada",
+    "step_picked_up": "Paquete recogido",
+    "step_picked_up_sub": "Entregado al viajero",
+    "step_in_transit": "En tránsito",
+    "step_in_transit_sub": "Durante el viaje",
+    "step_delivered": "Entregado al destinatario",
+    "step_delivered_sub": "Entregado en mano",
+    "step_confirmed": "Pago liberado",
+    "step_confirmed_sub": "Tras confirmación de entrega"
+  },
+  "disputes": {
+    "detail": {
+      "title": "Detalle de la Disputa",
+      "dispute_id": "Expediente #{{id}}",
+      "booking_ref": "Reserva #{{id}}",
+      "status_under_review": "En Revisión",
+      "status_open": "Disputa Abierta",
+      "status_resolved": "Resuelto",
+      "reason_label": "Motivo de la Disputa",
+      "description_label": "Explicación y Detalles",
+      "no_description": "No se proporcionaron detalles adicionales.",
+      "opened_on": "Notificado el {{date}}",
+      "escrow_title": "🔒 Fondos asegurados en depósito",
+      "escrow_text": "Los fondos de esta transacción están retenidos con seguridad. El equipo de mediación de GoBagage revisará la reclamación y se pondrá en contacto si se requiere más información.",
+      "view_chat": "Abrir conversación",
+      "close": "Cerrar"
+    },
+    "reasons": {
+      "package_damaged": "Paquete dañado",
+      "package_lost": "Paquete no recibido / perdido",
+      "delivery_delay": "Retraso importante en la entrega",
+      "non_compliant": "Contenido no conforme con la declaración",
+      "other": "Otro motivo de disputa",
+      "general": "Disputa en curso"
+    }
+  },
+  "notifications": {
+    "title": "Notificaciones",
+    "mark_all_read": "Marcar todo como leído",
+    "empty_title": "Sin notificaciones",
+    "empty_subtitle": "Aquí recibirás actualizaciones importantes."
   }
 }

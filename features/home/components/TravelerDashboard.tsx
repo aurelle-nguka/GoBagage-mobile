@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native'
-import { TrendingUp, Plane, Inbox, DollarSign } from 'lucide-react-native'
+import { TrendingUp } from 'lucide-react-native'
 import { useFocusEffect } from 'expo-router'
 import { useTranslation } from 'react-i18next'
 import { StatCard } from './StatCard'
@@ -27,39 +27,29 @@ interface TripItem {
 interface TravelerDashboardProps {
   onPublish: () => void
   onTracking: (tripId: string) => void
-  onSeeAllTrips: () => void
-  refreshing?: boolean
+  onSeeAll?: () => void
 }
 
 export function TravelerDashboard({
   onPublish,
   onTracking,
-  onSeeAllTrips,
-  refreshing = false,
+  onSeeAll,
 }: TravelerDashboardProps) {
   const { t } = useTranslation()
   const [trips, setTrips] = useState<TripItem[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTrips, setActiveTrips] = useState(0)
   const [totalRequests, setTotalRequests] = useState(0)
-  const [totalEarned, setTotalEarned] = useState(0)
 
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [tripsRes, bookingsRes] = await Promise.all([
-        apiClient.get('/trips/mine'),
-        apiClient.get('/bookings'),
-      ])
+      const response = await apiClient.get('/trips/mine')
+      const raw = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.content ?? [])
 
-      const rawTrips = Array.isArray(tripsRes.data)
-        ? tripsRes.data
-        : (tripsRes.data?.content ?? [])
-      const rawBookings = Array.isArray(bookingsRes.data)
-        ? bookingsRes.data
-        : (bookingsRes.data?.content ?? [])
-
-      const mapped: TripItem[] = rawTrips
+      const mapped: TripItem[] = raw
         .filter((t: any) => t.status === 'OPEN' || t.status === 'BOOKED')
         .slice(0, 3)
         .map((t: any) => ({
@@ -74,21 +64,15 @@ export function TravelerDashboard({
 
       setTrips(mapped)
       setActiveTrips(
-        rawTrips.filter(
-          (t: any) => t.status === 'OPEN' || t.status === 'BOOKED',
-        ).length,
+        raw.filter((t: any) => t.status === 'OPEN' || t.status === 'BOOKED')
+          .length,
       )
       setTotalRequests(
-        rawTrips.reduce(
+        raw.reduce(
           (sum: number, t: any) => sum + (t.pendingRequestsCount ?? 0),
           0,
         ),
       )
-
-      const earned = rawBookings
-        .filter((b: any) => b.status === 'CONFIRMED')
-        .reduce((sum: number, b: any) => sum + (b.travelerAmountCad ?? 0), 0)
-      setTotalEarned(earned)
     } catch {
     } finally {
       setLoading(false)
@@ -105,23 +89,21 @@ export function TravelerDashboard({
     <>
       <View style={styles.statsRow}>
         <StatCard
-          icon={<Plane size={20} color='#00C853' />}
+          emoji='✈️'
           value={loading ? '…' : String(activeTrips)}
-          label={t('home.active_trips')}
+          label={t('home.active_trips', 'Trajets Actifs')}
           backgroundColor='#e8faf0'
         />
         <StatCard
-          icon={<Inbox size={20} color='#2196F3' />}
+          emoji='📩'
           value={loading ? '…' : String(totalRequests)}
-          label={t('home.requests')}
+          label={t('home.requests', 'Demandes')}
           backgroundColor='#e8f4fd'
         />
         <StatCard
-          icon={<DollarSign size={20} color='#FF9800' />}
-          value={
-            loading ? '…' : totalEarned > 0 ? `$${totalEarned.toFixed(2)}` : '—'
-          }
-          label={t('home.earned')}
+          emoji='💰'
+          value='—'
+          label={t('home.earned', 'Gains')}
           backgroundColor='#fff8e8'
         />
       </View>
@@ -132,9 +114,15 @@ export function TravelerDashboard({
         activeOpacity={0.9}
       >
         <View>
-          <Text style={styles.ctaEyebrow}>{t('home.ready_to_earn')}</Text>
-          <Text style={styles.ctaTitle}>{t('home.publish_trip')}</Text>
-          <Text style={styles.ctaSubtitle}>{t('home.publish_subtitle')}</Text>
+          <Text style={styles.ctaEyebrow}>
+            {t('home.ready_to_earn', 'Prêt à gagner ?')}
+          </Text>
+          <Text style={styles.ctaTitle}>
+            {t('home.publish_trip', 'Publier un Trajet')}
+          </Text>
+          <Text style={styles.ctaSubtitle}>
+            {t('home.publish_subtitle', 'Définissez votre route, kg et prix')}
+          </Text>
         </View>
         <View style={styles.ctaIconBox}>
           <TrendingUp size={26} color={Colors.white} />
@@ -142,9 +130,13 @@ export function TravelerDashboard({
       </TouchableOpacity>
 
       <View style={styles.sectionHeader}>
-        <Text style={styles.sectionTitle}>{t('home.my_active_trips')}</Text>
-        <TouchableOpacity onPress={onSeeAllTrips}>
-          <Text style={styles.seeAll}>{t('home.see_all')}</Text>
+        <Text style={styles.sectionTitle}>
+          {t('home.my_active_trips', 'Mes Trajets Actifs')}
+        </Text>
+        <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
+          <Text style={styles.seeAll}>
+            {t('home.see_all', 'Tout voir')}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -156,10 +148,14 @@ export function TravelerDashboard({
         />
       ) : trips.length === 0 ? (
         <View style={styles.emptyState}>
-          <Plane size={48} color='#d1d5db' />
-          <Text style={styles.emptyText}>{t('home.no_trips')}</Text>
+          <Text style={styles.emptyEmoji}>✈️</Text>
+          <Text style={styles.emptyText}>
+            {t('home.no_trips', 'Aucun trajet actif')}
+          </Text>
           <TouchableOpacity onPress={onPublish}>
-            <Text style={styles.emptyAction}>{t('home.publish_first')}</Text>
+            <Text style={styles.emptyAction}>
+              {t('home.publish_first', 'Publiez votre premier trajet')}
+            </Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -181,7 +177,11 @@ export function TravelerDashboard({
 }
 
 const styles = StyleSheet.create({
-  statsRow: { flexDirection: 'row', gap: Spacing[3], marginBottom: Spacing[5] },
+  statsRow: {
+    flexDirection: 'row',
+    gap: Spacing[3],
+    marginBottom: Spacing[5],
+  },
   ctaCard: {
     backgroundColor: Colors.primary,
     borderRadius: Radius['2xl'],
@@ -206,7 +206,11 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
   },
-  ctaSubtitle: { color: 'rgba(255,255,255,0.8)', fontSize: 12, marginTop: 2 },
+  ctaSubtitle: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    marginTop: 2,
+  },
   ctaIconBox: {
     width: 48,
     height: 48,
@@ -231,12 +235,15 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
   },
-  emptyState: { alignItems: 'center', paddingVertical: Spacing[8] },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: Spacing[8],
+  },
+  emptyEmoji: { fontSize: 36, marginBottom: Spacing[2] },
   emptyText: {
     color: Colors.mutedForeground,
     fontSize: FontSize.base,
     marginBottom: Spacing[2],
-    marginTop: Spacing[2],
   },
   emptyAction: {
     color: Colors.primary,

@@ -5,6 +5,7 @@ import axios, {
 } from 'axios';
 import { tokenService } from './token.service';
 import { API_BASE_URL, API_TIMEOUT } from '../constants/api.constants';
+import i18n from '../../i18n';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
@@ -20,6 +21,9 @@ apiClient.interceptors.request.use(
     const token = await tokenService.getAccessToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+    if (i18n?.language) {
+      config.headers['Accept-Language'] = i18n.language;
     }
     return config;
   },

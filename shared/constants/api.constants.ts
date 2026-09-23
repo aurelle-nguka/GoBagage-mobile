@@ -21,6 +21,7 @@ export const Endpoints = {
   AUTH_PASSWORD_RESET:  '/auth/password/reset',
 
   USERS_ME:             '/users/me',
+  USERS_ME_AVATAR:      '/users/me/avatar',
   USERS_ME_KYC:         '/users/me/kyc',
   USERS_PUBLIC:         (id: string) => `/users/${id}/public`,
 
@@ -57,4 +58,10 @@ export const Endpoints = {
   ADMIN_KYC_QUEUE:      '/admin/kyc-queue',
   ADMIN_KYC_VALIDATE:   (id: string) => `/admin/kyc/${id}`,
   ADMIN_CORRIDORS:      '/admin/corridors',
+  ADMIN_STATS:          '/admin/stats',
+
+  NOTIFICATIONS:        '/notifications',
+  NOTIFICATIONS_UNREAD: '/notifications/unread-count',
+  NOTIFICATION_READ:    (id: string | number) => `/notifications/${id}/read`,
+  NOTIFICATIONS_READ_ALL: '/notifications/read-all',
 } as const;

@@ -38,12 +38,14 @@ export default function TrackingPage() {
       to={data.to}
       departureDate={data.departureDate}
       status={data.status}
+      paymentStatus={data.paymentStatus}
       progressPercent={data.progressPercent}
       parcel={data.parcel}
       traveler={data.traveler}
       onBack={() => router.back()}
       onChat={() => router.push(`/(modals)/chat/${bookingId}`)}
       onCall={() => {}}
+      onReportProblem={() => router.push(`/(modals)/dispute/${bookingId}`)}
       onConfirmDelivery={async () => {
         const ok = await confirm()
         if (ok) {

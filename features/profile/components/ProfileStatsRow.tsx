@@ -1,3 +1,4 @@
+import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { Plane, Package, DollarSign } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -5,35 +6,39 @@ import { FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { formatCAD } from '../../../shared/utils/currency.utils'
 
 interface ProfileStatsRowProps {
-  tripsCount: number
-  parcelsSentCount: number
-  totalEarnings: number
+  tripsCount?: number
+  parcelsSentCount?: number
+  totalEarnings?: number
 }
 
 export function ProfileStatsRow({
-  tripsCount,
-  parcelsSentCount,
-  totalEarnings,
+  tripsCount = 0,
+  parcelsSentCount = 0,
+  totalEarnings = 0,
 }: ProfileStatsRowProps) {
   const { t } = useTranslation()
+  const safeTrips = typeof tripsCount === 'number' && !isNaN(tripsCount) ? tripsCount : 0
+  const safeParcels = typeof parcelsSentCount === 'number' && !isNaN(parcelsSentCount) ? parcelsSentCount : 0
+  const safeEarnings = typeof totalEarnings === 'number' && !isNaN(totalEarnings) ? totalEarnings : 0
+
   return (
     <View style={styles.row}>
       <StatBox
         icon={<Plane size={20} color='#00C853' />}
-        value={String(tripsCount)}
-        label={t('profile.trips', 'Trips')}
+        value={String(safeTrips)}
+        label={t('profile.trips', { defaultValue: 'Trajets' })}
         backgroundColor='#e8faf0'
       />
       <StatBox
         icon={<Package size={20} color='#2196F3' />}
-        value={String(parcelsSentCount)}
-        label={t('profile.parcels_sent', 'Parcels sent')}
+        value={String(safeParcels)}
+        label={t('profile.parcels_sent', { defaultValue: 'Colis envoyés' })}
         backgroundColor='#e8f4fd'
       />
       <StatBox
         icon={<DollarSign size={20} color='#FF9800' />}
-        value={formatCAD(totalEarnings)}
-        label={t('profile.earnings', 'Earnings')}
+        value={formatCAD(safeEarnings)}
+        label={t('profile.earnings', { defaultValue: 'Gains' })}
         backgroundColor='#fff8e8'
         small
       />

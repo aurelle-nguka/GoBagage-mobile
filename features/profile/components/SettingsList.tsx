@@ -1,3 +1,8 @@
+/**
+ * Go Bagage — SettingsList
+ * Liste de réglages cliquables (paiement, notifications, langue).
+ */
+
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import { ChevronRight } from 'lucide-react-native'
 import { Colors, FontSize, Spacing, Radius } from '../../../theme'
@@ -36,7 +41,7 @@ export function SettingsList({ items }: SettingsListProps) {
             <Text
               style={[
                 styles.value,
-                item.valueColor ? { color: item.valueColor } : null,
+                item.valueColor ? { color: item.valueColor, fontWeight: '600' } : null,
               ]}
             >
               {item.value}

@@ -54,24 +54,6 @@ function MtnMomoIcon() {
   )
 }
 
-function InteracIcon() {
-  return (
-    <Svg width={36} height={24} viewBox='0 0 36 24'>
-      <Rect width={36} height={24} rx={4} fill='#FFD100' />
-      <SvgText
-        x={18}
-        y={16}
-        textAnchor='middle'
-        fill='#1A1A1A'
-        fontSize={9}
-        fontWeight='bold'
-      >
-        Interac
-      </SvgText>
-    </Svg>
-  )
-}
-
 interface PaymentMethodConfig {
   provider: PaymentProvider
   label: string
@@ -90,7 +72,7 @@ function getPaymentMethods(
       Icon: StripeIcon,
     },
     {
-      provider: 'ORANGE_MONEY',
+      provider: 'ORANGE',
       label: t('payment.method_orange_label', 'Orange Money'),
       sublabel: t(
         'payment.method_orange_sublabel',
@@ -99,19 +81,13 @@ function getPaymentMethods(
       Icon: OrangeMoneyIcon,
     },
     {
-      provider: 'MTN_MOMO',
+      provider: 'MTN',
       label: t('payment.method_momo_label', 'MTN MoMo'),
       sublabel: t(
         'payment.method_momo_sublabel',
         'Mobile money · Cameroun, GH...',
       ),
       Icon: MtnMomoIcon,
-    },
-    {
-      provider: 'INTERAC',
-      label: t('payment.method_interac_label', 'Interac e-Transfer'),
-      sublabel: t('payment.method_interac_sublabel', 'Canadian banks only'),
-      Icon: InteracIcon,
     },
   ]
 }

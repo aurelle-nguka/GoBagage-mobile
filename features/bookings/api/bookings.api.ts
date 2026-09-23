@@ -60,7 +60,9 @@ export async function confirmDelivery(bookingId: string): Promise<BookingDTO> {
   return response.data;
 }
 
-export async function cancelBooking(bookingId: string): Promise<BookingDTO> {
-  const response = await apiClient.patch<BookingDTO>(`/bookings/${bookingId}/cancel`);
+export async function cancelBooking(bookingId: string, reason?: string): Promise<BookingDTO> {
+  const response = await apiClient.patch<BookingDTO>(`/bookings/${bookingId}/cancel`, {
+    reason,
+  });
   return response.data;
 }

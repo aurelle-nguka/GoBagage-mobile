@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getBooking, confirmDelivery } from '../api/bookings.api';
-import { BookingDTO, BookingStatus } from '../types/booking.type';
+import { BookingDTO, BookingStatus, PaymentEscrowStatus } from '../types/booking.type';
 
 export interface TrackingData {
   bookingId: string;
   status: BookingStatus;
+  paymentStatus: PaymentEscrowStatus;
   progressPercent: number;
   from: string;
   to: string;
@@ -102,6 +103,7 @@ function mapBookingToTracking(booking: BookingDTO): TrackingData {
   return {
     bookingId:       String(booking.id),
     status:          booking.status,
+    paymentStatus:   (booking.paymentStatus as PaymentEscrowStatus) ?? 'INITIATED',
     progressPercent: STATUS_PROGRESS[booking.status] ?? 0,
     from:            corridor?.departureCity ?? 'Unknown',
     to:              corridor?.arrivalCity   ?? 'Unknown',

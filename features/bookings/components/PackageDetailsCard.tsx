@@ -1,3 +1,8 @@
+/**
+ * Go Bagage — PackageDetailsCard
+ * Récapitulatif du colis suivi.
+ */
+
 import { View, Text, StyleSheet } from 'react-native'
 import { Package } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -21,19 +26,19 @@ export function PackageDetailsCard({
   return (
     <View style={styles.card}>
       <Text style={styles.title}>
-        {t('tracking.package_details', 'Package Details')}
+        {t('tracking.package_details', { defaultValue: 'Détails du Colis' })}
       </Text>
       <View style={styles.row}>
         <View style={styles.iconBox}>
-          <Package size={32} color={Colors.primary} />
+          <Package size={28} color={Colors.primary} />
         </View>
         <View style={styles.info}>
           <Text style={styles.description}>{description}</Text>
           <Text style={styles.meta}>
-            {t('parcel.category')}: {category} · {weightKg} kg
+            {t('tracking.category', { defaultValue: 'Catégorie' })}: {category} · {weightKg} kg
           </Text>
           <Text style={styles.recipient}>
-            {t('tracking.recipient', 'Recipient')}: {recipientName}
+            {t('tracking.recipient', { defaultValue: 'Destinataire' })}: {recipientName}
           </Text>
         </View>
       </View>
@@ -61,7 +66,11 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 0.5,
   },
-  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[3],
+  },
   iconBox: {
     width: 64,
     height: 64,
@@ -70,12 +79,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  info: { flex: 1 },
+  info: {
+    flex: 1,
+  },
   description: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
     color: Colors.foreground,
   },
-  meta: { fontSize: FontSize.sm, color: Colors.mutedForeground },
-  recipient: { fontSize: FontSize.sm, color: '#9ca3af' },
+  meta: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+  },
+  recipient: {
+    fontSize: FontSize.sm,
+    color: '#9ca3af',
+  },
 })

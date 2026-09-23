@@ -1,6 +1,6 @@
 
 import { View, Text, StyleSheet } from 'react-native';
-import { AlertTriangle } from 'lucide-react-native';
+import { AlertCircle } from 'lucide-react-native';
 import { Colors, FontSize, Radius, Spacing } from '../../../theme';
 
 interface ErrorBannerProps {
@@ -10,7 +10,7 @@ interface ErrorBannerProps {
 export function ErrorBanner({ message }: ErrorBannerProps) {
   return (
     <View style={styles.banner}>
-      <AlertTriangle size={16} color={Colors.destructive} />
+      <AlertCircle size={16} color={Colors.destructive} />
       <Text style={styles.text}>{message}</Text>
     </View>
   );

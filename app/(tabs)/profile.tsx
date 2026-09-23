@@ -6,6 +6,7 @@ import { useAuthStore } from '../../store/auth.store'
 import { Colors } from '../../theme/colors'
 import { ProfileScreen } from '../../features/profile/screens/ProfileScreen'
 import { getMyProfile } from '../../features/auth/api/auth.api'
+import { useProfile } from '../../features/profile/hooks/useProfile'
 
 export default function ProfilePage() {
   const router = useRouter()
@@ -27,13 +28,13 @@ export default function ProfilePage() {
         profilePhoto: userDto.profilePhotoUrl ?? undefined,
         bio: userDto.bio ?? undefined,
         averageRating: userDto.averageRating ?? 0,
-        totalDeliveries: userDto.totalDeliveries,
-        subscriptionType: userDto.subscriptionPlan,
+        totalDeliveries: userDto.totalDeliveries ?? 0,
+        subscriptionType: userDto.subscriptionPlan ?? 'FREE',
         createdAt: userDto.createdAt,
       }
       setUser(updatedUser)
     } catch (err) {}
-  }, [])
+  }, [setUser])
 
   const handleRefresh = async () => {
     setRefreshing(true)
@@ -68,9 +69,8 @@ export default function ProfilePage() {
         router.push(`/(modals)/tracking/${bookingId}`)
       }
       onPaymentMethods={() => {}}
-      onNotificationSettings={() => {}}
-      onLanguageSettings={() => router.push('/(modals)/language')}
-      onEditProfile={() => router.push('/(modals)/edit-profile')}
+      onNotificationSettings={() => router.push('/(modals)/notifications')}
+      onLanguageSettings={() => {}}
       onLogout={async () => {
         await logout()
         router.replace('/(auth)/onboarding')

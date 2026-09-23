@@ -26,9 +26,9 @@ export interface CorridorStatusRequest {
 }
 
 export function corridorLabel(c: CorridorResponse): string {
-  return `${c.departureCity} → ${c.arrivalCity}`;
+  return `${c.departureCity} - ${c.arrivalCity}`;
 }
 
 export function corridorSubLabel(c: CorridorResponse): string {
-  return `${c.departureCountry} → ${c.arrivalCountry}`;
+  return `${c.departureCountry} - ${c.arrivalCountry}`;
 }

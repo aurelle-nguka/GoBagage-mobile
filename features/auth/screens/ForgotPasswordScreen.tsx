@@ -13,11 +13,13 @@ import { ErrorBanner } from '../../../shared/components/feedback/ErrorBanner'
 interface ForgotPasswordScreenProps {
   onBack: () => void
   onDone: () => void
+  onGoToReset?: () => void
 }
 
 export function ForgotPasswordScreen({
   onBack,
   onDone,
+  onGoToReset,
 }: ForgotPasswordScreenProps) {
   const { t } = useTranslation()
   const [email, setEmail] = useState('')
@@ -62,11 +64,25 @@ export function ForgotPasswordScreen({
               "we've sent a password reset link. It may take a few minutes to arrive.",
             )}
           </Text>
-          <PrimaryButton
-            label={t('auth.back_to_login', 'Back to Login')}
-            onPress={onDone}
-            style={styles.successButton}
-          />
+
+          <View style={styles.successActions}>
+            {onGoToReset ? (
+              <PrimaryButton
+                label={t('auth.enter_reset_code', 'Enter Reset Code')}
+                onPress={onGoToReset}
+                style={styles.successButton}
+              />
+            ) : null}
+            <TouchableOpacity
+              onPress={onDone}
+              style={styles.secondaryLinkButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.secondaryLinkText}>
+                {t('auth.back_to_login', 'Back to Login')}
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </SafeAreaView>
     )
@@ -120,6 +136,18 @@ export function ForgotPasswordScreen({
             loading={loading}
             onPress={handleSubmit}
           />
+
+          {onGoToReset ? (
+            <TouchableOpacity
+              onPress={onGoToReset}
+              style={styles.hasCodeButton}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
+              <Text style={styles.hasCodeText}>
+                {t('auth.already_have_code', 'Already have a code? Enter code')}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
@@ -173,5 +201,18 @@ const styles = StyleSheet.create({
     marginBottom: Spacing[8],
   },
   bold: { fontWeight: FontWeight.bold, color: Colors.foreground },
+  successActions: { width: '100%', gap: Spacing[3], alignItems: 'center' },
   successButton: { width: '100%' },
+  secondaryLinkButton: { paddingVertical: Spacing[2] },
+  secondaryLinkText: {
+    color: Colors.primary,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
+  },
+  hasCodeButton: { alignSelf: 'center', marginTop: Spacing[2], paddingVertical: Spacing[2] },
+  hasCodeText: {
+    color: Colors.primary,
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.medium,
+  },
 })

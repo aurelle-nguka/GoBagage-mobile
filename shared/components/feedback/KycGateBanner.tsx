@@ -5,7 +5,7 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { AlertTriangle, Clock, XCircle, CheckCircle2 } from 'lucide-react-native'
+import { ShieldAlert, Clock, XCircle, CheckCircle2 } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { KycStatus } from '../../../types/user.types'
@@ -31,7 +31,7 @@ function getConfig(t: (key: string, fallback: string) => string): Record<
     PENDING: {
       bg: '#fff8e8',
       border: '#ffe0b2',
-      Icon: AlertTriangle,
+      Icon: ShieldAlert,
       iconColor: Colors.warning,
       title: t(
         'common.kyc_gate.pending_title',
@@ -107,7 +107,7 @@ export function KycGateBanner({ kycStatus, onGoToKyc }: KycGateBannerProps) {
             activeOpacity={0.85}
           >
             <Text style={styles.buttonText}>
-              {t('common.kyc_gate.verify_cta', 'Verify my identity →')}
+              {t('common.kyc_gate.verify_cta', 'Verify my identity')}
             </Text>
           </TouchableOpacity>
         )}

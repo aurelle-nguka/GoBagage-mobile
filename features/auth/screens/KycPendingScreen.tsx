@@ -1,16 +1,16 @@
-import { View, Text, StyleSheet } from 'react-native'
-import { SafeAreaView } from 'react-native-safe-area-context'
-import { Clock } from 'lucide-react-native'
-import { useTranslation } from 'react-i18next'
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
-import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
+import { View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Clock } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton';
 
 interface KycPendingScreenProps {
-  onContinue: () => void
+  onContinue: () => void;
 }
 
 export function KycPendingScreen({ onContinue }: KycPendingScreenProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
 
   return (
     <SafeAreaView style={styles.container}>
@@ -20,39 +20,41 @@ export function KycPendingScreen({ onContinue }: KycPendingScreenProps) {
         </View>
 
         <Text style={styles.title}>
-          {t('kyc.pending_title', 'Verification Pending')}
+          {t('kyc.pending.title', { defaultValue: 'Verification Pending' })}
         </Text>
         <Text style={styles.description}>
-          {t(
-            'kyc.pending_desc',
-            "Our team is reviewing your documents. This usually takes 1–24 hours. We'll notify you once verified.",
-          )}
+          {t('kyc.pending.desc', {
+            defaultValue: "Our team is reviewing your documents. This usually takes 1–24 hours. We'll notify you once verified.",
+          })}
         </Text>
 
         <View style={styles.statusBanner}>
-          <Clock size={22} color={Colors.warning} />
+          <Text style={styles.statusEmoji}>⏳</Text>
           <View>
             <Text style={styles.statusTitle}>
-              {t('kyc.pending_status', 'Pending verification')}
+              {t('kyc.pending.banner_title', { defaultValue: 'Pending verification' })}
             </Text>
             <Text style={styles.statusSubtitle}>
-              {t('kyc.submitted_success', 'Documents submitted successfully')}
+              {t('kyc.pending.banner_sub', { defaultValue: 'Documents submitted successfully' })}
             </Text>
           </View>
         </View>
 
         <PrimaryButton
-          label={t('kyc.continue_app', 'Continue to App')}
+          label={t('kyc.pending.continue_btn', { defaultValue: 'Continue to App' })}
           onPress={onContinue}
           style={styles.continueButton}
         />
       </View>
     </SafeAreaView>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   content: {
     flex: 1,
     alignItems: 'center',
@@ -94,11 +96,19 @@ const styles = StyleSheet.create({
     padding: Spacing[4],
     marginBottom: Spacing[6],
   },
+  statusEmoji: {
+    fontSize: 22,
+  },
   statusTitle: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
     color: '#E65100',
   },
-  statusSubtitle: { fontSize: FontSize.sm, color: Colors.mutedForeground },
-  continueButton: { width: '100%' },
-})
+  statusSubtitle: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+  },
+  continueButton: {
+    width: '100%',
+  },
+});

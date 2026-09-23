@@ -17,19 +17,22 @@ import {
   RecentActivityRow,
   type ActivityItem,
 } from '../components/RecentActivityRow'
+import { mapBookingToActivityItem } from '../hooks/useProfile'
 import { useAuthStore } from '../../../store/auth.store'
 import apiClient from '../../../shared/services/api.client'
 
 interface AllActivityScreenProps {
   onBack: () => void
   onOpenBooking: (bookingId: string) => void
+  onOpenReview: (bookingId: string) => void
 }
 
 export function AllActivityScreen({
   onBack,
   onOpenBooking,
+  onOpenReview,
 }: AllActivityScreenProps) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuthStore()
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -64,10 +67,9 @@ export function AllActivityScreen({
             to,
             amount: isEarning ? b.travelerAmountCad : -(b.totalAmountCad ?? 0),
             date: b.createdAt
-              ? new Intl.DateTimeFormat('en', {
+              ? new Intl.DateTimeFormat(i18n.language || 'fr', {
                   month: 'short',
                   day: 'numeric',
-                  year: 'numeric',
                 }).format(new Date(b.createdAt))
               : '—',
             status: b.status ?? 'PENDING',
@@ -85,7 +87,7 @@ export function AllActivityScreen({
         setRefreshing(false)
       }
     },
-    [isTraveler],
+    [user, i18n.language, t],
   )
 
   useFocusEffect(
@@ -141,6 +143,7 @@ export function AllActivityScreen({
             <RecentActivityRow
               activity={item}
               onPress={() => onOpenBooking(item.id)}
+              onRate={isTraveler ? undefined : () => onOpenReview(item.id)}
             />
           )}
           ListEmptyComponent={

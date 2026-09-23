@@ -1,8 +1,3 @@
-/**
- * Go Bagage — SubscriptionCard
- * Bandeau d'abonnement (CDC section 5.1 — Gratuit / Premium).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Crown } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -10,12 +5,12 @@ import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { SubscriptionType } from '../../../types/user.types'
 
 interface SubscriptionCardProps {
-  plan: SubscriptionType
+  plan?: SubscriptionType
 }
 
-export function SubscriptionCard({ plan }: SubscriptionCardProps) {
+export function SubscriptionCard({ plan = 'FREE' }: SubscriptionCardProps) {
   const { t } = useTranslation()
-  const isPremium = plan === 'PREMIUM'
+  const isPremium = (plan || 'FREE') === 'PREMIUM'
 
   return (
     <View style={styles.card}>
@@ -23,19 +18,17 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
       <View style={styles.textBlock}>
         <Text style={styles.title}>
           {isPremium
-            ? t('profile.subscription.premium_title', 'Premium Member')
-            : t('profile.subscription.free_title', 'Free Plan')}
+            ? t('profile.subscription.premium_title', { defaultValue: 'Premium Member' })
+            : t('profile.subscription.free_title', { defaultValue: 'Free Plan' })}
         </Text>
         <Text style={styles.subtitle}>
           {isPremium
-            ? t(
-                'profile.subscription.premium_subtitle',
-                'Priority listings · 0% extra fee · Priority support',
-              )
-            : t(
-                'profile.subscription.free_subtitle',
-                'Upgrade to unlock unlimited transactions',
-              )}
+            ? t('profile.subscription.premium_subtitle', {
+                defaultValue: 'Priority listings · 0% extra fee · Priority support',
+              })
+            : t('profile.subscription.free_subtitle', {
+                defaultValue: 'Upgrade to unlock unlimited transactions',
+              })}
         </Text>
       </View>
       <View
@@ -46,8 +39,8 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
       >
         <Text style={[styles.badgeText, isPremium && styles.badgeTextDark]}>
           {isPremium
-            ? t('profile.subscription.active', 'ACTIVE')
-            : t('profile.subscription.upgrade', 'UPGRADE')}
+            ? t('profile.subscription.active', { defaultValue: 'ACTIVE' })
+            : t('profile.subscription.upgrade', { defaultValue: 'UPGRADE' })}
         </Text>
       </View>
     </View>

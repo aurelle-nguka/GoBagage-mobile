@@ -53,7 +53,7 @@ export function SearchScreen({ onBack, onSearch }: SearchScreenProps) {
           loading={loading}
           selected={selectedCorridor}
           onSelect={setSelectedCorridor}
-          placeholder={t('search.placeholder')}
+          placeholder='e.g. Montreal - Douala'
         />
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import {
   View,
   Text,
@@ -9,7 +9,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'
-import { CheckCircle, Info, AlertTriangle, Check } from 'lucide-react-native'
+import { CheckCircle } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { AuthHeader } from '../components/AuthHeader'
 import { AuthProgressSteps } from '../components/AuthProgressSteps'
@@ -38,35 +38,12 @@ export function KycUploadScreen({
   onSkip,
 }: KycUploadScreenProps) {
   const { t } = useTranslation()
-
-  const ROLE_LABELS: Record<RoleChoice, string> = {
-    TRAVELER: t('onboarding.traveler'),
-    SENDER: t('onboarding.sender'),
-    BOTH: `${t('onboarding.traveler')} & ${t('onboarding.sender')}`,
-  }
-
-  const DOCUMENT_TYPES: {
-    id: DocumentType
-    label: string
-    description: string
-  }[] = [
-    {
-      id: 'CNI',
-      label: t('kyc.cni'),
-      description: t('kyc.cni_desc', 'National Identity Card'),
-    },
-    {
-      id: 'PASSPORT',
-      label: t('kyc.passport'),
-      description: t('kyc.passport_desc', 'Valid international passport'),
-    },
-  ]
-
   const [documentType, setDocumentType] = useState<DocumentType | null>(null)
   const [idFrontUri, setIdFrontUri] = useState<string | null>(null)
   const [idBackUri, setIdBackUri] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [confirmUpdate, setConfirmUpdate] = useState(false)
+
   const [docTypeError, setDocTypeError] = useState('')
   const [frontError, setFrontError] = useState('')
   const [backError, setBackError] = useState('')
@@ -74,20 +51,54 @@ export function KycUploadScreen({
 
   const isVerified = kycStatus === 'VERIFIED'
 
+  const roleLabel = useMemo(() => {
+    switch (role) {
+      case 'TRAVELER':
+        return t('roles.traveler', { defaultValue: 'Traveler' })
+      case 'SENDER':
+        return t('roles.sender', { defaultValue: 'Sender' })
+      case 'BOTH':
+      default:
+        return t('roles.both', { defaultValue: 'Traveler & Sender' })
+    }
+  }, [role, t])
+
+  const documentTypes = useMemo<{
+    id: DocumentType
+    label: string
+    emoji: string
+    description: string
+  }[]>(() => [
+    {
+      id: 'CNI',
+      label: t('kyc.cni_label', { defaultValue: 'National ID Card' }),
+      emoji: '🪪',
+      description: t('kyc.cni_desc', { defaultValue: "Carte Nationale d'Identité" }),
+    },
+    {
+      id: 'PASSPORT',
+      label: t('kyc.passport_label', { defaultValue: 'Passport' }),
+      emoji: '📔',
+      description: t('kyc.passport_desc', { defaultValue: 'Valid international passport' }),
+    },
+  ], [t])
+
   const pickImage = async (side: 'front' | 'back') => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (status !== 'granted') {
       Alert.alert(
-        t('kyc.permission_title', 'Permission required'),
-        t('kyc.permission_desc', 'Go Bagage needs access to your photos.'),
+        t('kyc.permission_title', { defaultValue: 'Permission required' }),
+        t('kyc.permission_photos', { defaultValue: 'Go Bagage needs access to your photos.' }),
       )
       return
     }
+
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       quality: 0.8,
       allowsEditing: true,
     })
+
     if (!result.canceled && result.assets[0]) {
       const uri = result.assets[0].uri
       if (side === 'front') {
@@ -102,25 +113,37 @@ export function KycUploadScreen({
 
   const validate = (): boolean => {
     let valid = true
+
     if (!documentType) {
-      setDocTypeError(t('kyc.errors.doc_type_required'))
+      setDocTypeError(t('kyc.doc_type_error', { defaultValue: 'Please select a document type.' }))
       valid = false
-    } else setDocTypeError('')
+    } else {
+      setDocTypeError('')
+    }
+
     if (!idFrontUri) {
-      setFrontError(t('kyc.errors.front_required'))
+      setFrontError(t('kyc.front_error', { defaultValue: 'Please upload the front of your document.' }))
       valid = false
-    } else setFrontError('')
+    } else {
+      setFrontError('')
+    }
+
     if (!idBackUri) {
-      setBackError(t('kyc.errors.back_required'))
+      setBackError(t('kyc.back_error', { defaultValue: 'Please upload the back of your document.' }))
       valid = false
-    } else setBackError('')
+    } else {
+      setBackError('')
+    }
+
     return valid
   }
 
   const handleSubmit = async () => {
     if (!validate()) return
+
     setApiError('')
     setLoading(true)
+
     try {
       const formData = new FormData()
       formData.append('frontFile', {
@@ -134,12 +157,16 @@ export function KycUploadScreen({
         type: 'image/jpeg',
       } as any)
       formData.append('documentType', documentType!)
+
       await apiClient.post('/users/me/kyc', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       onSuccess()
     } catch (err: any) {
-      setApiError(err?.response?.data?.message ?? t('common.error'))
+      setApiError(
+        err?.response?.data?.message ??
+          t('common.error', { defaultValue: 'Failed to submit documents. Please try again.' }),
+      )
     } finally {
       setLoading(false)
     }
@@ -147,18 +174,17 @@ export function KycUploadScreen({
 
   if (isVerified && !confirmUpdate) {
     return (
-      <SafeAreaView style={styles.container}>
-        <AuthHeader roleLabel={ROLE_LABELS[role]} onBack={onBack} />
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <AuthHeader roleLabel={roleLabel} onBack={onBack} />
         <View style={styles.verifiedContent}>
           <View style={styles.verifiedIconCircle}>
             <CheckCircle size={48} color={Colors.primary} />
           </View>
-          <Text style={styles.verifiedTitle}>{t('kyc.verified')}</Text>
+          <Text style={styles.verifiedTitle}>{t('kyc.verified_title', { defaultValue: 'Identity already verified' })}</Text>
           <Text style={styles.verifiedSubtitle}>
-            {t(
-              'kyc.verified_desc',
-              "Your identity has been successfully verified. You don't need to submit new documents unless your ID has expired or changed.",
-            )}
+            {t('kyc.verified_desc', {
+              defaultValue: "Your identity has been successfully verified. You don't need to submit new documents unless your ID has expired or changed.",
+            })}
           </Text>
           <View style={styles.verifiedActions}>
             <TouchableOpacity
@@ -166,14 +192,16 @@ export function KycUploadScreen({
               onPress={() => setConfirmUpdate(true)}
               activeOpacity={0.85}
             >
-              <Text style={styles.updateButtonText}>{t('kyc.update')}</Text>
+              <Text style={styles.updateButtonText}>
+                {t('kyc.update_anyway', { defaultValue: 'Update my documents anyway' })}
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.backButton}
               onPress={onBack}
               activeOpacity={0.85}
             >
-              <Text style={styles.backButtonText}>{t('common.back')}</Text>
+              <Text style={styles.backButtonText}>{t('kyc.go_back', { defaultValue: 'Go back' })}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -182,8 +210,9 @@ export function KycUploadScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <AuthHeader roleLabel={ROLE_LABELS[role]} onBack={onBack} />
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <AuthHeader roleLabel={roleLabel} onBack={onBack} />
+
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.content}
@@ -192,27 +221,29 @@ export function KycUploadScreen({
         {!isVerified && <AuthProgressSteps currentStep={2} />}
 
         {isVerified && confirmUpdate && (
-          <View style={[styles.updateBanner, styles.updateBannerRow]}>
-            <AlertTriangle size={18} color={Colors.warning} />
-            <Text style={[styles.updateBannerText, styles.updateBannerTextFlex]}>
-              {t(
-                'kyc.update_warning',
-                'You are updating your already verified documents. This will require a new review.',
-              )}
+          <View style={styles.updateBanner}>
+            <Text style={styles.updateBannerText}>
+              {t('kyc.update_warning', {
+                defaultValue: '⚠️ You are updating your already verified documents. This will require a new review.',
+              })}
             </Text>
           </View>
         )}
 
         <Text style={styles.title}>
           {isVerified
-            ? t('kyc.update_title', 'Update your documents')
-            : t('kyc.title')}
+            ? t('kyc.title_update', { defaultValue: 'Update your documents' })
+            : t('kyc.title', { defaultValue: 'Verify your identity' })}
         </Text>
-        <Text style={styles.subtitle}>{t('kyc.subtitle')}</Text>
+        <Text style={styles.subtitle}>
+          {t('kyc.subtitle', { defaultValue: 'Select your document type and upload both sides.' })}
+        </Text>
 
-        <Text style={styles.sectionLabel}>{t('kyc.document_type')} *</Text>
+        <Text style={styles.sectionLabel}>
+          {t('kyc.doc_type', { defaultValue: 'Document type' })} *
+        </Text>
         <View style={styles.docTypeRow}>
-          {DOCUMENT_TYPES.map((doc) => {
+          {documentTypes.map((doc) => {
             const isSelected = documentType === doc.id
             return (
               <TouchableOpacity
@@ -232,6 +263,7 @@ export function KycUploadScreen({
                 }}
                 activeOpacity={0.85}
               >
+                <Text style={styles.docTypeEmoji}>{doc.emoji}</Text>
                 <Text
                   style={[
                     styles.docTypeLabel,
@@ -250,58 +282,74 @@ export function KycUploadScreen({
                 </Text>
                 {isSelected && (
                   <View style={styles.selectedBadge}>
-                    <Check size={12} color={Colors.white} strokeWidth={3} />
+                    <Text style={styles.selectedBadgeText}>✓</Text>
                   </View>
                 )}
               </TouchableOpacity>
             )
           })}
         </View>
-        {docTypeError ? <FieldError message={docTypeError} /> : null}
+        {docTypeError ? (
+          <Text style={styles.fieldError}>⚠ {docTypeError}</Text>
+        ) : null}
 
         {documentType && (
           <>
             <Text style={styles.sectionLabel}>
-              {t('kyc.upload_photos', 'Upload photos')}
+              {t('kyc.upload_section', { defaultValue: 'Upload photos' })}
             </Text>
             <View style={styles.infoBanner}>
-              <Info size={18} color='#1565C0' />
+              <Text style={styles.infoEmoji}>ℹ️</Text>
               <Text style={styles.infoText}>
-                {t(
-                  'kyc.info_text',
-                  'Your documents are encrypted and only used for identity verification.',
-                )}
+                {t('kyc.encryption_notice', {
+                  defaultValue: 'Your documents are encrypted and only used for identity verification.',
+                })}
               </Text>
             </View>
 
             <View style={styles.uploadList}>
               <View>
                 <IdUploadCard
-                  label={`${t('kyc.front')} ${documentType === 'CNI' ? t('kyc.id_card', 'ID Card') : t('kyc.passport')} *`}
+                  label={
+                    documentType === 'CNI'
+                      ? t('kyc.front_cni', { defaultValue: 'Front of ID Card *' })
+                      : t('kyc.front_passport', { defaultValue: 'Passport Identity Page *' })
+                  }
                   uploadedUri={idFrontUri}
                   onPress={() => pickImage('front')}
                 />
-                {frontError ? <FieldError message={frontError} /> : null}
+                {frontError ? (
+                  <Text style={styles.fieldError}>⚠ {frontError}</Text>
+                ) : null}
               </View>
+
               <View>
                 <IdUploadCard
-                  label={`${t('kyc.back')} ${documentType === 'CNI' ? t('kyc.id_card', 'ID Card') : t('kyc.passport')} *`}
+                  label={
+                    documentType === 'CNI'
+                      ? t('kyc.back_cni', { defaultValue: 'Back of ID Card *' })
+                      : t('kyc.back_passport', { defaultValue: 'Passport Page 2 *' })
+                  }
                   uploadedUri={idBackUri}
                   onPress={() => pickImage('back')}
                 />
-                {backError ? <FieldError message={backError} /> : null}
+                {backError ? (
+                  <Text style={styles.fieldError}>⚠ {backError}</Text>
+                ) : null}
               </View>
             </View>
           </>
         )}
 
         {apiError ? (
-          <FieldError message={apiError} style={{ marginTop: Spacing[3] }} />
+          <Text style={[styles.fieldError, { marginTop: Spacing[3] }]}>
+            ⚠ {apiError}
+          </Text>
         ) : null}
 
         <PrimaryButton
-          label={t('kyc.submit')}
-          loadingLabel={t('kyc.loading')}
+          label={t('kyc.submit', { defaultValue: 'Submit Documents' })}
+          loadingLabel={t('kyc.submitting', { defaultValue: 'Submitting...' })}
           loading={loading}
           onPress={handleSubmit}
           style={styles.submitButton}
@@ -309,26 +357,13 @@ export function KycUploadScreen({
 
         {!isVerified && (
           <TouchableOpacity style={styles.skipButton} onPress={onSkip}>
-            <Text style={styles.skipText}>{t('kyc.skip')}</Text>
+            <Text style={styles.skipText}>
+              {t('kyc.skip', { defaultValue: 'Skip for now' })}
+            </Text>
           </TouchableOpacity>
         )}
       </ScrollView>
     </SafeAreaView>
-  )
-}
-
-function FieldError({
-  message,
-  style,
-}: {
-  message: string
-  style?: object
-}) {
-  return (
-    <View style={[styles.fieldErrorRow, style]}>
-      <AlertTriangle size={13} color={Colors.destructive} />
-      <Text style={styles.fieldError}>{message}</Text>
-    </View>
   )
 }
 
@@ -398,18 +433,10 @@ const styles = StyleSheet.create({
     padding: Spacing[4],
     marginBottom: Spacing[4],
   },
-  updateBannerRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: Spacing[2],
-  },
   updateBannerText: {
     fontSize: FontSize.sm,
     color: Colors.warning,
     lineHeight: FontSize.sm * 1.5,
-  },
-  updateBannerTextFlex: {
-    flex: 1,
   },
   title: {
     fontSize: FontSize['2xl'],
@@ -448,6 +475,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8faf0',
   },
   docTypeCardError: { borderColor: Colors.destructive },
+  docTypeEmoji: { fontSize: 28, marginBottom: Spacing[2] },
   docTypeLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
@@ -473,6 +501,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  selectedBadgeText: {
+    color: Colors.white,
+    fontSize: 10,
+    fontWeight: FontWeight.bold,
+  },
   infoBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -484,6 +517,7 @@ const styles = StyleSheet.create({
     padding: Spacing[4],
     marginBottom: Spacing[4],
   },
+  infoEmoji: { fontSize: 20 },
   infoText: {
     flex: 1,
     fontSize: FontSize.sm,
@@ -491,15 +525,10 @@ const styles = StyleSheet.create({
     lineHeight: FontSize.sm * 1.5,
   },
   uploadList: { gap: Spacing[4], marginBottom: Spacing[2] },
-  fieldErrorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: Spacing[1],
-  },
   fieldError: {
     fontSize: FontSize.sm,
     color: Colors.destructive,
+    marginTop: Spacing[1],
   },
   submitButton: { marginTop: Spacing[6] },
   skipButton: {

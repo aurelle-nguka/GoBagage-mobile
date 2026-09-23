@@ -5,13 +5,20 @@ import {
   Text,
   StyleSheet,
   RefreshControl,
+  TouchableOpacity,
   ActivityIndicator,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import {
+  CreditCard,
+  Bell,
+  Globe,
+  ShieldCheck,
+  User as UserIcon,
+} from 'lucide-react-native'
 import { useFocusEffect } from 'expo-router'
 import { useTranslation } from 'react-i18next'
-import { CreditCard, Bell, Globe, ShieldCheck } from 'lucide-react-native'
-import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
+import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { ProfileHeader } from '../components/ProfileHeader'
 import { KycStatusBanner } from '../components/KycStatusBanner'
 import { ProfileStatsRow } from '../components/ProfileStatsRow'
@@ -22,6 +29,7 @@ import {
 } from '../components/RecentActivityRow'
 import { SettingsList, type SettingsItem } from '../components/SettingsList'
 import { LogoutButton } from '../components/LogoutButton'
+import { EditProfileModal } from '../components/EditProfileModal'
 import type { User } from '../../../types/user.types'
 import apiClient from '../../../shared/services/api.client'
 
@@ -37,7 +45,6 @@ interface ProfileScreenProps {
   onLogout: () => void
   onRefresh: () => void
   refreshing: boolean
-  onEditProfile: () => void
 }
 
 export function ProfileScreen({
@@ -52,9 +59,9 @@ export function ProfileScreen({
   onLogout,
   onRefresh,
   refreshing,
-  onEditProfile,
 }: ProfileScreenProps) {
   const { t, i18n } = useTranslation()
+  const [editModalVisible, setEditModalVisible] = useState(false)
 
   const [activities, setActivities] = useState<ActivityItem[]>([])
   const [tripsCount, setTripsCount] = useState(0)
@@ -121,7 +128,7 @@ export function ProfileScreen({
           to,
           amount: isEarning ? b.travelerAmountCad : -(b.totalAmountCad ?? 0),
           date: b.createdAt
-            ? new Intl.DateTimeFormat(i18n.language, {
+            ? new Intl.DateTimeFormat(i18n.language || 'fr', {
                 month: 'short',
                 day: 'numeric',
               }).format(new Date(b.createdAt))
@@ -135,7 +142,7 @@ export function ProfileScreen({
     } finally {
       setLoadingStats(false)
     }
-  }, [user, i18n.language])
+  }, [user, i18n.language, t])
 
   useFocusEffect(
     useCallback(() => {
@@ -143,62 +150,75 @@ export function ProfileScreen({
     }, [loadStats]),
   )
 
+  const handleFullRefresh = async () => {
+    await Promise.all([onRefresh(), loadStats()])
+  }
+
   const initials =
     `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase()
   const fullName = `${user.firstName} ${user.lastName}`
-  const memberSince = new Intl.DateTimeFormat(i18n.language, {
+  const memberSince = new Intl.DateTimeFormat(i18n.language || 'fr', {
     month: 'short',
     year: 'numeric',
   }).format(new Date(user.createdAt))
+
   const kycIsVerified = user.kycStatus === 'VERIFIED'
 
   const settingsItems: SettingsItem[] = [
     {
+      id: 'edit_profile',
+      Icon: UserIcon,
+      label: t('profile.edit', { defaultValue: 'Modifier le Profil' }),
+      color: Colors.primary,
+      onPress: () => setEditModalVisible(true),
+    },
+    {
       id: 'kyc',
       Icon: ShieldCheck,
-      label: t('profile.kyc'),
-      color: kycIsVerified ? Colors.primary : Colors.warning,
+      label: t('profile.kyc', { defaultValue: 'Vérification d’Identité (KYC)' }),
+      color: kycIsVerified ? '#00C853' : Colors.warning,
       value: kycIsVerified
-        ? t('profile.kyc_verified')
-        : t('profile.kyc_required'),
-      valueColor: kycIsVerified ? Colors.primary : Colors.warning,
+        ? t('profile.kyc_verified', { defaultValue: 'Vérifié' })
+        : `⚠️ ${t('profile.kyc_required', { defaultValue: 'Requis' })}`,
+      valueColor: kycIsVerified ? '#00C853' : Colors.warning,
       onPress: onGoToKyc,
     },
     {
       id: 'payment',
       Icon: CreditCard,
-      label: t('profile.payment_methods'),
+      label: t('profile.payment_methods', { defaultValue: 'Méthodes de Paiement' }),
       color: Colors.secondary,
       onPress: onPaymentMethods,
     },
     {
       id: 'notifications',
       Icon: Bell,
-      label: t('profile.notifications'),
+      label: t('profile.notifications', { defaultValue: 'Notifications' }),
       color: Colors.warning,
       onPress: onNotificationSettings,
     },
     {
       id: 'language',
       Icon: Globe,
-      label: t('profile.language'),
+      label: t('profile.language', { defaultValue: 'Langue' }),
       color: '#9C27B0',
-      value: LANG_LABELS[i18n.language] ?? 'English',
+      value: LANG_LABELS[i18n.language] ?? (i18n.language || 'fr').toUpperCase(),
       onPress: onLanguageSettings,
     },
   ]
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ProfileHeader
         initials={initials}
         name={fullName}
-        bio={user.bio}
         memberSince={memberSince}
         averageRating={user.averageRating}
         isVerified={kycIsVerified}
+        profilePhoto={user.profilePhoto}
+        bio={user.bio}
         onBack={onBack}
-        onEdit={onEditProfile}
+        onEditProfile={() => setEditModalVisible(true)}
       />
 
       <ScrollView
@@ -207,7 +227,7 @@ export function ProfileScreen({
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={onRefresh}
+            onRefresh={handleFullRefresh}
             colors={[Colors.primary]}
             tintColor={Colors.primary}
           />
@@ -239,18 +259,22 @@ export function ProfileScreen({
 
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>
-            {t('profile.recent_activity')}
+            {t('profile.recent_activity', { defaultValue: 'Activité Récente' })}
           </Text>
-          <Text style={styles.seeAll} onPress={onSeeAllActivity}>
-            {t('home.see_all')}
-          </Text>
+          <TouchableOpacity onPress={onSeeAllActivity} activeOpacity={0.7}>
+            <Text style={styles.seeAll}>
+              {t('profile.all_activity', { defaultValue: 'Toute l’Activité' })}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {loadingStats ? (
           <ActivityIndicator size='small' color={Colors.primary} />
         ) : activities.length === 0 ? (
           <View style={styles.emptyActivity}>
-            <Text style={styles.emptyText}>{t('profile.no_activity')}</Text>
+            <Text style={styles.emptyActivityText}>
+              {t('profile.no_activity', { defaultValue: 'Aucune activité pour l’instant' })}
+            </Text>
           </View>
         ) : (
           activities.map((activity) => (
@@ -263,20 +287,34 @@ export function ProfileScreen({
         )}
 
         <Text style={styles.sectionTitleStandalone}>
-          {t('profile.settings')}
+          {t('profile.settings', { defaultValue: 'Paramètres' })}
         </Text>
         <SettingsList items={settingsItems} />
 
         <LogoutButton onPress={onLogout} />
       </ScrollView>
+
+      {/* Edit Profile Modal */}
+      <EditProfileModal
+        visible={editModalVisible}
+        user={user}
+        onClose={() => setEditModalVisible(false)}
+        onSuccess={handleFullRefresh}
+      />
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: Spacing[5], paddingTop: Spacing[5] },
+  scrollContent: {
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[5],
+  },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -300,11 +338,18 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.medium,
   },
   emptyActivity: {
+    paddingVertical: Spacing[4],
     alignItems: 'center',
-    paddingVertical: Spacing[6],
+    justifyContent: 'center',
+    backgroundColor: Colors.card,
+    borderRadius: Radius.lg,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    marginBottom: Spacing[4],
   },
-  emptyText: {
-    color: '#9ca3af',
-    fontSize: FontSize.base,
+  emptyActivityText: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+    fontStyle: 'italic',
   },
 })

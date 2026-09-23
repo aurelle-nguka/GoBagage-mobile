@@ -1,3 +1,10 @@
+/**
+ * Go Bagage — TravelerBookingScreen
+ * Vue voyageur d'une réservation acceptée : timeline + détails colis + actions de progression.
+ * Symétrique de TrackingScreen (vue expéditeur), mais avec des actions au lieu d'un bouton confirm.
+ * Écran absent de la maquette — complète le parcours voyageur défini au CDC section 3.1, étapes 5-7.
+ */
+
 import {
   View,
   Text,
@@ -7,12 +14,12 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ArrowLeft, MessageCircle } from 'lucide-react-native'
-import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { TrackingTimeline } from '../components/TrackingTimeline'
 import { PackageDetailsCard } from '../components/PackageDetailsCard'
 import { BookingStatus } from '../types/booking.type'
 import { TravelerActionButton } from '../components/TravelerActionButton'
+import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
 interface TravelerBookingScreenProps {
   from: string
@@ -25,38 +32,42 @@ interface TravelerBookingScreenProps {
     weightKg: number
     recipientName: string
   }
-  sender: { initials: string; name: string }
+  sender: {
+    initials: string
+    name: string
+  }
   onBack: () => void
   onChat: () => void
   onMarkPickedUp: () => void
   onMarkDelivered: () => void
 }
 
-const TIMELINE_STEPS = (t: (key: string) => string) => [
+// Réutilise le même référentiel d'étapes que la vue expéditeur (TrackingScreen)
+const TIMELINE_STEPS = [
   {
     status: 'ACCEPTED' as BookingStatus,
-    label: t('tracking.step_confirmed'),
-    sublabel: t('booking.step_confirmed_sub'),
+    label: 'Booking confirmed',
+    sublabel: 'You accepted this request',
   },
   {
     status: 'PICKED_UP' as BookingStatus,
-    label: t('tracking.step_pickup'),
-    sublabel: t('booking.step_pickup_sub'),
+    label: 'Package picked up',
+    sublabel: 'Confirm once you have the parcel',
   },
   {
     status: 'IN_TRANSIT' as BookingStatus,
-    label: t('tracking.step_transit'),
-    sublabel: t('booking.step_transit_sub'),
+    label: 'In transit',
+    sublabel: 'During your flight',
   },
   {
     status: 'DELIVERED' as BookingStatus,
-    label: t('tracking.step_delivered'),
-    sublabel: t('booking.step_delivered_sub'),
+    label: 'Delivered to recipient',
+    sublabel: 'Confirm once handed over',
   },
   {
     status: 'CONFIRMED' as BookingStatus,
-    label: t('tracking.step_released'),
-    sublabel: t('booking.step_released_sub'),
+    label: 'Payment released',
+    sublabel: 'After sender confirmation',
   },
 ]
 
@@ -72,10 +83,8 @@ export function TravelerBookingScreen({
   onMarkPickedUp,
   onMarkDelivered,
 }: TravelerBookingScreenProps) {
-  const { t } = useTranslation()
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -84,10 +93,16 @@ export function TravelerBookingScreen({
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
         <View style={styles.headerTextBlock}>
-          <Text style={styles.headerTitle}>{t('booking.title')}</Text>
-          <Text style={styles.headerSubtitle}>
-            {from} → {to} · {departureDate}
-          </Text>
+          <Text style={styles.headerTitle}>Booking Details</Text>
+          <RouteLabel
+            from={from}
+            to={to}
+            suffix={` · ${departureDate}`}
+            size="xs"
+            color={Colors.mutedForeground}
+            arrowColor={Colors.mutedForeground}
+            fontWeight="normal"
+          />
         </View>
         <TouchableOpacity
           style={styles.chatButton}
@@ -106,18 +121,18 @@ export function TravelerBookingScreen({
           <View style={styles.senderAvatar}>
             <Text style={styles.senderAvatarText}>{sender.initials}</Text>
           </View>
-          <Text style={styles.senderText}>
-            {t('booking.sender_label', 'Sender')}: {sender.name}
-          </Text>
+          <Text style={styles.senderText}>Sender: {sender.name}</Text>
         </View>
 
-        <TrackingTimeline steps={TIMELINE_STEPS(t)} currentStatus={status} />
+        <TrackingTimeline steps={TIMELINE_STEPS} currentStatus={status} />
+
         <PackageDetailsCard
           description={parcel.description}
           category={parcel.category}
           weightKg={parcel.weightKg}
           recipientName={parcel.recipientName}
         />
+
         <TravelerActionButton
           status={status}
           onMarkPickedUp={onMarkPickedUp}
@@ -129,7 +144,10 @@ export function TravelerBookingScreen({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,13 +162,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 1 },
     elevation: 2,
   },
-  headerTextBlock: { flex: 1 },
+  headerTextBlock: {
+    flex: 1,
+  },
   headerTitle: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  headerSubtitle: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  headerSubtitle: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+  },
   chatButton: {
     width: 36,
     height: 36,
@@ -159,8 +182,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  scroll: { flex: 1 },
-  scrollContent: { paddingHorizontal: Spacing[5], paddingTop: Spacing[5] },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[5],
+  },
   senderBanner: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,15 +1,22 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
 import { useRouter } from 'expo-router'
-import { LogOut, Shield, Languages } from 'lucide-react-native'
+import { LogOut, Shield, Languages, Bell, User } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface AdminHeaderProps {
   adminName: string
+  unreadNotifications?: number
+  onPressNotifications?: () => void
   onLogout: () => void
 }
 
-export function AdminHeader({ adminName, onLogout }: AdminHeaderProps) {
+export function AdminHeader({
+  adminName,
+  unreadNotifications = 0,
+  onPressNotifications,
+  onLogout,
+}: AdminHeaderProps) {
   const { t } = useTranslation()
   const router = useRouter()
 
@@ -27,7 +34,12 @@ export function AdminHeader({ adminName, onLogout }: AdminHeaderProps) {
 
   return (
     <View style={styles.header}>
-      <View style={styles.left}>
+      <TouchableOpacity
+        style={styles.left}
+        onPress={() => router.push('/(modals)/edit-profile')}
+        activeOpacity={0.7}
+        accessibilityLabel={t('profile.edit', 'Edit Profile')}
+      >
         <View style={styles.badgeRow}>
           <Shield size={14} color={Colors.primary} />
           <Text style={styles.badge}>{t('admin.title')}</Text>
@@ -35,15 +47,38 @@ export function AdminHeader({ adminName, onLogout }: AdminHeaderProps) {
         <Text style={styles.greeting}>
           {t('admin.greeting', { name: adminName })}
         </Text>
-      </View>
+      </TouchableOpacity>
       <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={onPressNotifications ?? (() => router.push('/(modals)/notifications'))}
+          activeOpacity={0.8}
+          accessibilityLabel={t('notifications.title', 'Notifications')}
+        >
+          <Bell size={18} color={Colors.foreground} />
+          {unreadNotifications > 0 && (
+            <View style={styles.unreadBadge}>
+              <Text style={styles.unreadBadgeText}>
+                {unreadNotifications > 99 ? '99+' : unreadNotifications}
+              </Text>
+            </View>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => router.push('/(modals)/edit-profile')}
+          activeOpacity={0.8}
+          accessibilityLabel={t('profile.edit', 'Edit Profile')}
+        >
+          <User size={18} color={Colors.primary} />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.iconButton}
           onPress={() => router.push('/(modals)/language')}
           activeOpacity={0.8}
           accessibilityLabel={t('profile.language', 'Language')}
         >
-          <Languages size={18} color={Colors.primary} />
+          <Languages size={18} color={Colors.foreground} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.iconButton, styles.logoutButton]}
@@ -100,6 +135,26 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+  },
+  unreadBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: Radius.full,
+    backgroundColor: Colors.destructive,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 3,
+    borderWidth: 1.5,
+    borderColor: Colors.white,
+  },
+  unreadBadgeText: {
+    color: Colors.white,
+    fontSize: 10,
+    fontWeight: FontWeight.bold,
   },
   logoutButton: {
     backgroundColor: '#fef2f2',

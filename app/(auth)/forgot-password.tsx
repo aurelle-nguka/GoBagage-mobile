@@ -8,6 +8,7 @@ export default function ForgotPasswordPage() {
     <ForgotPasswordScreen
       onBack={() => router.back()}
       onDone={() => router.replace('/(auth)/login')}
+      onGoToReset={() => router.push('/(auth)/reset-password')}
     />
   )
 }

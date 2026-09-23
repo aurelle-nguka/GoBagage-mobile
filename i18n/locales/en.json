@@ -28,7 +28,7 @@
     "have_account": "Already have an account?",
     "logout": "Log Out",
     "logout_confirm": "Are you sure you want to log out of your account?",
-    "logout_confirm_admin": "Are you sure you want to log out of the admin panel?",
+    "logout_confirm_admin": "Are you sure you want to log out of the admin session?",
     "send_reset": "Send Reset Link",
     "check_email": "Check your email",
     "welcome_back": "Welcome back",
@@ -55,15 +55,34 @@
     "verify_code": "Verify Code",
     "verifying": "Verifying...",
     "resend_in": "Resend code in",
+    "enter_reset_code": "Enter Reset Code",
+    "already_have_code": "Already have a code? Enter code",
+    "reset_password_title": "Set New Password",
+    "reset_password_subtitle": "Enter the reset code you received by email and choose a new password.",
+    "reset_token_label": "Reset Code / Token",
+    "reset_token_placeholder": "Paste the code received by email",
+    "new_password": "New Password",
+    "new_password_placeholder": "••••••••",
+    "confirm_password": "Confirm New Password",
+    "confirm_password_placeholder": "••••••••",
+    "reset_password_submit": "Reset Password",
+    "password_reset_success_title": "Password Reset!",
+    "password_reset_success_desc": "Your password has been successfully reset. You can now log in with your new password.",
     "loading": {
       "login": "Logging in...",
       "register": "Creating account...",
-      "sending": "Sending..."
+      "sending": "Sending...",
+      "resetting": "Resetting..."
     },
     "errors": {
       "email_required": "Email address is required.",
       "email_invalid": "Please enter a valid email address.",
+      "token_required": "Reset code or token is required.",
       "password_required": "Password is required.",
+      "password_too_short": "Password must be at least 8 characters.",
+      "confirm_password_required": "Please confirm your password.",
+      "passwords_must_match": "Passwords do not match.",
+      "invalid_form": "Please check the form for errors.",
       "password_min": "Password must be at least 8 characters.",
       "password_uppercase": "Password must contain at least 1 uppercase letter.",
       "password_number": "Password must contain at least 1 number.",
@@ -76,42 +95,6 @@
       "phone_invalid": "Use international format: +237650255873",
       "otp_incomplete": "Please enter the {{length}}-digit code."
     }
-  },
-  "kyc": {
-    "title": "Verify your identity",
-    "subtitle": "Select your document type and upload both sides.",
-    "document_type": "Document type",
-    "cni": "National ID Card",
-    "passport": "Passport",
-    "front": "Front",
-    "back": "Back",
-    "submit": "Submit Documents",
-    "skip": "Skip for now",
-    "verified": "Identity already verified",
-    "update": "Update my documents anyway",
-    "loading": "Submitting...",
-    "pending_title": "Verification Pending",
-    "pending_desc": "Our team is reviewing your documents. This usually takes 1–24 hours. We'll notify you once verified.",
-    "pending_status": "Pending verification",
-    "submitted_success": "Documents submitted successfully",
-    "continue_app": "Continue to App",
-    "verified_desc": "Your identity has been successfully verified.",
-    "update_title": "Update your documents",
-    "update_warning": "You are updating your already verified documents. This will require a new review.",
-    "upload_photos": "Upload photos",
-    "info_text": "Your documents are encrypted and only used for identity verification.",
-    "id_card": "ID Card",
-    "permission_title": "Permission required",
-    "permission_desc": "Go Bagage needs access to your photos.",
-    "errors": {
-      "doc_type_required": "Please select a document type.",
-      "front_required": "Please upload the front of your document.",
-      "back_required": "Please upload the back of your document."
-    },
-    "upload_success": "Uploaded successfully",
-    "tap_to_upload": "Tap to upload photo",
-    "cni_desc": "National Identity Card",
-    "passport_desc": "Valid international passport"
   },
   "nav": {
     "home": "Home",
@@ -295,16 +278,39 @@
     "method_orange_sublabel": "Mobile money · Cameroun, CI...",
     "method_momo_label": "MTN MoMo",
     "method_momo_sublabel": "Mobile money · Cameroun, GH...",
-    "method_interac_label": "Interac e-Transfer",
-    "method_interac_sublabel": "Canadian banks only",
     "traveler_fallback": "Your traveler",
     "errors": {
       "no_client_secret": "No client secret received from server.",
-      "payment_failed": "Payment failed. Please try again."
-    }
+      "payment_failed": "Payment failed. Please try again.",
+      "mobile_money_failed": "The payment was not approved. Please try again."
+    },
+    "phone_required": "Phone number required",
+    "phone_required_msg": "Please enter the mobile money phone number.",
+    "mobile_money_phone_label": "Mobile money phone number",
+    "mobile_money_phone_placeholder": "+237 6XX XXX XXX",
+    "mobile_money_waiting_title": "Check your phone",
+    "mobile_money_waiting_text": "Approve the payment request sent to your phone to continue.",
+    "mobile_money_timeout_title": "Still waiting",
+    "mobile_money_timeout_text": "We haven't received a confirmation yet. You can check again, or come back later — we'll notify you once it's confirmed.",
+    "check_again": "Check again"
   },
   "profile": {
     "title": "Profile",
+    "avatar": {
+      "title": "Profile Photo",
+      "camera": "Camera",
+      "gallery": "Gallery",
+      "delete": "Delete",
+      "permission_camera_title": "Camera access required",
+      "permission_camera_desc": "Please allow access to camera to take a profile photo.",
+      "permission_gallery_title": "Photo library access required",
+      "permission_gallery_desc": "Please allow access to photos to select a profile photo.",
+      "delete_confirm_title": "Delete Photo",
+      "delete_confirm_desc": "Are you sure you want to delete your profile photo?",
+      "error_title": "Error",
+      "error_upload": "Failed to update profile photo.",
+      "error_delete": "Failed to delete profile photo."
+    },
     "edit": "Edit Profile",
     "edit_subtitle": "Update your personal information",
     "member_since": "Member since {{date}}",
@@ -343,14 +349,16 @@
       "verified_sublabel": "Your identity has been confirmed.",
       "pending_label": "Verification Required",
       "pending_sublabel": "Submit your ID to unlock all features.",
-      "pending_action": "Verify now →",
+      "pending_action": "Verify now",
       "under_review_label": "Under Review",
       "under_review_sublabel": "Documents submitted — usually 1–24h.",
       "rejected_label": "Verification Failed",
       "rejected_sublabel": "Documents rejected. Please resubmit.",
-      "rejected_action": "Resubmit →",
+      "rejected_action": "Resubmit",
       "reason_label": "Reason :"
-    }
+    },
+    "rate_action": "Rate",
+    "payouts": "My Earnings"
   },
   "search": {
     "title": "Find a Traveler",
@@ -464,7 +472,7 @@
       "rejected_title": "Verification failed",
       "rejected_subtitle": "Your documents were rejected. Please resubmit clear photos.",
       "verified_title": "Verified",
-      "verify_cta": "Verify my identity →"
+      "verify_cta": "Verify my identity"
     },
     "errors": {
       "invalid_request": "Invalid request. Please check your information.",
@@ -480,51 +488,116 @@
     }
   },
   "admin": {
-    "title": "ADMIN",
+    "title": "Administration",
     "greeting": "Hello, {{name}}",
     "overview": "Overview",
     "total_users": "Total Users",
-    "active_trips": "Active Trips",
-    "revenue": "Revenue",
-    "kyc_pending": "KYC Pending",
-    "quick_actions": "Quick Actions",
-    "kyc_queue": "KYC Review Queue",
-    "kyc_queue_subtitle": "{{count}} document awaiting review",
-    "kyc_queue_empty": "No pending documents",
-    "corridors": "Corridors Management",
-    "corridors_subtitle": "Activate, deactivate and configure routes",
-    "coming_soon": "Coming soon",
-    "all_clear": "All clear!",
-    "no_kyc": "No KYC documents in this category.",
-    "approve": "Approve",
-    "reject": "Reject",
-    "verified": "Verified",
-    "rejected": "Rejected",
-    "under_review": "Under Review",
-    "pending": "Pending",
     "registered_users": "Registered users",
+    "active_trips": "Active Trips",
+    "open_trips": "Open trips",
+    "revenue": "Commission Balance",
+    "available_balance": "Available balance",
+    "kyc_pending": "KYC Pending",
     "needs_review": "Needs review",
+    "all_clear": "All clear!",
+    "quick_actions": "Quick Actions",
+    "kyc_queue": "KYC Queue",
+    "kyc_queue_subtitle": "{{count}} pending document(s)",
+    "kyc_queue_empty": "No pending documents",
     "user_management": "User Management",
-    "disputes": "Disputes",
-    "kyc_review": "KYC Review",
     "user_info": "User Information",
+    "corridors": "Trips & Corridors",
+    "corridors_subtitle": "Route statistics and volume analytics",
+    "coming_soon": "Coming soon",
+    "all": "All",
     "full_name": "Full name",
     "email": "Email",
+    "phone": "Phone",
+    "role": "Role",
+    "status": "Status",
+    "status_label": "Status",
+    "kyc_review": "KYC Review",
+    "no_kyc": "No pending KYC documents",
+    "documents": "document(s)",
+    "identity_docs": "Identity Documents",
     "doc_type": "Document type",
     "submitted": "Submitted",
-    "status_label": "Status",
-    "identity_docs": "Identity Documents",
     "tap_zoom": "Tap to zoom",
     "tap_close": "Tap to close",
+    "approve": "Approve",
+    "reject": "Reject",
+    "reject_kyc": "Reject KYC",
+    "reject_subtitle": "Please provide a reason for rejecting this document.",
+    "reject_placeholder": "e.g. Unreadable document, expired date...",
+    "confirm_reject": "Confirm Reject",
     "already_approved": "Already approved",
     "already_rejected": "Already rejected",
-    "reject_kyc": "Reject KYC",
-    "reject_subtitle": "Please provide a reason. The user will be notified.",
-    "reject_placeholder": "e.g. Document is blurry, ID expired, information mismatch...",
-    "confirm_reject": "Confirm Reject",
-    "documents": "document",
-    "all": "All",
+    "pending": "Pending",
+    "verified": "Verified",
+    "rejected": "Rejected",
+    "under_review": "Under review",
+    "not_submitted": "Not submitted",
+    "users": {
+      "count": "{{count}} user",
+      "count_plural": "{{count}} users",
+      "search_placeholder": "Search by name or email...",
+      "no_results": "No users found",
+      "status_active": "Active",
+      "status_suspended": "Suspended",
+      "suspension_reason_label": "Suspension reason",
+      "last_login": "Last login: {{date}}",
+      "never": "Never",
+      "suspend_button": "Suspend Account",
+      "suspend_trigger_subtitle": "Temporarily disable user access",
+      "suspend_subtitle": "Provide a reason (optional). The user will be notified.",
+      "suspend_reason_placeholder": "e.g. Suspicious activity, policy violation...",
+      "suspend_confirm": "Confirm Suspension",
+      "reactivate_button": "Reactivate Account",
+      "reactivate_confirm_title": "Reactivate Account",
+      "reactivate_confirm_msg": "Are you sure you want to reactivate this user account?",
+      "errors": {
+        "load_failed": "Failed to load users.",
+        "load_detail_failed": "Failed to load user details.",
+        "suspend_failed": "Failed to suspend user.",
+        "reactivate_failed": "Failed to reactivate user."
+      }
+    },
+    "disputes": {
+      "title": "Disputes & Reports",
+      "dashboard_subtitle": "Review and resolve reported issues",
+      "detail_title": "Dispute Details",
+      "count": "{{count}} dispute",
+      "count_plural": "{{count}} disputes",
+      "no_results": "No disputes found",
+      "status_open": "Open",
+      "status_under_investigation": "Under investigation",
+      "status_decided": "Decided",
+      "status_closed": "Closed",
+      "investigate_button": "Start Investigation",
+      "decide_label": "Make Decision",
+      "release_funds": "Release funds to traveler",
+      "refund_sender": "Refund sender",
+      "note_label": "Note (optional)",
+      "note_placeholder": "Explain your decision...",
+      "confirm_decision": "Confirm Decision",
+      "close_note_label": "Closing note (optional)",
+      "close_note_placeholder": "Final remarks...",
+      "close_button": "Close Dispute",
+      "closed_label": "This dispute is permanently closed.",
+      "errors": {
+        "load_failed": "Failed to load disputes.",
+        "load_detail_failed": "Failed to load dispute details.",
+        "investigate_failed": "Failed to start investigation.",
+        "decide_failed": "Failed to submit decision.",
+        "close_failed": "Failed to close dispute."
+      }
+    },
+    "payouts": {
+      "title": "Balance & Payouts",
+      "subtitle": "{{amount}} available"
+    },
     "errors": {
+      "load_stats_failed": "Failed to load dashboard data.",
       "load_kyc_failed": "Failed to load KYC queue.",
       "approve_failed": "Failed to approve KYC.",
       "reject_failed": "Failed to reject KYC."
@@ -557,11 +630,63 @@
     "errors": {
       "load_failed": "Failed to load tracking.",
       "confirm_failed": "Failed to confirm delivery."
-    }
+    },
+    "step_pending_release": "Payment pending release",
+    "step_pending_release_sub": "Released to the traveler within 24h",
+    "payment_held_notice": "Payment is held securely and will be released to the traveler within 24h. You can still report a problem during this window."
   },
   "messaging": {
-    "input_placeholder": "Write a message...",
-    "privacy_notice": "Your contact details remain hidden. Keep all coordination in this chat."
+    "inbox_title": "Messages",
+    "empty_title": "No conversations yet",
+    "empty_subtitle": "When you book or accept a parcel, your conversations will appear here.",
+    "privacy_notice": "For your safety, direct contact info is protected until booking confirmation.",
+    "type_placeholder": "Write your message...",
+    "preview": {
+      "caption_placeholder": "Add a caption...",
+      "send": "Send"
+    },
+    "options": {
+      "view_contact": "View contact",
+      "media_links": "Media and docs",
+      "open_dispute": "Open a dispute",
+      "report_user": "Report user"
+    },
+    "contact": {
+      "title": "Contact info",
+      "unknown": "User",
+      "identity_verified": "Verified identity (KYC)",
+      "identity_pending": "Unverified identity",
+      "call_action": "Call contact",
+      "trip_section": "Associated trip",
+      "route": "Route",
+      "departure_date": "Departure date",
+      "booking_ref": "Booking #",
+      "booking_trip": "Current booking",
+      "security_title": "GoBagage Guarantee & Security",
+      "security_desc": "Your messages and payments are secure. Never share your bank details outside the platform."
+    },
+    "media": {
+      "title": "Media and docs",
+      "items_count": "items",
+      "tab_photos": "Photos",
+      "tab_audios": "Voice notes",
+      "you": "You",
+      "empty_photos_title": "No photos shared",
+      "empty_photos_sub": "Photos and screenshots shared in this conversation will appear here.",
+      "empty_audios_title": "No voice notes",
+      "empty_audios_sub": "Voice notes recorded and sent in this conversation will appear here."
+    },
+    "voice": {
+      "recording": "Recording...",
+      "permission_desc": "Please allow microphone access to send voice notes.",
+      "start_error": "Unable to start audio recording.",
+      "send_error": "Failed to send voice note."
+    },
+    "errors": {
+      "conversation_not_found": "Conversation not found.",
+      "load_failed": "Failed to load conversation.",
+      "send_failed": "Failed to send message."
+    }
   },
   "review": {
     "delivery_confirmed_title": "Delivery Confirmed",
@@ -624,5 +749,269 @@
       "fill_required": "Please fill all required fields.",
       "load_failed": "Failed to load corridors."
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "types": {
+      "NEW_USER_REGISTERED": {
+        "title": "New User Registered",
+        "body": "{{name}} ({{email}}) just created an account."
+      },
+      "KYC_SUBMITTED": {
+        "title": "KYC Document Submitted",
+        "body": "{{name}} submitted a document ({{docType}}) for verification."
+      },
+      "DISPUTE_OPENED": {
+        "title": "New Dispute Opened",
+        "body": "Dispute #{{disputeId}} opened for booking #{{bookingId}}. Reason: {{reason}}"
+      },
+      "DISPUTE": {
+        "title": "Dispute Opened",
+        "body": "A dispute has been opened for booking #{{bookingId}}."
+      },
+      "REPORT_FILED": {
+        "title": "New Report Filed",
+        "body": "Report #{{reportId}} submitted ({{targetType}}). Reason: {{reason}}"
+      },
+      "KYC_APPROVED": {
+        "title": "KYC Approved",
+        "body": "Your identity verification was approved!"
+      },
+      "KYC_REJECTED": {
+        "title": "KYC Rejected",
+        "body": "Your KYC was rejected: {{reason}}"
+      },
+      "BOOKING_CREATED": {
+        "title": "Booking Created",
+        "body": "Booking #{{bookingId}} created."
+      },
+      "BOOKING_ACCEPTED": {
+        "title": "Booking Accepted",
+        "body": "Booking #{{bookingId}} accepted."
+      },
+      "BOOKING_REJECTED": {
+        "title": "Booking Rejected",
+        "body": "Booking #{{bookingId}} rejected: {{reason}}"
+      },
+      "BOOKING_CONFIRMED": {
+        "title": "Booking Confirmed",
+        "body": "Booking #{{bookingId}} confirmed."
+      },
+      "BOOKING_CANCELLED": {
+        "title": "Booking Cancelled",
+        "body": "Booking #{{bookingId}} cancelled."
+      },
+      "PARCEL_PICKED_UP": {
+        "title": "Parcel Picked Up",
+        "body": "Your parcel has been picked up."
+      },
+      "PARCEL_IN_TRANSIT": {
+        "title": "Parcel In Transit",
+        "body": "Your parcel is in transit."
+      },
+      "PARCEL_DELIVERED": {
+        "title": "Parcel Delivered",
+        "body": "Your parcel has been delivered."
+      },
+      "PAYMENT_RELEASED": {
+        "title": "Payment Released",
+        "body": "Payment has been released."
+      },
+      "PAYMENT_REFUNDED": {
+        "title": "Payment Refunded",
+        "body": "Payment has been refunded."
+      },
+      "NEW_MESSAGE": {
+        "title": "New Message",
+        "body": "You have a new message from {{senderName}}."
+      },
+      "NEW_BOOKING_REQUEST": {
+        "title": "New Booking Request",
+        "body": "You received a new booking request."
+      },
+      "DELIVERY_REMINDER": {
+        "title": "Delivery Reminder",
+        "body": "Don't forget to deliver booking #{{bookingId}}."
+      },
+      "ACCOUNT_SUSPENDED": {
+        "title": "Account Suspended",
+        "body": "Your account has been temporarily suspended.",
+        "body_with_reason": "Your account has been suspended: {{reason}}"
+      },
+      "ACCOUNT_REACTIVATED": {
+        "title": "Account Reactivated",
+        "body": "Your account has been reactivated."
+      },
+      "PAYMENT_FAILED": {
+        "title": "Payment Failed",
+        "body": "Your payment for booking #{{bookingId}} failed. Please try again."
+      }
+    }
+  },
+  "disputes": {
+    "title": "Report a Problem",
+    "subtitle": "Let us know what went wrong with this booking. Our team will investigate and take action.",
+    "reason_label": "What happened?",
+    "description_label": "Additional details (optional)",
+    "description_placeholder": "Describe what happened...",
+    "submit_button": "Submit Report",
+    "submitted_title": "Report Submitted",
+    "submitted_subtitle": "Our team will review your report and get back to you shortly.",
+    "report_link": "Report a problem with this booking",
+    "reasons": {
+      "PARCEL_DAMAGED": "Parcel damaged",
+      "PARCEL_LOST": "Parcel lost",
+      "NOT_DELIVERED": "Not delivered",
+      "WRONG_ITEM": "Wrong item",
+      "TRAVELER_UNRESPONSIVE": "Traveler unresponsive",
+      "OTHER": "Other"
+    },
+    "errors": {
+      "reason_required": "Please select a reason."
+    }
+  },
+  "subscription": {
+    "title": "Go Bagage Premium",
+    "status_active": "Premium Active",
+    "status_free": "Free Plan",
+    "days_remaining": "{{count}} days remaining",
+    "renews_on": "Ends on {{date}}",
+    "launch_offer_title": "Launch Offer",
+    "launch_offer_subtitle": "{{count}} spots left · Ends {{date}}",
+    "promo_placeholder": "Enter promo code",
+    "apply_promo": "Apply",
+    "choose_method": "Choose a payment method",
+    "subscribe_button": "Subscribe — $35 CAD/year",
+    "cancel_button": "Cancel subscription",
+    "cancel_confirm_title": "Cancel subscription",
+    "cancel_confirm_msg": "Are you sure you want to cancel your Premium subscription?"
+  },
+  "payouts": {
+    "title": "My Earnings",
+    "balance_available": "Available balance",
+    "withdraw_button": "Withdraw",
+    "amount_label": "Amount to withdraw (CAD)",
+    "amount_placeholder": "0.00",
+    "provider_label": "Choose a withdrawal method",
+    "provider_orange": "Orange Money",
+    "provider_mtn": "MTN MoMo",
+    "provider_interac": "Interac",
+    "provider_bank": "Bank transfer",
+    "phone_label": "Phone number",
+    "phone_placeholder": "+237 6XX XXX XXX",
+    "details_label": "Bank details",
+    "details_placeholder": "Account holder name, IBAN/account number, bank",
+    "history_title": "Withdrawal history",
+    "no_history": "No withdrawals yet",
+    "status_pending": "Pending",
+    "status_processing": "Processing",
+    "status_completed": "Completed",
+    "status_failed": "Failed",
+    "success_message": "Payout of {{amount}} sent successfully",
+    "failure_message": "Payout failed: {{reason}}"
+  },
+  "roles": {
+    "traveler": "Traveler",
+    "sender": "Sender",
+    "both": "Traveler & Sender",
+    "admin": "Administrator"
+  },
+  "kyc": {
+    "title": "Identity Verification",
+    "title_update": "Update my documents",
+    "subtitle": "Select your document type and upload both sides.",
+    "verified_title": "Identity already verified",
+    "verified_desc": "Your identity has been successfully verified. You don't need to submit new documents unless your ID has expired.",
+    "update_anyway": "Update my documents anyway",
+    "go_back": "Go back",
+    "update_warning": "⚠️ You are updating your already verified documents. This will require a new review by our team.",
+    "doc_type": "Document type",
+    "cni_label": "National ID Card",
+    "cni_desc": "Valid national identity card",
+    "passport_label": "Passport",
+    "passport_desc": "Valid international passport",
+    "upload_section": "Upload photos",
+    "encryption_notice": "Your documents are encrypted and only used for identity verification.",
+    "front_cni": "Front of ID Card *",
+    "back_cni": "Back of ID Card *",
+    "front_passport": "Passport Identity Page *",
+    "back_passport": "Passport Page 2 *",
+    "front_error": "Please upload the front of your document.",
+    "back_error": "Please upload the back of your document.",
+    "doc_type_error": "Please select a document type.",
+    "submit": "Submit Documents",
+    "submitting": "Submitting...",
+    "skip": "Skip for now",
+    "permission_photos": "Go Bagage needs access to your photos to upload your ID document.",
+    "pending": {
+      "title": "Verification in progress",
+      "desc": "Our team is reviewing your documents. This usually takes between 1h and 24h. We will notify you as soon as your profile is verified.",
+      "banner_title": "Pending verification",
+      "banner_sub": "Documents submitted successfully",
+      "continue_btn": "Continue to App"
+    },
+    "statuses": {
+      "pending": "Pending verification",
+      "under_review": "Under review",
+      "verified": "Identity verified",
+      "rejected": "Verification rejected"
+    }
+  },
+  "tracking": {
+    "title": "Live Tracking",
+    "live": "Live",
+    "complete": "complete",
+    "shipment_status": "Shipment Status",
+    "package_details": "Package Details",
+    "category": "Category",
+    "recipient": "Recipient",
+    "your_traveler": "Your Traveler",
+    "reviews": "reviews",
+    "confirm_delivery": "✅ Confirm Delivery",
+    "confirm_delivery_pending": "⏳ Confirm Delivery (available on arrival)",
+    "not_found": "Booking not found.",
+    "step_accepted": "Booking confirmed",
+    "step_accepted_sub": "Request accepted",
+    "step_picked_up": "Package picked up",
+    "step_picked_up_sub": "Handed over to traveler",
+    "step_in_transit": "In transit",
+    "step_in_transit_sub": "During the journey",
+    "step_delivered": "Delivered to recipient",
+    "step_delivered_sub": "Handed over to recipient",
+    "step_confirmed": "Payment released",
+    "step_confirmed_sub": "After delivery confirmation"
+  },
+  "disputes": {
+    "detail": {
+      "title": "Dispute Details",
+      "dispute_id": "Case #{{id}}",
+      "booking_ref": "Booking #{{id}}",
+      "status_under_review": "Under Review",
+      "status_open": "Dispute Open",
+      "status_resolved": "Resolved",
+      "reason_label": "Dispute Reason",
+      "description_label": "Explanation & Details",
+      "no_description": "No additional details provided.",
+      "opened_on": "Reported on {{date}}",
+      "escrow_title": "🔒 Funds Secured in Escrow",
+      "escrow_text": "The funds for this transaction are securely held. The GoBagage mediation team is reviewing the claim and will contact you if more information is needed.",
+      "view_chat": "Open Conversation",
+      "close": "Close"
+    },
+    "reasons": {
+      "package_damaged": "Damaged Package",
+      "package_lost": "Package Not Received / Lost",
+      "delivery_delay": "Major Delivery Delay",
+      "non_compliant": "Content Not Matching Declaration",
+      "other": "Other Dispute Reason",
+      "general": "Ongoing Dispute"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "mark_all_read": "Mark all as read",
+    "empty_title": "No notifications",
+    "empty_subtitle": "You will receive important updates here."
   }
 }

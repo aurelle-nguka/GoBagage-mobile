@@ -10,11 +10,14 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import {
   Users,
   FileCheck,
-  AlertTriangle,
+  Scale,
   TrendingUp,
+  Wallet,
+  ShieldAlert,
 } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
+import { formatCAD } from '../../../shared/utils/currency.utils'
 import { AdminHeader } from '../components/AdminHeader'
 import { KpiCard } from '../components/KpiCard copy'
 
@@ -22,10 +25,17 @@ interface AdminDashboardScreenProps {
   adminName: string
   pendingKycCount: number
   totalUsers: number
+  activeTrips: number
+  commissionBalanceCad: number | null
+  unreadNotifications?: number
   refreshing: boolean
   onRefresh: () => void
+  onPressNotifications?: () => void
   onGoToKycQueue: () => void
   onGoToCorridors: () => void
+  onGoToUsers: () => void
+  onGoToDisputes: () => void
+  onGoToPayouts: () => void
   onLogout: () => void
 }
 
@@ -33,17 +43,29 @@ export function AdminDashboardScreen({
   adminName,
   pendingKycCount,
   totalUsers,
+  activeTrips,
+  commissionBalanceCad,
+  unreadNotifications = 0,
   refreshing,
   onRefresh,
+  onPressNotifications,
   onGoToKycQueue,
   onGoToCorridors,
+  onGoToUsers,
+  onGoToDisputes,
+  onGoToPayouts,
   onLogout,
 }: AdminDashboardScreenProps) {
   const { t } = useTranslation()
 
   return (
     <SafeAreaView style={styles.container}>
-      <AdminHeader adminName={adminName} onLogout={onLogout} />
+      <AdminHeader
+        adminName={adminName}
+        unreadNotifications={unreadNotifications}
+        onPressNotifications={onPressNotifications}
+        onLogout={onLogout}
+      />
 
       <ScrollView
         style={styles.scroll}
@@ -63,30 +85,31 @@ export function AdminDashboardScreen({
           <KpiCard
             icon={<Users size={20} color={Colors.secondary} />}
             label={t('admin.total_users')}
-            value={totalUsers > 0 ? totalUsers : '—'}
-            subtitle={
-              totalUsers > 0
-                ? t('admin.registered_users', 'Registered users')
-                : t('admin.coming_soon')
-            }
+            value={totalUsers}
+            subtitle={t('admin.registered_users', 'Registered users')}
             backgroundColor='#e8f4fd'
           />
           <KpiCard
             icon={<FileCheck size={20} color={Colors.primary} />}
             label={t('admin.active_trips')}
-            value='—'
-            subtitle={t('admin.coming_soon')}
+            value={activeTrips}
+            subtitle={t('admin.open_trips', 'Open trips')}
             backgroundColor='#e8faf0'
           />
           <KpiCard
             icon={<TrendingUp size={20} color={Colors.warning} />}
             label={t('admin.revenue')}
-            value='—'
-            subtitle={t('admin.coming_soon')}
+            value={commissionBalanceCad != null ? formatCAD(commissionBalanceCad) : '—'}
+            subtitle={t('admin.available_balance', 'Available balance')}
             backgroundColor='#fff8e8'
           />
           <KpiCard
-            icon={<AlertTriangle size={20} color={Colors.destructive} />}
+            icon={
+              <ShieldAlert
+                size={20}
+                color={pendingKycCount > 0 ? Colors.destructive : Colors.primary}
+              />
+            }
             label={t('admin.kyc_pending')}
             value={pendingKycCount}
             subtitle={
@@ -105,8 +128,16 @@ export function AdminDashboardScreen({
           onPress={onGoToKycQueue}
           activeOpacity={0.9}
         >
-          <View style={[styles.actionIcon, { backgroundColor: '#fff8e8' }]}>
-            <FileCheck size={24} color={Colors.warning} />
+          <View
+            style={[
+              styles.actionIcon,
+              { backgroundColor: pendingKycCount > 0 ? '#fef2f2' : '#fff8e8' },
+            ]}
+          >
+            <ShieldAlert
+              size={24}
+              color={pendingKycCount > 0 ? Colors.destructive : Colors.warning}
+            />
           </View>
           <View style={styles.actionInfo}>
             <Text style={styles.actionTitle}>{t('admin.kyc_queue')}</Text>
@@ -123,13 +154,25 @@ export function AdminDashboardScreen({
           )}
         </TouchableOpacity>
 
-        <View style={styles.comingSoonCard}>
-          <Users size={20} color='#9ca3af' />
-          <Text style={styles.comingSoonText}>
-            {t('admin.user_management', 'User Management')} —{' '}
-            {t('admin.coming_soon')}
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={onGoToUsers}
+          activeOpacity={0.9}
+        >
+          <View style={[styles.actionIcon, { backgroundColor: '#f3e8fd' }]}>
+            <Users size={24} color='#9333ea' />
+          </View>
+          <View style={styles.actionInfo}>
+            <Text style={styles.actionTitle}>
+              {t('admin.user_management', 'User Management')}
+            </Text>
+            <Text style={styles.actionSubtitle}>
+              {totalUsers > 0
+                ? t('admin.users.count', '{{count}} users', { count: totalUsers })
+                : t('admin.registered_users', 'Registered users')}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.actionCard}
@@ -147,12 +190,39 @@ export function AdminDashboardScreen({
           </View>
         </TouchableOpacity>
 
-        <View style={styles.comingSoonCard}>
-          <AlertTriangle size={20} color='#9ca3af' />
-          <Text style={styles.comingSoonText}>
-            {t('admin.disputes', 'Disputes')} — {t('admin.coming_soon')}
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={onGoToDisputes}
+          activeOpacity={0.9}
+        >
+          <View style={[styles.actionIcon, { backgroundColor: '#fef2f2' }]}>
+            <Scale size={24} color={Colors.destructive} />
+          </View>
+          <View style={styles.actionInfo}>
+            <Text style={styles.actionTitle}>{t('admin.disputes.title', 'Disputes')}</Text>
+            <Text style={styles.actionSubtitle}>
+              {t('admin.disputes.dashboard_subtitle', 'Review and resolve reported issues')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.actionCard}
+          onPress={onGoToPayouts}
+          activeOpacity={0.9}
+        >
+          <View style={[styles.actionIcon, { backgroundColor: '#fff8e8' }]}>
+            <Wallet size={24} color={Colors.warning} />
+          </View>
+          <View style={styles.actionInfo}>
+            <Text style={styles.actionTitle}>{t('admin.payouts.title', 'Balance & Payouts')}</Text>
+            <Text style={styles.actionSubtitle}>
+              {commissionBalanceCad != null
+                ? t('admin.payouts.subtitle', '{{amount}} available', { amount: formatCAD(commissionBalanceCad) })
+                : t('admin.coming_soon')}
+            </Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   )

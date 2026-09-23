@@ -1,5 +1,5 @@
-export type PaymentProvider = 'STRIPE' | 'INTERAC' | 'ORANGE_MONEY' | 'MTN_MOMO';
-export type EscrowStatus = 'INITIATED' | 'HELD' | 'RELEASED' | 'REFUNDED';
+export type PaymentProvider = 'STRIPE' | 'ORANGE' | 'MTN';
+export type EscrowStatus = 'INITIATED' | 'HELD' | 'RELEASED' | 'REFUNDED' | 'FAILED';
 
 export interface Payment {
   id: string;
@@ -18,4 +18,5 @@ export interface InitiatePaymentDto {
   provider: PaymentProvider;
   amount: number;
   currency: string;
+  mobileMoneyPhone?: string;
 }

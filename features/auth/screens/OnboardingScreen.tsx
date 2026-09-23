@@ -193,7 +193,7 @@ function RoleSelector({ onSelect }: { onSelect: (role: RoleChoice) => void }) {
               style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}
             >
               <Text style={styles.roleTextButtonLabel}>
-                {t('onboarding.both')}
+                {t('onboarding.both', "I'm Both")}
               </Text>
               <ArrowRight size={14} color={Colors.primary} />
             </View>

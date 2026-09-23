@@ -1,5 +1,13 @@
-import { useState } from 'react'
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { useEffect, useState } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ActivityIndicator,
+  StyleSheet,
+  Alert,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ScrollView } from 'react-native'
 import { ArrowLeft, Lock } from 'lucide-react-native'
@@ -18,6 +26,7 @@ import { TripSummaryCard } from '../components/TripSummaryCard'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
 import { ErrorBanner } from '../../../shared/components/feedback/ErrorBanner'
 import { useStripePayment } from '../hooks/useStripePayment'
+import { useMobileMoneyPayment } from '../hooks/useMobileMoneyPayment'
 
 interface PaymentScreenProps {
   bookingId: string
@@ -46,21 +55,55 @@ export function PaymentScreen({
   const [selectedMethod, setSelectedMethod] =
     useState<PaymentProvider>('STRIPE')
   const [cardComplete, setCardComplete] = useState(false)
-  const { loading, error, pay } = useStripePayment()
+  const [phone, setPhone] = useState('')
+  const { loading: stripeLoading, error: stripeError, pay: payStripe } =
+    useStripePayment()
+  const mobileMoney = useMobileMoneyPayment()
+
+  const isMobileMoney = selectedMethod === 'ORANGE' || selectedMethod === 'MTN'
+  const loading = isMobileMoney ? mobileMoney.loading : stripeLoading
+  const error = isMobileMoney ? mobileMoney.error : stripeError
 
   const subtotalBase = weightKg * pricePerKg
   const { subtotal, commission, total } = calculateCommission(subtotalBase)
 
+  useEffect(() => {
+    mobileMoney.reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedMethod])
+
+  useEffect(() => {
+    if (mobileMoney.state === 'success') {
+      onSuccess(selectedMethod)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileMoney.state])
+
   const handlePay = async () => {
-    if (selectedMethod === 'STRIPE' && !cardComplete) {
+    if (selectedMethod === 'STRIPE') {
+      if (!cardComplete) {
+        Alert.alert(
+          t('payment.card_incomplete', 'Incomplete card'),
+          t('payment.card_incomplete_msg', 'Please fill in all card details.'),
+        )
+        return
+      }
+      const success = await payStripe(bookingId)
+      if (success) onSuccess(selectedMethod)
+      return
+    }
+
+    if (!phone.trim()) {
       Alert.alert(
-        t('payment.card_incomplete', 'Incomplete card'),
-        t('payment.card_incomplete_msg', 'Please fill in all card details.'),
+        t('payment.phone_required', 'Phone number required'),
+        t(
+          'payment.phone_required_msg',
+          'Please enter the mobile money phone number.',
+        ),
       )
       return
     }
-    const success = await pay(bookingId)
-    if (success) onSuccess(selectedMethod)
+    await mobileMoney.pay(bookingId, selectedMethod, phone.trim())
   }
 
   return (
@@ -147,27 +190,85 @@ export function PaymentScreen({
           </View>
         )}
 
-        {(selectedMethod === 'ORANGE_MONEY' ||
-          selectedMethod === 'MTN_MOMO') && (
-          <View style={styles.momoInfo}>
-            <Text style={styles.momoText}>
+        {isMobileMoney && (
+          <View style={styles.cardSection}>
+            <View style={styles.momoInfo}>
+              <Text style={styles.momoText}>
+                {t(
+                  'payment.momo_info',
+                  'After confirming, you will receive a prompt on your mobile money phone to authorize the payment.',
+                )}
+              </Text>
+            </View>
+            <Text style={styles.cardLabel}>
+              {t('payment.mobile_money_phone_label', 'Mobile money phone number')}
+            </Text>
+            <TextInput
+              value={phone}
+              onChangeText={setPhone}
+              placeholder={t(
+                'payment.mobile_money_phone_placeholder',
+                '+237 6XX XXX XXX',
+              )}
+              placeholderTextColor='#9ca3af'
+              keyboardType='phone-pad'
+              editable={mobileMoney.state !== 'awaiting_confirmation'}
+              style={styles.phoneInput}
+            />
+          </View>
+        )}
+
+        {mobileMoney.state === 'awaiting_confirmation' && (
+          <View style={styles.waitingBox}>
+            <ActivityIndicator size='small' color={Colors.primary} />
+            <Text style={styles.waitingTitle}>
+              {t('payment.mobile_money_waiting_title', 'Check your phone')}
+            </Text>
+            <Text style={styles.waitingText}>
               {t(
-                'payment.momo_info',
-                'After confirming, you will receive a prompt on your mobile money phone to authorize the payment.',
+                'payment.mobile_money_waiting_text',
+                'Approve the payment request sent to your phone to continue.',
               )}
             </Text>
           </View>
         )}
 
+        {mobileMoney.state === 'timeout' && (
+          <View style={styles.waitingBox}>
+            <Text style={styles.waitingTitle}>
+              {t('payment.mobile_money_timeout_title', 'Still waiting')}
+            </Text>
+            <Text style={styles.waitingText}>
+              {t(
+                'payment.mobile_money_timeout_text',
+                "We haven't received a confirmation yet. You can check again, or come back later — we'll notify you once it's confirmed.",
+              )}
+            </Text>
+            <TouchableOpacity
+              onPress={mobileMoney.checkStatus}
+              style={styles.checkAgainButton}
+              disabled={mobileMoney.loading}
+            >
+              <Text style={styles.checkAgainText}>
+                {mobileMoney.loading
+                  ? t('payment.processing')
+                  : t('payment.check_again', 'Check again')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
         {error ? <ErrorBanner message={error} /> : null}
 
-        <PrimaryButton
-          label={t('payment.pay', { amount: formatCAD(total) })}
-          loadingLabel={t('payment.processing')}
-          loading={loading}
-          onPress={handlePay}
-          style={styles.payButton}
-        />
+        {mobileMoney.state !== 'awaiting_confirmation' && (
+          <PrimaryButton
+            label={t('payment.pay', { amount: formatCAD(total) })}
+            loadingLabel={t('payment.processing')}
+            loading={loading}
+            onPress={handlePay}
+            style={styles.payButton}
+          />
+        )}
 
         <Text style={styles.footerText}>{t('payment.footer')}</Text>
       </ScrollView>
@@ -258,12 +359,52 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8faf0',
     borderRadius: Radius.xl,
     padding: Spacing[4],
-    marginTop: Spacing[4],
   },
   momoText: {
     fontSize: FontSize.base,
     color: Colors.foreground,
     lineHeight: FontSize.base * 1.5,
+  },
+  phoneInput: {
+    backgroundColor: Colors.inputBackground,
+    borderRadius: Radius.xl,
+    borderWidth: 1.5,
+    borderColor: Colors.transparent,
+    paddingHorizontal: Spacing[4],
+    paddingVertical: Spacing[3],
+    fontSize: FontSize.md,
+    color: Colors.foreground,
+  },
+  waitingBox: {
+    alignItems: 'center',
+    backgroundColor: Colors.white,
+    borderRadius: Radius['2xl'],
+    padding: Spacing[5],
+    marginBottom: Spacing[4],
+    gap: Spacing[2],
+  },
+  waitingTitle: {
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.bold,
+    color: Colors.foreground,
+  },
+  waitingText: {
+    fontSize: FontSize.sm,
+    color: Colors.mutedForeground,
+    textAlign: 'center',
+    lineHeight: FontSize.sm * 1.5,
+  },
+  checkAgainButton: {
+    marginTop: Spacing[2],
+    paddingHorizontal: Spacing[5],
+    paddingVertical: Spacing[3],
+    borderRadius: Radius.xl,
+    backgroundColor: Colors.primary,
+  },
+  checkAgainText: {
+    color: Colors.white,
+    fontWeight: FontWeight.semibold,
+    fontSize: FontSize.base,
   },
   payButton: {
     marginBottom: Spacing[4],

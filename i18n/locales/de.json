@@ -28,7 +28,7 @@
     "have_account": "Bereits ein Konto?",
     "logout": "Abmelden",
     "logout_confirm": "Möchten Sie sich wirklich abmelden?",
-    "logout_confirm_admin": "Möchten Sie das Admin-Panel wirklich verlassen?",
+    "logout_confirm_admin": "Möchten Sie sich wirklich von der Administratorsitzung abmelden?",
     "send_reset": "Zurücksetzen-Link senden",
     "check_email": "Überprüfen Sie Ihre E-Mail",
     "welcome_back": "Willkommen zurück",
@@ -55,15 +55,34 @@
     "otp_sent": "Wir haben einen 6-stelligen Code per SMS gesendet an",
     "verify_code": "Code verifizieren",
     "verifying": "Wird verifiziert...",
+    "enter_reset_code": "Reset-Code eingeben",
+    "already_have_code": "Haben Sie bereits einen Code? Eingeben",
+    "reset_password_title": "Neues Passwort festlegen",
+    "reset_password_subtitle": "Geben Sie den per E-Mail erhaltenen Reset-Code ein und wählen Sie ein neues Passwort.",
+    "reset_token_label": "Reset-Code / Token",
+    "reset_token_placeholder": "Per E-Mail erhaltenen Code einfügen",
+    "new_password": "Neues Passwort",
+    "new_password_placeholder": "••••••••",
+    "confirm_password": "Neues Passwort bestätigen",
+    "confirm_password_placeholder": "••••••••",
+    "reset_password_submit": "Passwort zurücksetzen",
+    "password_reset_success_title": "Passwort zurückgesetzt!",
+    "password_reset_success_desc": "Ihr Passwort wurde erfolgreich zurückgesetzt. Sie können sich jetzt anmelden.",
     "loading": {
       "login": "Anmelden...",
       "register": "Konto wird erstellt...",
-      "sending": "Wird gesendet..."
+      "sending": "Wird gesendet...",
+      "resetting": "Wird zurückgesetzt..."
     },
     "errors": {
       "email_required": "E-Mail-Adresse ist erforderlich.",
       "email_invalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+      "token_required": "Reset-Code ist erforderlich.",
       "password_required": "Passwort ist erforderlich.",
+      "password_too_short": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+      "confirm_password_required": "Bitte bestätigen Sie Ihr Passwort.",
+      "passwords_must_match": "Passwörter stimmen nicht überein.",
+      "invalid_form": "Bitte überprüfen Sie das Formular auf Fehler.",
       "password_min": "Das Passwort muss mindestens 8 Zeichen lang sein.",
       "password_uppercase": "Das Passwort muss mindestens 1 Großbuchstaben enthalten.",
       "password_number": "Das Passwort muss mindestens 1 Zahl enthalten.",
@@ -76,42 +95,6 @@
       "phone_invalid": "Verwenden Sie das internationale Format: +237650255873",
       "otp_incomplete": "Bitte geben Sie den {{length}}-stelligen Code ein."
     }
-  },
-  "kyc": {
-    "title": "Identität verifizieren",
-    "subtitle": "Wählen Sie Ihren Dokumenttyp und laden Sie beide Seiten hoch.",
-    "document_type": "Dokumenttyp",
-    "cni": "Personalausweis",
-    "passport": "Reisepass",
-    "front": "Vorderseite",
-    "back": "Rückseite",
-    "submit": "Dokumente einreichen",
-    "skip": "Jetzt überspringen",
-    "verified": "Identität bereits verifiziert",
-    "update": "Dokumente trotzdem aktualisieren",
-    "loading": "Wird eingereicht...",
-    "pending_title": "Verifizierung ausstehend",
-    "pending_desc": "Unser Team überprüft Ihre Dokumente. Dies dauert in der Regel 1–24 Stunden.",
-    "pending_status": "Verifizierung ausstehend",
-    "submitted_success": "Dokumente erfolgreich eingereicht",
-    "continue_app": "Weiter zur App",
-    "verified_desc": "Ihre Identität wurde erfolgreich verifiziert.",
-    "update_title": "Dokumente aktualisieren",
-    "update_warning": "Sie aktualisieren Ihre bereits verifizierten Dokumente. Eine neue Überprüfung ist erforderlich.",
-    "upload_photos": "Fotos hochladen",
-    "info_text": "Ihre Dokumente werden verschlüsselt und nur zur Identitätsverifizierung verwendet.",
-    "id_card": "Personalausweis",
-    "permission_title": "Berechtigung erforderlich",
-    "permission_desc": "Go Bagage benötigt Zugriff auf Ihre Fotos.",
-    "errors": {
-      "doc_type_required": "Bitte wählen Sie einen Dokumenttyp.",
-      "front_required": "Bitte laden Sie die Vorderseite Ihres Dokuments hoch.",
-      "back_required": "Bitte laden Sie die Rückseite Ihres Dokuments hoch."
-    },
-    "upload_success": "Erfolgreich hochgeladen",
-    "tap_to_upload": "Tippen, um ein Foto hochzuladen",
-    "cni_desc": "Personalausweis",
-    "passport_desc": "Gültiger internationaler Reisepass"
   },
   "nav": {
     "home": "Startseite",
@@ -295,13 +278,21 @@
     "method_orange_sublabel": "Mobile Geld · Kamerun, Elfenbeinküste...",
     "method_momo_label": "MTN MoMo",
     "method_momo_sublabel": "Mobile Geld · Kamerun, Ghana...",
-    "method_interac_label": "Interac e-Transfer",
-    "method_interac_sublabel": "Nur kanadische Banken",
     "traveler_fallback": "Ihr Reisender",
     "errors": {
       "no_client_secret": "Kein Client-Secret vom Server erhalten.",
-      "payment_failed": "Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut."
-    }
+      "payment_failed": "Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+      "mobile_money_failed": "Die Zahlung wurde nicht genehmigt. Bitte versuche es erneut."
+    },
+    "phone_required": "Telefonnummer erforderlich",
+    "phone_required_msg": "Bitte gib die Mobile-Money-Telefonnummer ein.",
+    "mobile_money_phone_label": "Mobile-Money-Telefonnummer",
+    "mobile_money_phone_placeholder": "+237 6XX XXX XXX",
+    "mobile_money_waiting_title": "Überprüfe dein Telefon",
+    "mobile_money_waiting_text": "Bestätige die Zahlungsanfrage auf deinem Telefon, um fortzufahren.",
+    "mobile_money_timeout_title": "Warten weiterhin",
+    "mobile_money_timeout_text": "Wir haben noch keine Bestätigung erhalten. Du kannst erneut prüfen oder später zurückkehren — wir benachrichtigen dich, sobald es bestätigt ist.",
+    "check_again": "Erneut prüfen"
   },
   "tracking": {
     "title": "Live-Tracking",
@@ -327,10 +318,28 @@
     "errors": {
       "load_failed": "Sendungsverfolgung konnte nicht geladen werden.",
       "confirm_failed": "Lieferung konnte nicht bestätigt werden."
-    }
+    },
+    "step_pending_release": "Zahlung wartet auf Freigabe",
+    "step_pending_release_sub": "Wird dem Reisenden innerhalb von 24h freigegeben",
+    "payment_held_notice": "Die Zahlung wird sicher verwahrt und innerhalb von 24h an den Reisenden freigegeben. Du kannst während dieser Zeit weiterhin ein Problem melden."
   },
   "profile": {
     "title": "Profil",
+    "avatar": {
+      "title": "Profilbild",
+      "camera": "Kamera",
+      "gallery": "Galerie",
+      "delete": "Löschen",
+      "permission_camera_title": "Kamerazugriff erforderlich",
+      "permission_camera_desc": "Bitte erlaube den Zugriff auf die Kamera, um ein Profilbild aufzunehmen.",
+      "permission_gallery_title": "Fotozugriff erforderlich",
+      "permission_gallery_desc": "Bitte erlaube den Zugriff auf deine Fotos, um ein Profilbild auszuwählen.",
+      "delete_confirm_title": "Profilbild löschen",
+      "delete_confirm_desc": "Möchtest du dein Profilbild wirklich löschen?",
+      "error_title": "Fehler",
+      "error_upload": "Profilbild konnte nicht aktualisiert werden.",
+      "error_delete": "Profilbild konnte nicht gelöscht werden."
+    },
     "edit": "Profil bearbeiten",
     "edit_subtitle": "Persönliche Informationen aktualisieren",
     "member_since": "Mitglied seit {{date}}",
@@ -369,14 +378,16 @@
       "verified_sublabel": "Ihre Identität wurde bestätigt.",
       "pending_label": "Verifizierung erforderlich",
       "pending_sublabel": "Reichen Sie Ihren Ausweis ein, um alle Funktionen freizuschalten.",
-      "pending_action": "Jetzt verifizieren →",
+      "pending_action": "Jetzt verifizieren",
       "under_review_label": "In Überprüfung",
       "under_review_sublabel": "Dokumente eingereicht — normalerweise 1–24 Std.",
       "rejected_label": "Verifizierung fehlgeschlagen",
       "rejected_sublabel": "Dokumente abgelehnt. Bitte erneut einreichen.",
-      "rejected_action": "Erneut einreichen →",
+      "rejected_action": "Erneut einreichen",
       "reason_label": "Grund:"
-    }
+    },
+    "rate_action": "Bewerten",
+    "payouts": "Meine Einnahmen"
   },
   "search": {
     "title": "Reisenden finden",
@@ -490,7 +501,7 @@
       "rejected_title": "Verifizierung fehlgeschlagen",
       "rejected_subtitle": "Ihre Dokumente wurden abgelehnt. Bitte reichen Sie klare Fotos erneut ein.",
       "verified_title": "Verifiziert",
-      "verify_cta": "Meine Identität verifizieren →"
+      "verify_cta": "Meine Identität verifizieren"
     },
     "errors": {
       "invalid_request": "Ungültige Anfrage. Bitte überprüfen Sie Ihre Angaben.",
@@ -506,62 +517,176 @@
     }
   },
   "admin": {
-    "title": "ADMIN",
+    "title": "Administration",
     "greeting": "Hallo, {{name}}",
     "overview": "Übersicht",
-    "total_users": "Gesamtbenutzer",
-    "active_trips": "Aktive Reisen",
-    "revenue": "Einnahmen",
-    "kyc_pending": "KYC Ausstehend",
-    "quick_actions": "Schnellaktionen",
-    "kyc_queue": "KYC-Überprüfungswarteschlange",
-    "kyc_queue_subtitle": "{{count}} Dokument wartet auf Überprüfung",
-    "kyc_queue_empty": "Keine ausstehenden Dokumente",
-    "corridors": "Korridorverwaltung",
-    "corridors_subtitle": "Routen aktivieren, deaktivieren und konfigurieren",
-    "coming_soon": "Demnächst verfügbar",
-    "all_clear": "Alles klar!",
-    "no_kyc": "Keine KYC-Dokumente in dieser Kategorie.",
-    "approve": "Genehmigen",
-    "reject": "Ablehnen",
-    "verified": "Verifiziert",
-    "rejected": "Abgelehnt",
-    "under_review": "In Überprüfung",
-    "pending": "Ausstehend",
+    "total_users": "Gesamte Benutzer",
     "registered_users": "Registrierte Benutzer",
-    "needs_review": "Überprüfung erforderlich",
+    "active_trips": "Aktive Fahrten",
+    "open_trips": "Offene Fahrten",
+    "revenue": "Provisionsguthaben",
+    "available_balance": "Verfügbares Guthaben",
+    "kyc_pending": "Ausstehendes KYC",
+    "needs_review": "Überprüfung nötig",
+    "all_clear": "Alles erledigt!",
+    "quick_actions": "Schnellaktionen",
+    "kyc_queue": "KYC-Warteschlange",
+    "kyc_queue_subtitle": "{{count}} ausstehende(s) Dokument(e)",
+    "kyc_queue_empty": "Keine ausstehenden Dokumente",
     "user_management": "Benutzerverwaltung",
-    "disputes": "Streitigkeiten",
-    "kyc_review": "KYC-Überprüfung",
     "user_info": "Benutzerinformationen",
+    "corridors": "Routen & Korridore",
+    "corridors_subtitle": "Routenstatistiken und Volumen",
+    "coming_soon": "Demnächst",
+    "all": "Alle",
     "full_name": "Vollständiger Name",
     "email": "E-Mail",
+    "phone": "Telefon",
+    "role": "Rolle",
+    "status": "Status",
+    "status_label": "Status",
+    "kyc_review": "KYC-Überprüfung",
+    "no_kyc": "Keine ausstehenden KYC-Dokumente",
+    "documents": "Dokument(e)",
+    "identity_docs": "Ausweisdokumente",
     "doc_type": "Dokumenttyp",
     "submitted": "Eingereicht am",
-    "status_label": "Status",
-    "identity_docs": "Identitätsdokumente",
     "tap_zoom": "Zum Vergrößern tippen",
     "tap_close": "Zum Schließen tippen",
+    "approve": "Genehmigen",
+    "reject": "Ablehnen",
+    "reject_kyc": "KYC ablehnen",
+    "reject_subtitle": "Bitte geben Sie einen Grund für die Ablehnung an.",
+    "reject_placeholder": "z.B. Unleserliches Dokument, abgelaufenes Datum...",
+    "confirm_reject": "Ablehnung bestätigen",
     "already_approved": "Bereits genehmigt",
     "already_rejected": "Bereits abgelehnt",
-    "reject_kyc": "KYC ablehnen",
-    "reject_subtitle": "Bitte geben Sie einen Grund an. Der Benutzer wird benachrichtigt.",
-    "reject_placeholder": "z.B. Dokument ist unscharf, ID abgelaufen...",
-    "confirm_reject": "Ablehnung bestätigen",
-    "documents": "Dokument",
-    "all": "Alle",
+    "pending": "Ausstehend",
+    "verified": "Verifiziert",
+    "rejected": "Abgelehnt",
+    "under_review": "Wird geprüft",
+    "not_submitted": "Nicht eingereicht",
+    "users": {
+      "count": "{{count}} Benutzer",
+      "count_plural": "{{count}} Benutzer",
+      "search_placeholder": "Nach Name oder E-Mail suchen...",
+      "no_results": "Keine Benutzer gefunden",
+      "status_active": "Aktiv",
+      "status_suspended": "Gesperrt",
+      "suspension_reason_label": "Grund für die Sperrung",
+      "last_login": "Letzte Anmeldung: {{date}}",
+      "never": "Nie",
+      "suspend_button": "Konto sperren",
+      "suspend_trigger_subtitle": "Benutzerzugriff vorübergehend deaktivieren",
+      "suspend_subtitle": "Geben Sie einen Grund an (optional). Der Benutzer wird benachrichtigt.",
+      "suspend_reason_placeholder": "z.B. Verdächtige Aktivitäten, Regelverstoß...",
+      "suspend_confirm": "Sperrung bestätigen",
+      "reactivate_button": "Konto reaktivieren",
+      "reactivate_confirm_title": "Konto reaktivieren",
+      "reactivate_confirm_msg": "Möchten Sie das Konto dieses Benutzers wirklich reaktivieren?",
+      "errors": {
+        "load_failed": "Benutzer konnten nicht geladen werden.",
+        "load_detail_failed": "Benutzerdetails konnten nicht geladen werden.",
+        "suspend_failed": "Benutzer konnte nicht gesperrt werden.",
+        "reactivate_failed": "Benutzer konnte nicht reaktiviert werden."
+      }
+    },
+    "disputes": {
+      "title": "Streitigkeiten & Berichte",
+      "dashboard_subtitle": "Gemeldete Probleme prüfen und lösen",
+      "detail_title": "Streitfall-Details",
+      "count": "{{count}} Streitfall",
+      "count_plural": "{{count}} Streitfälle",
+      "no_results": "Keine Streitfälle gefunden",
+      "status_open": "Offen",
+      "status_under_investigation": "Wird untersucht",
+      "status_decided": "Entschieden",
+      "status_closed": "Geschlossen",
+      "investigate_button": "Untersuchung starten",
+      "decide_label": "Entscheidung treffen",
+      "release_funds": "Gelder an Reisenden freigeben",
+      "refund_sender": "Absender erstatten",
+      "note_label": "Notiz (optional)",
+      "note_placeholder": "Erklären Sie Ihre Entscheidung...",
+      "confirm_decision": "Entscheidung bestätigen",
+      "close_note_label": "Abschlussnotiz (optional)",
+      "close_note_placeholder": "Abschließende Bemerkungen...",
+      "close_button": "Streitfall schließen",
+      "closed_label": "Dieser Streitfall ist endgültig geschlossen.",
+      "errors": {
+        "load_failed": "Streitfälle konnten nicht geladen werden.",
+        "load_detail_failed": "Streitfall-Details konnten nicht geladen werden.",
+        "investigate_failed": "Untersuchung konnte nicht gestartet werden.",
+        "decide_failed": "Entscheidung konnte nicht übermittelt werden.",
+        "close_failed": "Streitfall konnte nicht geschlossen werden."
+      }
+    },
+    "payouts": {
+      "title": "Guthaben & Auszahlungen",
+      "subtitle": "{{amount}} verfügbar"
+    },
     "errors": {
+      "load_stats_failed": "Dashboard-Daten konnten nicht geladen werden.",
       "load_kyc_failed": "KYC-Warteschlange konnte nicht geladen werden.",
-      "approve_failed": "KYC konnte nicht genehmigt werden.",
-      "reject_failed": "KYC konnte nicht abgelehnt werden."
+      "approve_failed": "KYC-Genehmigung fehlgeschlagen.",
+      "reject_failed": "KYC-Ablehnung fehlgeschlagen."
     }
   },
   "language": {
     "subtitle": "Wählen Sie Ihre bevorzugte Sprache"
   },
   "messaging": {
-    "input_placeholder": "Nachricht schreiben...",
-    "privacy_notice": "Ihre Kontaktdaten bleiben verborgen. Halten Sie die gesamte Koordination in diesem Chat."
+    "inbox_title": "Nachrichten",
+    "empty_title": "Noch keine Unterhaltungen",
+    "empty_subtitle": "Wenn Sie ein Paket buchen oder annehmen, werden Ihre Nachrichten hier angezeigt.",
+    "privacy_notice": "Zu Ihrer Sicherheit werden direkte Kontaktdaten vor der Bestätigung geschützt.",
+    "type_placeholder": "Nachricht eingeben...",
+    "preview": {
+      "caption_placeholder": "Bildunterschrift hinzufügen...",
+      "send": "Senden"
+    },
+    "options": {
+      "view_contact": "Kontakt anzeigen",
+      "media_links": "Medien und Dokumente",
+      "open_dispute": "Problem melden",
+      "report_user": "Benutzer melden"
+    },
+    "contact": {
+      "title": "Kontaktinfo",
+      "unknown": "Benutzer",
+      "identity_verified": "Identität verifiziert (KYC)",
+      "identity_pending": "Identität nicht verifiziert",
+      "call_action": "Kontakt anrufen",
+      "trip_section": "Zugehörige Reise",
+      "route": "Route",
+      "departure_date": "Abreisedatum",
+      "booking_ref": "Buchung #",
+      "booking_trip": "Aktuelle Buchung",
+      "security_title": "GoBagage Garantie & Sicherheit",
+      "security_desc": "Ihre Nachrichten und Zahlungen sind geschützt. Teilen Sie niemals Bankdaten außerhalb der Plattform."
+    },
+    "media": {
+      "title": "Medien und Dokumente",
+      "items_count": "Elemente",
+      "tab_photos": "Fotos",
+      "tab_audios": "Sprachnachrichten",
+      "you": "Sie",
+      "empty_photos_title": "Keine Fotos geteilt",
+      "empty_photos_sub": "In dieser Unterhaltung geteilte Fotos werden hier angezeigt.",
+      "empty_audios_title": "Keine Sprachnachrichten",
+      "empty_audios_sub": "In dieser Unterhaltung gesendete Sprachnachrichten werden hier angezeigt."
+    },
+    "voice": {
+      "recording": "Aufnahme...",
+      "permission_desc": "Bitte erlauben Sie den Mikrofonzugriff, um Sprachnachrichten zu senden.",
+      "start_error": "Audioaufnahme konnte nicht gestartet werden.",
+      "send_error": "Sprachnachricht konnte nicht gesendet werden."
+    },
+    "errors": {
+      "conversation_not_found": "Unterhaltung nicht gefunden.",
+      "load_failed": "Unterhaltung konnte nicht geladen werden.",
+      "send_failed": "Nachricht konnte nicht gesendet werden."
+    }
   },
   "review": {
     "delivery_confirmed_title": "Lieferung Bestätigt",
@@ -624,5 +749,269 @@
       "fill_required": "Bitte füllen Sie alle erforderlichen Felder aus.",
       "load_failed": "Korridore konnten nicht geladen werden."
     }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen",
+    "types": {
+      "NEW_USER_REGISTERED": {
+        "title": "Neuer Benutzer registriert",
+        "body": "{{name}} ({{email}}) hat gerade ein Konto erstellt."
+      },
+      "KYC_SUBMITTED": {
+        "title": "KYC-Dokument eingereicht",
+        "body": "{{name}} hat ein Dokument ({{docType}}) zur Überprüfung eingereicht."
+      },
+      "DISPUTE_OPENED": {
+        "title": "Neuer Streitfall eröffnet",
+        "body": "Streitfall #{{disputeId}} für Buchung #{{bookingId}} eröffnet. Grund: {{reason}}"
+      },
+      "DISPUTE": {
+        "title": "Streitfall eröffnet",
+        "body": "Für Buchung #{{bookingId}} wurde ein Streitfall eröffnet."
+      },
+      "REPORT_FILED": {
+        "title": "Neuer Bericht eingereicht",
+        "body": "Bericht #{{reportId}} eingereicht ({{targetType}}). Grund: {{reason}}"
+      },
+      "KYC_APPROVED": {
+        "title": "KYC genehmigt",
+        "body": "Ihre Identitätsprüfung wurde erfolgreich genehmigt!"
+      },
+      "KYC_REJECTED": {
+        "title": "KYC abgelehnt",
+        "body": "Ihr Dokument wurde abgelehnt: {{reason}}"
+      },
+      "BOOKING_CREATED": {
+        "title": "Buchung erstellt",
+        "body": "Buchung #{{bookingId}} erstellt."
+      },
+      "BOOKING_ACCEPTED": {
+        "title": "Buchung akzeptiert",
+        "body": "Ihre Buchung #{{bookingId}} wurde vom Reisenden akzeptiert."
+      },
+      "BOOKING_REJECTED": {
+        "title": "Buchung abgelehnt",
+        "body": "Ihre Buchung #{{bookingId}} wurde abgelehnt: {{reason}}"
+      },
+      "BOOKING_CONFIRMED": {
+        "title": "Buchung bestätigt",
+        "body": "Ihre Buchung #{{bookingId}} ist bestätigt."
+      },
+      "BOOKING_CANCELLED": {
+        "title": "Buchung storniert",
+        "body": "Buchung #{{bookingId}} wurde storniert."
+      },
+      "PARCEL_PICKED_UP": {
+        "title": "Paket abgeholt",
+        "body": "Ihr Paket wurde vom Reisenden abgeholt."
+      },
+      "PARCEL_IN_TRANSIT": {
+        "title": "Paket unterwegs",
+        "body": "Ihr Paket ist auf dem Weg."
+      },
+      "PARCEL_DELIVERED": {
+        "title": "Paket zugestellt",
+        "body": "Ihr Paket wurde erfolgreich zugestellt!"
+      },
+      "PAYMENT_RELEASED": {
+        "title": "Zahlung freigegeben",
+        "body": "Die Zahlung wurde auf Ihr Konto überwiesen."
+      },
+      "PAYMENT_REFUNDED": {
+        "title": "Zahlung erstattet",
+        "body": "Die Rückerstattung wurde veranlasst."
+      },
+      "NEW_MESSAGE": {
+        "title": "Neue Nachricht",
+        "body": "Sie haben eine neue Nachricht von {{senderName}} erhalten."
+      },
+      "NEW_BOOKING_REQUEST": {
+        "title": "Neue Buchungsanfrage",
+        "body": "Sie haben eine neue Buchungsanfrage erhalten."
+      },
+      "DELIVERY_REMINDER": {
+        "title": "Liefererinnerung",
+        "body": "Vergessen Sie nicht, die Zustellung von Buchung #{{bookingId}} zu bestätigen."
+      },
+      "ACCOUNT_SUSPENDED": {
+        "title": "Konto gesperrt",
+        "body": "Ihr Konto wurde vorübergehend gesperrt.",
+        "body_with_reason": "Ihr Konto wurde aus folgendem Grund gesperrt: {{reason}}"
+      },
+      "ACCOUNT_REACTIVATED": {
+        "title": "Konto reaktiviert",
+        "body": "Ihr Konto wurde erfolgreich reaktiviert."
+      },
+      "PAYMENT_FAILED": {
+        "title": "Zahlung fehlgeschlagen",
+        "body": "Ihre Zahlung für Buchung #{{bookingId}} ist fehlgeschlagen. Bitte erneut versuchen."
+      }
+    }
+  },
+  "disputes": {
+    "title": "Problem melden",
+    "subtitle": "Teilen Sie uns mit, was bei dieser Buchung schiefgelaufen ist. Unser Team wird dies untersuchen und handeln.",
+    "reason_label": "Was ist passiert?",
+    "description_label": "Zusätzliche Details (optional)",
+    "description_placeholder": "Beschreiben Sie, was passiert ist...",
+    "submit_button": "Meldung senden",
+    "submitted_title": "Bericht eingereicht",
+    "submitted_subtitle": "Unser Team wird Ihren Bericht prüfen und sich in Kürze bei Ihnen melden.",
+    "report_link": "Problem mit dieser Buchung melden",
+    "reasons": {
+      "PARCEL_DAMAGED": "Paket beschädigt",
+      "PARCEL_LOST": "Paket verloren",
+      "NOT_DELIVERED": "Nicht zugestellt",
+      "WRONG_ITEM": "Falscher Artikel",
+      "TRAVELER_UNRESPONSIVE": "Reisender antwortet nicht",
+      "OTHER": "Anderer Grund"
+    },
+    "errors": {
+      "reason_required": "Bitte wählen Sie einen Grund aus."
+    }
+  },
+  "subscription": {
+    "title": "Go Bagage Premium",
+    "status_active": "Premium aktiv",
+    "status_free": "Kostenloser Plan",
+    "days_remaining": "{{count}} Tage verbleibend",
+    "renews_on": "Endet am {{date}}",
+    "launch_offer_title": "Startangebot",
+    "launch_offer_subtitle": "{{count}} Plätze übrig · Endet am {{date}}",
+    "promo_placeholder": "Promo-Code eingeben",
+    "apply_promo": "Anwenden",
+    "choose_method": "Zahlungsmethode wählen",
+    "subscribe_button": "Abonnieren — 35 $ CAD/Jahr",
+    "cancel_button": "Abonnement kündigen",
+    "cancel_confirm_title": "Abonnement kündigen",
+    "cancel_confirm_msg": "Möchten Sie Ihr Premium-Abonnement wirklich kündigen?"
+  },
+  "payouts": {
+    "title": "Meine Einnahmen",
+    "balance_available": "Verfügbares Guthaben",
+    "withdraw_button": "Abheben",
+    "amount_label": "Auszahlungsbetrag (CAD)",
+    "amount_placeholder": "0,00",
+    "provider_label": "Auszahlungsmethode wählen",
+    "provider_orange": "Orange Money",
+    "provider_mtn": "MTN MoMo",
+    "provider_interac": "Interac",
+    "provider_bank": "Banküberweisung",
+    "phone_label": "Telefonnummer",
+    "phone_placeholder": "+237 6XX XXX XXX",
+    "details_label": "Bankdaten",
+    "details_placeholder": "Name des Kontoinhabers, IBAN/Kontonummer, Bank",
+    "history_title": "Auszahlungsverlauf",
+    "no_history": "Noch keine Auszahlungen",
+    "status_pending": "Ausstehend",
+    "status_processing": "In Bearbeitung",
+    "status_completed": "Abgeschlossen",
+    "status_failed": "Fehlgeschlagen",
+    "success_message": "Auszahlung von {{amount}} erfolgreich gesendet",
+    "failure_message": "Auszahlung fehlgeschlagen: {{reason}}"
+  },
+  "roles": {
+    "traveler": "Reisender",
+    "sender": "Absender",
+    "both": "Reisender & Absender",
+    "admin": "Administrator"
+  },
+  "kyc": {
+    "title": "Identitätsprüfung",
+    "title_update": "Meine Dokumente aktualisieren",
+    "subtitle": "Wählen Sie Ihren Dokumenttyp und laden Sie beide Seiten hoch.",
+    "verified_title": "Identität bereits verifiziert",
+    "verified_desc": "Ihre Identität wurde erfolgreich überprüft. Sie müssen keine neuen Dokumente einreichen, es sei denn, Ihr Ausweis ist abgelaufen.",
+    "update_anyway": "Dokumente trotzdem aktualisieren",
+    "go_back": "Zurück",
+    "update_warning": "⚠️ Sie aktualisieren Ihre bereits verifizierten Dokumente. Dies erfordert eine erneute Prüfung durch unser Team.",
+    "doc_type": "Dokumenttyp",
+    "cni_label": "Personalausweis",
+    "cni_desc": "Gültiger Personalausweis",
+    "passport_label": "Reisepass",
+    "passport_desc": "Gültiger internationaler Reisepass",
+    "upload_section": "Fotos des Dokuments",
+    "encryption_notice": "Ihre Dokumente sind verschlüsselt und werden ausschließlich zur Identitätsprüfung verwendet.",
+    "front_cni": "Vorderseite des Personalausweises *",
+    "back_cni": "Rückseite des Personalausweises *",
+    "front_passport": "Reisepass-Hauptseite *",
+    "back_passport": "Reisepass-Seite 2 *",
+    "front_error": "Bitte laden Sie die Vorderseite Ihres Dokuments hoch.",
+    "back_error": "Bitte laden Sie die Rückseite Ihres Dokuments hoch.",
+    "doc_type_error": "Bitte wählen Sie einen Dokumenttyp aus.",
+    "submit": "Dokumente einreichen",
+    "submitting": "Wird eingereicht...",
+    "skip": "Vorerst überspringen",
+    "permission_photos": "Go Bagage benötigt Zugriff auf Ihre Fotos, um Ihr Ausweisdokument hochzuladen.",
+    "pending": {
+      "title": "Überprüfung läuft",
+      "desc": "Unser Team prüft Ihre Dokumente. Dies dauert in der Regel 1 bis 24 Stunden. Wir benachrichtigen Sie, sobald Ihr Profil bestätigt ist.",
+      "banner_title": "Überprüfung ausstehend",
+      "banner_sub": "Dokumente erfolgreich eingereicht",
+      "continue_btn": "Weiter zur App"
+    },
+    "statuses": {
+      "pending": "Überprüfung ausstehend",
+      "under_review": "In Prüfung",
+      "verified": "Identität verifiziert",
+      "rejected": "Überprüfung abgelehnt"
+    }
+  },
+  "tracking": {
+    "title": "Live-Verfolgung",
+    "live": "Live",
+    "complete": "abgeschlossen",
+    "shipment_status": "Sendungsstatus",
+    "package_details": "Paketdetails",
+    "category": "Kategorie",
+    "recipient": "Empfänger",
+    "your_traveler": "Ihr Reisender",
+    "reviews": "Bewertungen",
+    "confirm_delivery": "✅ Empfang bestätigen",
+    "confirm_delivery_pending": "⏳ Empfang bestätigen (bei Ankunft verfügbar)",
+    "not_found": "Buchung nicht gefunden.",
+    "step_accepted": "Buchung bestätigt",
+    "step_accepted_sub": "Anfrage angenommen",
+    "step_picked_up": "Paket abgeholt",
+    "step_picked_up_sub": "An Reisenden übergeben",
+    "step_in_transit": "Unterwegs",
+    "step_in_transit_sub": "Während der Reise",
+    "step_delivered": "An Empfänger zugestellt",
+    "step_delivered_sub": "Persönlich übergeben",
+    "step_confirmed": "Zahlung freigegeben",
+    "step_confirmed_sub": "Nach Lieferbestätigung"
+  },
+  "disputes": {
+    "detail": {
+      "title": "Streitfalldetails",
+      "dispute_id": "Fall #{{id}}",
+      "booking_ref": "Buchung #{{id}}",
+      "status_under_review": "In Prüfung",
+      "status_open": "Streitfall offen",
+      "status_resolved": "Gelöst",
+      "reason_label": "Streitfallgrund",
+      "description_label": "Erklärung & Details",
+      "no_description": "Keine weiteren Details angegeben.",
+      "opened_on": "Gemeldet am {{date}}",
+      "escrow_title": "🔒 Treuhandgelder gesichert",
+      "escrow_text": "Die Gelder für diese Transaktion sind sicher hinterlegt. Das GoBagage-Schlichtungsteam prüft den Fall und wird Sie bei Bedarf kontaktieren.",
+      "view_chat": "Unterhaltung öffnen",
+      "close": "Schließen"
+    },
+    "reasons": {
+      "package_damaged": "Beschädigtes Paket",
+      "package_lost": "Paket nicht erhalten / verloren",
+      "delivery_delay": "Erhebliche Lieferverzögerung",
+      "non_compliant": "Inhalt entspricht nicht der Angabe",
+      "other": "Anderer Grund",
+      "general": "Laufender Streitfall"
+    }
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "mark_all_read": "Alle als gelesen markieren",
+    "empty_title": "Keine Benachrichtigungen",
+    "empty_subtitle": "Wichtige Neuigkeiten werden hier angezeigt."
   }
 }

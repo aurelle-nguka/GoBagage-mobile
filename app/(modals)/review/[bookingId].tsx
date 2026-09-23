@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { useTranslation } from 'react-i18next'
 import { ReviewScreen } from '../../../features/reviews/screens/ReviewScreen'
 import { useSubmitReview } from '../../../features/reviews/hooks/useSubmitReview'
 import { getBooking } from '../../../features/bookings/api/bookings.api'
@@ -10,7 +9,6 @@ import { Colors } from '../../../theme'
 import { BookingDTO } from '../../../features/bookings/types/booking.type'
 
 export default function ReviewPage() {
-  const { t } = useTranslation()
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
@@ -38,13 +36,9 @@ export default function ReviewPage() {
   const traveler = b?.traveler ?? b?.trip?.traveler
   const corridor = b?.trip?.corridor
 
-  const routeLabel = corridor
-    ? `${corridor.departureCity} → ${corridor.arrivalCity}`
-    : t('review.your_trip_fallback', 'Your trip')
-
   const travelerName = traveler
     ? `${traveler.firstName} ${traveler.lastNameInitial}.`
-    : t('review.your_traveler_fallback', 'Your traveler')
+    : 'Your traveler'
 
   const travelerInitials = traveler
     ? `${(traveler.firstName ?? 'T')[0]}${traveler.lastNameInitial ?? ''}`.toUpperCase()
@@ -54,14 +48,12 @@ export default function ReviewPage() {
 
   return (
     <ReviewScreen
-      routeLabel={routeLabel}
+      corridor={corridor}
       departureDate={b?.trip?.departureDate ?? ''}
       releasedAmount={releasedAmount}
       revieweeInitials={travelerInitials}
       revieweeName={travelerName}
-      revieweeContext={t('review.traveler_on_route', 'Your traveler on {{route}}', {
-        route: routeLabel,
-      })}
+      revieweeContext={corridor ? `Your traveler on ${corridor.departureCity} - ${corridor.arrivalCity}` : 'Your traveler'}
       onBack={() => router.back()}
       onSubmit={async ({ rating, badges, comment }) => {
         if (!booking || !traveler) return

@@ -1,3 +1,9 @@
+/**
+ * Go Bagage — TrackingMapPlaceholder
+ * Visualisation simplifiée du trajet (origine → avion → destination + % de progression).
+ * En V2, ceci sera remplacé par une vraie carte (react-native-maps) avec position GPS réelle.
+ */
+
 import { View, Text, StyleSheet } from 'react-native'
 import { MapPin, Plane } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
@@ -39,11 +45,7 @@ export function TrackingMapPlaceholder({
               ]}
             />
           ))}
-          <Plane
-            size={18}
-            color={Colors.primary}
-            style={{ marginHorizontal: 4 }}
-          />
+          <Plane size={18} color={Colors.primary} style={styles.planeIcon} />
         </View>
 
         <View style={styles.cityBlock}>
@@ -76,14 +78,29 @@ const styles = StyleSheet.create({
     gap: Spacing[3],
     paddingHorizontal: Spacing[4],
   },
-  cityBlock: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  cityBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   cityLabel: {
     fontSize: FontSize.sm,
     fontWeight: FontWeight.semibold,
     color: Colors.foreground,
   },
-  lineRow: { flexDirection: 'row', alignItems: 'center', gap: 2, flex: 1 },
-  segment: { flex: 1, height: 2 },
+  lineRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    flex: 1,
+  },
+  segment: {
+    flex: 1,
+    height: 2,
+  },
+  planeIcon: {
+    marginHorizontal: 4,
+  },
   statusBadge: {
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing[3],

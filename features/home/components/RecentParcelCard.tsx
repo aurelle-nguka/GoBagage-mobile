@@ -1,5 +1,5 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { Package, ArrowRight, Calendar, Weight } from 'lucide-react-native'
+import { Package, ArrowRight } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
@@ -8,27 +8,12 @@ type ParcelDisplayStatus = 'In Transit' | 'Pending' | 'Delivered' | 'Confirmed'
 
 const STATUS_CONFIG: Record<
   ParcelDisplayStatus,
-  { key: string; fallback: string; bg: string; color: string }
+  { bg: string; color: string }
 > = {
-  Pending: { key: 'admin.pending', fallback: 'Pending', bg: '#fff8e8', color: Colors.warning },
-  'In Transit': {
-    key: 'trip.in_transit',
-    fallback: 'In Transit',
-    bg: '#e8f4fd',
-    color: Colors.secondary,
-  },
-  Delivered: {
-    key: 'trip.delivered',
-    fallback: 'Delivered',
-    bg: '#e8faf0',
-    color: Colors.primary,
-  },
-  Confirmed: {
-    key: 'home.status_confirmed',
-    fallback: 'Confirmed',
-    bg: '#e8faf0',
-    color: Colors.primary,
-  },
+  Pending: { bg: '#fff8e8', color: Colors.warning },
+  'In Transit': { bg: '#e8f4fd', color: Colors.secondary },
+  Delivered: { bg: '#e8faf0', color: Colors.primary },
+  Confirmed: { bg: '#e8faf0', color: Colors.primary },
 }
 
 interface RecentParcelCardProps {
@@ -53,6 +38,21 @@ export function RecentParcelCard({
   const { t } = useTranslation()
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG['Pending']
 
+  const getTranslatedStatus = (st: ParcelDisplayStatus) => {
+    switch (st) {
+      case 'Pending':
+        return t('tracking.statuses.pending', 'En attente')
+      case 'In Transit':
+        return t('tracking.statuses.in_transit', 'En transit')
+      case 'Delivered':
+        return t('tracking.statuses.delivered', 'Livré')
+      case 'Confirmed':
+        return t('tracking.statuses.confirmed', 'Confirmé')
+      default:
+        return st
+    }
+  }
+
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
       <View style={styles.headerRow}>
@@ -62,28 +62,20 @@ export function RecentParcelCard({
           </View>
           <View style={styles.textBlock}>
             <RouteLabel from={from} to={to} size='sm' />
-            <Text style={styles.viaText}>
-              {t('parcel.via_traveler', 'via {{name}}', { name: travelerName })}
-            </Text>
+            <Text style={styles.viaText}>via {travelerName}</Text>
           </View>
         </View>
 
         <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
           <Text style={[styles.statusText, { color: config.color }]}>
-            {t(config.key, config.fallback)}
+            {getTranslatedStatus(status)}
           </Text>
         </View>
       </View>
 
       <View style={styles.metaRow}>
-        <View style={styles.metaItem}>
-          <Calendar size={12} color={Colors.mutedForeground} />
-          <Text style={styles.metaText}>{date}</Text>
-        </View>
-        <View style={styles.metaItem}>
-          <Weight size={12} color={Colors.mutedForeground} />
-          <Text style={styles.metaText}>{weight}</Text>
-        </View>
+        <Text style={styles.metaText}>📅 {date}</Text>
+        <Text style={styles.metaText}>⚖️ {weight}</Text>
         <ArrowRight size={14} color='#9ca3af' style={styles.chevron} />
       </View>
     </TouchableOpacity>
@@ -140,11 +132,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing[4],
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
   },
   metaText: {
     fontSize: FontSize.sm,

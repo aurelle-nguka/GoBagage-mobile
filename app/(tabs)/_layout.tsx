@@ -1,5 +1,6 @@
+import { useEffect } from 'react'
 import { Platform, Dimensions } from 'react-native'
-import { Tabs } from 'expo-router'
+import { Tabs, useRouter } from 'expo-router'
 import { Home, PlusCircle, Search, Map, User } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '../../store/auth.store'
@@ -9,8 +10,15 @@ const { height } = Dimensions.get('window')
 const isSmallScreen = height < 700
 
 export default function TabsLayout() {
+  const router = useRouter()
   const { t } = useTranslation()
   const { user } = useAuthStore()
+
+  useEffect(() => {
+    if (user?.roles.includes('ADMIN')) {
+      router.replace('/(admin)/dashboard')
+    }
+  }, [user])
 
   const isSender = user?.roles.includes('SENDER') ?? false
   const isTraveler = user?.roles.includes('TRAVELER') ?? false

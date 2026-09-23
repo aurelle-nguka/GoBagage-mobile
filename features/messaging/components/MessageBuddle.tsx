@@ -1,11 +1,14 @@
 /**
  * Go Bagage — MessageBubble
- * Bulle de message : 3 variantes (système, moi, interlocuteur).
+ * Bulle de message : 3 variantes (système, moi, interlocuteur) + support des images et notes vocales (Audio).
  */
 
-import { View, Text, StyleSheet } from 'react-native'
-import { Lock } from 'lucide-react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, Pressable } from 'react-native'
+import { Lock, X } from 'lucide-react-native'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
+import { API_BASE_URL } from '../../../shared/constants/api.constants'
+import { AudioMessagePlayer } from './AudioMessagePlayer'
 
 export type MessageSender = 'me' | 'traveler' | 'system'
 
@@ -14,6 +17,18 @@ interface MessageBubbleProps {
   sender: MessageSender
   time: string
   senderInitials?: string
+  mediaUrl?: string
+  contentType?: 'TEXT' | 'IMAGE' | 'AUDIO' | 'SYSTEM'
+  durationSeconds?: number
+}
+
+function resolveMediaUrl(url?: string): string | null {
+  if (!url) return null
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
+    return url
+  }
+  const serverOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
+  return `${serverOrigin}${url.startsWith('/') ? '' : '/'}${url}`
 }
 
 export function MessageBubble({
@@ -21,7 +36,13 @@ export function MessageBubble({
   sender,
   time,
   senderInitials,
+  mediaUrl,
+  contentType,
+  durationSeconds,
 }: MessageBubbleProps) {
+  const [modalVisible, setModalVisible] = useState(false)
+  const fullMediaUrl = resolveMediaUrl(mediaUrl)
+
   if (sender === 'system') {
     return (
       <View style={styles.systemRow}>
@@ -34,6 +55,7 @@ export function MessageBubble({
   }
 
   const isMe = sender === 'me'
+  const isAudio = contentType === 'AUDIO' || (mediaUrl && (mediaUrl.endsWith('.m4a') || mediaUrl.endsWith('.aac') || mediaUrl.endsWith('.mp3') || mediaUrl.endsWith('.wav')))
 
   return (
     <View style={[styles.messageRow, isMe ? styles.rowEnd : styles.rowStart]}>
@@ -51,14 +73,43 @@ export function MessageBubble({
             isMe ? styles.bubbleTailMe : styles.bubbleTailOther,
           ]}
         >
-          <Text style={[styles.text, isMe ? styles.textMe : styles.textOther]}>
-            {text}
-          </Text>
+          {isAudio && fullMediaUrl ? (
+            <AudioMessagePlayer
+              audioUrl={fullMediaUrl}
+              isMe={isMe}
+              durationSeconds={durationSeconds}
+            />
+          ) : fullMediaUrl ? (
+            <TouchableOpacity
+              activeOpacity={0.9}
+              onPress={() => setModalVisible(true)}
+              style={styles.imageContainer}
+            >
+              <Image source={{ uri: fullMediaUrl }} style={styles.bubbleImage} resizeMode='cover' />
+            </TouchableOpacity>
+          ) : null}
+
+          {text && !isAudio ? (
+            <Text style={[styles.text, isMe ? styles.textMe : styles.textOther, fullMediaUrl ? { marginTop: 6 } : null]}>
+              {text}
+            </Text>
+          ) : null}
         </View>
         <Text style={[styles.time, isMe ? styles.timeRight : styles.timeLeft]}>
           {time}
         </Text>
       </View>
+
+      {fullMediaUrl && !isAudio && (
+        <Modal visible={modalVisible} transparent animationType='fade' onRequestClose={() => setModalVisible(false)}>
+          <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <X size={24} color={Colors.white} />
+            </TouchableOpacity>
+            <Image source={{ uri: fullMediaUrl }} style={styles.fullImage} resizeMode='contain' />
+          </Pressable>
+        </Modal>
+      )}
     </View>
   )
 }
@@ -112,11 +163,11 @@ const styles = StyleSheet.create({
     color: Colors.primary,
   },
   bubbleColumn: {
-    maxWidth: '72%',
+    maxWidth: '78%',
   },
   bubble: {
-    paddingHorizontal: Spacing[4],
-    paddingVertical: Spacing[3],
+    paddingHorizontal: Spacing[3],
+    paddingVertical: Spacing[2],
     borderRadius: Radius['2xl'],
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -136,9 +187,19 @@ const styles = StyleSheet.create({
   bubbleTailOther: {
     borderBottomLeftRadius: 4,
   },
+  imageContainer: {
+    borderRadius: Radius.lg,
+    overflow: 'hidden',
+  },
+  bubbleImage: {
+    width: 200,
+    height: 150,
+    borderRadius: Radius.lg,
+  },
   text: {
     fontSize: FontSize.base,
-    lineHeight: FontSize.base * 1.5,
+    lineHeight: FontSize.base * 1.4,
+    paddingHorizontal: 4,
   },
   textMe: {
     color: Colors.white,
@@ -156,5 +217,24 @@ const styles = StyleSheet.create({
   },
   timeLeft: {
     textAlign: 'left',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+    padding: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: Radius.full,
+  },
+  fullImage: {
+    width: '90%',
+    height: '75%',
   },
 })

@@ -20,7 +20,7 @@ interface UseBookingActionsResult {
   pickUp:   (bookingId: string) => Promise<BookingDTO | null>;
   deliver:  (bookingId: string) => Promise<BookingDTO | null>;
   confirm:  (bookingId: string) => Promise<BookingDTO | null>;
-  cancel:   (bookingId: string) => Promise<BookingDTO | null>;
+  cancel:   (bookingId: string, reason?: string) => Promise<BookingDTO | null>;
 }
 
 export function useBookingActions(): UseBookingActionsResult {
@@ -50,6 +50,6 @@ export function useBookingActions(): UseBookingActionsResult {
     pickUp:  (id)         => wrap(() => markPickedUp(id)),
     deliver: (id)         => wrap(() => markDelivered(id)),
     confirm: (id)         => wrap(() => confirmDelivery(id)),
-    cancel:  (id)         => wrap(() => cancelBooking(id)),
+    cancel:  (id, reason) => wrap(() => cancelBooking(id, reason)),
   };
 }

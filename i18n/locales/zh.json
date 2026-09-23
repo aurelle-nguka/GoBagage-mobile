@@ -28,7 +28,7 @@
     "have_account": "已有账户？",
     "logout": "退出登录",
     "logout_confirm": "您确定要退出登录吗？",
-    "logout_confirm_admin": "您确定要退出管理面板吗？",
+    "logout_confirm_admin": "您确定要退出管理员会话吗？",
     "send_reset": "发送重置链接",
     "check_email": "检查您的电子邮件",
     "welcome_back": "欢迎回来",
@@ -55,15 +55,34 @@
     "verifying": "验证中...",
     "resend": "重新发送",
     "resend_in": "重新发送验证码于",
+    "enter_reset_code": "输入重置代码",
+    "already_have_code": "已有重置代码？点击输入",
+    "reset_password_title": "设置新密码",
+    "reset_password_subtitle": "输入通过电子邮件收到的重置代码并设置新密码。",
+    "reset_token_label": "重置代码 / Token",
+    "reset_token_placeholder": "粘贴邮件中收到的代码",
+    "new_password": "新密码",
+    "new_password_placeholder": "••••••••",
+    "confirm_password": "确认新密码",
+    "confirm_password_placeholder": "••••••••",
+    "reset_password_submit": "重置密码",
+    "password_reset_success_title": "密码已重置！",
+    "password_reset_success_desc": "您的密码已成功重置，现在可以使用新密码登录。",
     "loading": {
       "login": "登录中...",
       "register": "创建账户中...",
-      "sending": "发送中..."
+      "sending": "发送中...",
+      "resetting": "重置中..."
     },
     "errors": {
       "email_required": "电子邮件地址是必填项。",
       "email_invalid": "请输入有效的电子邮件地址。",
+      "token_required": "重置代码是必填项。",
       "password_required": "密码是必填项。",
+      "password_too_short": "密码至少需要8个字符。",
+      "confirm_password_required": "请确认您的密码。",
+      "passwords_must_match": "两次输入的密码不一致。",
+      "invalid_form": "请检查表单中的错误。",
       "password_min": "密码至少需要8个字符。",
       "password_uppercase": "密码必须包含至少1个大写字母。",
       "password_number": "密码必须包含至少1个数字。",
@@ -76,42 +95,6 @@
       "phone_invalid": "请使用国际格式：+237650255873",
       "otp_incomplete": "请输入{{length}}位验证码。"
     }
-  },
-  "kyc": {
-    "title": "验证您的身份",
-    "subtitle": "选择您的文件类型并上传两面。",
-    "document_type": "文件类型",
-    "cni": "身份证",
-    "passport": "护照",
-    "front": "正面",
-    "back": "背面",
-    "submit": "提交文件",
-    "skip": "暂时跳过",
-    "verified": "身份已验证",
-    "update": "仍然更新我的文件",
-    "pending_title": "验证待处理",
-    "pending_desc": "我们的团队正在审核您的文件。通常需要1-24小时。验证后我们将通知您。",
-    "pending_status": "验证待处理",
-    "submitted_success": "文件提交成功",
-    "continue_app": "继续使用应用",
-    "verified_desc": "您的身份已成功验证。",
-    "update_title": "更新您的文件",
-    "update_warning": "您正在更新已验证的文件。这将需要新的审核。",
-    "upload_photos": "上传照片",
-    "info_text": "您的文件已加密，仅用于身份验证。",
-    "id_card": "身份证",
-    "permission_title": "需要权限",
-    "permission_desc": "Go Bagage需要访问您的照片。",
-    "loading": "提交中...",
-    "errors": {
-      "doc_type_required": "请选择文件类型。",
-      "front_required": "请上传文件正面。",
-      "back_required": "请上传文件背面。"
-    },
-    "upload_success": "上传成功",
-    "tap_to_upload": "点击上传照片",
-    "cni_desc": "身份证",
-    "passport_desc": "有效的国际护照"
   },
   "nav": {
     "home": "首页",
@@ -295,13 +278,21 @@
     "method_orange_sublabel": "移动支付 · 喀麦隆、科特迪瓦...",
     "method_momo_label": "MTN MoMo",
     "method_momo_sublabel": "移动支付 · 喀麦隆、加纳...",
-    "method_interac_label": "Interac e-Transfer",
-    "method_interac_sublabel": "仅限加拿大银行",
     "traveler_fallback": "您的旅行者",
     "errors": {
       "no_client_secret": "未从服务器收到客户端密钥。",
-      "payment_failed": "付款失败，请重试。"
-    }
+      "payment_failed": "付款失败，请重试。",
+      "mobile_money_failed": "支付未被批准。请重试。"
+    },
+    "phone_required": "需要电话号码",
+    "phone_required_msg": "请输入移动支付电话号码。",
+    "mobile_money_phone_label": "移动支付电话号码",
+    "mobile_money_phone_placeholder": "+237 6XX XXX XXX",
+    "mobile_money_waiting_title": "请检查您的手机",
+    "mobile_money_waiting_text": "请在您的手机上批准支付请求以继续。",
+    "mobile_money_timeout_title": "仍在等待",
+    "mobile_money_timeout_text": "我们尚未收到确认。您可以再次检查，或稍后返回——一旦确认我们会通知您。",
+    "check_again": "再次检查"
   },
   "tracking": {
     "title": "实时追踪",
@@ -327,10 +318,28 @@
     "errors": {
       "load_failed": "加载追踪信息失败。",
       "confirm_failed": "确认送达失败。"
-    }
+    },
+    "step_pending_release": "付款待释放",
+    "step_pending_release_sub": "将在24小时内释放给旅行者",
+    "payment_held_notice": "付款已被安全托管，将在24小时内释放给旅行者。在此期间您仍可以举报问题。"
   },
   "profile": {
     "title": "个人资料",
+    "avatar": {
+      "title": "头像",
+      "camera": "相机",
+      "gallery": "相册",
+      "delete": "删除",
+      "permission_camera_title": "需要相机权限",
+      "permission_camera_desc": "请允许访问相机以拍摄个人头像。",
+      "permission_gallery_title": "需要相册权限",
+      "permission_gallery_desc": "请允许访问相册以选择个人头像。",
+      "delete_confirm_title": "删除头像",
+      "delete_confirm_desc": "您确定要删除个人头像吗？",
+      "error_title": "错误",
+      "error_upload": "更新个人头像失败。",
+      "error_delete": "删除个人头像失败。"
+    },
     "edit": "编辑资料",
     "edit_subtitle": "更新个人信息",
     "member_since": "会员自 {{date}}",
@@ -369,14 +378,16 @@
       "verified_sublabel": "您的身份已确认。",
       "pending_label": "需要验证",
       "pending_sublabel": "提交您的身份证件以解锁所有功能。",
-      "pending_action": "立即验证 →",
+      "pending_action": "立即验证",
       "under_review_label": "审核中",
       "under_review_sublabel": "文件已提交 — 通常需要1-24小时。",
       "rejected_label": "验证失败",
       "rejected_sublabel": "文件被拒绝，请重新提交。",
-      "rejected_action": "重新提交 →",
+      "rejected_action": "重新提交",
       "reason_label": "原因："
-    }
+    },
+    "rate_action": "评价",
+    "payouts": "我的收入"
   },
   "search": {
     "title": "查找旅行者",
@@ -490,7 +501,7 @@
       "rejected_title": "验证失败",
       "rejected_subtitle": "您的文件被拒绝。请重新提交清晰的照片。",
       "verified_title": "已验证",
-      "verify_cta": "验证我的身份 →"
+      "verify_cta": "验证我的身份"
     },
     "errors": {
       "invalid_request": "请求无效，请检查您的信息。",
@@ -506,62 +517,176 @@
     }
   },
   "admin": {
-    "title": "管理员",
+    "title": "管理后台",
     "greeting": "你好，{{name}}",
     "overview": "概览",
-    "total_users": "总用户数",
-    "active_trips": "活跃行程",
-    "revenue": "收入",
-    "kyc_pending": "待处理KYC",
-    "quick_actions": "快速操作",
+    "total_users": "用户总数",
+    "registered_users": "注册用户",
+    "active_trips": "进行中的行程",
+    "open_trips": "开放行程",
+    "revenue": "佣金余额",
+    "available_balance": "可用余额",
+    "kyc_pending": "待审KYC",
+    "needs_review": "需要审核",
+    "all_clear": "全部完成！",
+    "quick_actions": "快捷操作",
     "kyc_queue": "KYC审核队列",
-    "kyc_queue_subtitle": "{{count}} 份文件等待审核",
-    "kyc_queue_empty": "没有待处理文件",
-    "corridors": "走廊管理",
-    "corridors_subtitle": "激活、停用和配置路线",
+    "kyc_queue_subtitle": "{{count}} 份待审文件",
+    "kyc_queue_empty": "没有待处理的文件",
+    "user_management": "用户管理",
+    "user_info": "用户信息",
+    "corridors": "行程与路线",
+    "corridors_subtitle": "路线统计与运输量分析",
     "coming_soon": "即将推出",
-    "all_clear": "一切正常！",
-    "no_kyc": "此类别中没有KYC文件。",
-    "approve": "批准",
+    "all": "全部",
+    "full_name": "全名",
+    "email": "电子邮件",
+    "phone": "电话",
+    "role": "角色",
+    "status": "状态",
+    "status_label": "状态",
+    "kyc_review": "KYC审核",
+    "no_kyc": "没有待处理的KYC文件",
+    "documents": "份文件",
+    "identity_docs": "身份证明文件",
+    "doc_type": "文件类型",
+    "submitted": "提交于",
+    "tap_zoom": "点击放大",
+    "tap_close": "点击关闭",
+    "approve": "通过",
     "reject": "拒绝",
+    "reject_kyc": "拒绝KYC",
+    "reject_subtitle": "请提供拒绝此文件的原因。",
+    "reject_placeholder": "例如：文件不清晰、已过期...",
+    "confirm_reject": "确认拒绝",
+    "already_approved": "已通过",
+    "already_rejected": "已拒绝",
+    "pending": "待处理",
     "verified": "已验证",
     "rejected": "已拒绝",
     "under_review": "审核中",
-    "pending": "待处理",
-    "registered_users": "注册用户",
-    "needs_review": "需要审核",
-    "user_management": "用户管理",
-    "disputes": "争议",
-    "kyc_review": "KYC审核",
-    "user_info": "用户信息",
-    "full_name": "全名",
-    "email": "电子邮件",
-    "doc_type": "文件类型",
-    "submitted": "提交于",
-    "status_label": "状态",
-    "identity_docs": "身份证件",
-    "tap_zoom": "点击放大",
-    "tap_close": "点击关闭",
-    "already_approved": "已批准",
-    "already_rejected": "已拒绝",
-    "reject_kyc": "拒绝KYC",
-    "reject_subtitle": "请提供原因。用户将收到通知。",
-    "reject_placeholder": "例如 文件模糊，ID已过期...",
-    "confirm_reject": "确认拒绝",
-    "documents": "文件",
-    "all": "全部",
+    "not_submitted": "未提交",
+    "users": {
+      "count": "{{count}} 位用户",
+      "count_plural": "{{count}} 位用户",
+      "search_placeholder": "按姓名或邮箱搜索...",
+      "no_results": "未找到用户",
+      "status_active": "正常",
+      "status_suspended": "已封禁",
+      "suspension_reason_label": "封禁原因",
+      "last_login": "最后登录：{{date}}",
+      "never": "从未",
+      "suspend_button": "封禁账户",
+      "suspend_trigger_subtitle": "暂时禁用该用户的访问权限",
+      "suspend_subtitle": "提供原因（可选）。用户将收到通知。",
+      "suspend_reason_placeholder": "例如：可疑行为、违反平台规则...",
+      "suspend_confirm": "确认封禁",
+      "reactivate_button": "解封账户",
+      "reactivate_confirm_title": "解封账户",
+      "reactivate_confirm_msg": "您确定要重新启用此用户的账户吗？",
+      "errors": {
+        "load_failed": "加载用户列表失败。",
+        "load_detail_failed": "加载用户详情失败。",
+        "suspend_failed": "封禁用户失败。",
+        "reactivate_failed": "解封用户失败。"
+      }
+    },
+    "disputes": {
+      "title": "争议与举报",
+      "dashboard_subtitle": "审核并解决用户举报的问题",
+      "detail_title": "争议详情",
+      "count": "{{count}} 起争议",
+      "count_plural": "{{count}} 起争议",
+      "no_results": "未找到争议记录",
+      "status_open": "待处理",
+      "status_under_investigation": "调查中",
+      "status_decided": "已裁决",
+      "status_closed": "已结案",
+      "investigate_button": "开始调查",
+      "decide_label": "做出裁决",
+      "release_funds": "放款给旅行者",
+      "refund_sender": "退款给发件人",
+      "note_label": "裁决说明（可选）",
+      "note_placeholder": "请说明您的裁决理由...",
+      "confirm_decision": "确认裁决",
+      "close_note_label": "结案说明（可选）",
+      "close_note_placeholder": "最终备注...",
+      "close_button": "结案",
+      "closed_label": "该争议已永久结案。",
+      "errors": {
+        "load_failed": "加载争议列表失败。",
+        "load_detail_failed": "加载争议详情失败。",
+        "investigate_failed": "启动调查失败。",
+        "decide_failed": "提交裁决失败。",
+        "close_failed": "结案失败。"
+      }
+    },
+    "payouts": {
+      "title": "余额与提现",
+      "subtitle": "{{amount}} 可用"
+    },
     "errors": {
+      "load_stats_failed": "加载仪表板数据失败。",
       "load_kyc_failed": "加载KYC队列失败。",
-      "approve_failed": "KYC批准失败。",
-      "reject_failed": "KYC拒绝失败。"
+      "approve_failed": "批准KYC失败。",
+      "reject_failed": "拒绝KYC失败。"
     }
   },
   "language": {
     "subtitle": "选择您的首选语言"
   },
   "messaging": {
-    "input_placeholder": "输入消息...",
-    "privacy_notice": "您的联系方式将保密。请在此聊天中进行所有沟通。"
+    "inbox_title": "消息",
+    "empty_title": "暂无对话",
+    "empty_subtitle": "当您预订或接受包裹托运时，您的对话将显示在此处。",
+    "privacy_notice": "为了您的安全，直接联系信息在确认前受保护。",
+    "type_placeholder": "输入您的消息...",
+    "preview": {
+      "caption_placeholder": "添加说明...",
+      "send": "发送"
+    },
+    "options": {
+      "view_contact": "查看联系人",
+      "media_links": "媒体和文件",
+      "open_dispute": "发起争议",
+      "report_user": "举报用户"
+    },
+    "contact": {
+      "title": "联系人信息",
+      "unknown": "用户",
+      "identity_verified": "已实名认证 (KYC)",
+      "identity_pending": "未认证身份",
+      "call_action": "拨打电话",
+      "trip_section": "关联行程",
+      "route": "路线",
+      "departure_date": "出发日期",
+      "booking_ref": "预订编号 #",
+      "booking_trip": "当前预订",
+      "security_title": "GoBagage 保障与安全",
+      "security_desc": "您的交流和付款均受安全保护。切勿在平台外分享银行信息。"
+    },
+    "media": {
+      "title": "媒体和文件",
+      "items_count": "项",
+      "tab_photos": "照片",
+      "tab_audios": "语音信息",
+      "you": "您",
+      "empty_photos_title": "暂无分享的照片",
+      "empty_photos_sub": "在此对话中分享的照片将显示在此处。",
+      "empty_audios_title": "暂无语音信息",
+      "empty_audios_sub": "在此对话中发送的语音信息将显示在此处。"
+    },
+    "voice": {
+      "recording": "录音中...",
+      "permission_desc": "请允许访问麦克风以发送语音信息。",
+      "start_error": "无法开始录音。",
+      "send_error": "发送语音信息失败。"
+    },
+    "errors": {
+      "conversation_not_found": "未找到对话。",
+      "load_failed": "加载对话失败。",
+      "send_failed": "发送消息失败。"
+    }
   },
   "review": {
     "delivery_confirmed_title": "送达已确认",
@@ -624,5 +749,269 @@
       "fill_required": "请填写所有必填字段。",
       "load_failed": "加载走廊失败。"
     }
+  },
+  "notifications": {
+    "title": "通知",
+    "empty": "暂无通知",
+    "types": {
+      "NEW_USER_REGISTERED": {
+        "title": "新用户注册",
+        "body": "{{name}} ({{email}}) 刚刚创建了账户。"
+      },
+      "KYC_SUBMITTED": {
+        "title": "KYC文件已提交",
+        "body": "{{name}} 提交了 ({{docType}}) 进行验证。"
+      },
+      "DISPUTE_OPENED": {
+        "title": "新争议已发起",
+        "body": "预订 #{{bookingId}} 发起了争议 #{{disputeId}}。原因：{{reason}}"
+      },
+      "DISPUTE": {
+        "title": "争议已开启",
+        "body": "预订 #{{bookingId}} 的争议已开启。"
+      },
+      "REPORT_FILED": {
+        "title": "新举报已提交",
+        "body": "举报 #{{reportId}} 已提交 ({{targetType}})。原因：{{reason}}"
+      },
+      "KYC_APPROVED": {
+        "title": "KYC已通过",
+        "body": "您的身份验证已成功通过！"
+      },
+      "KYC_REJECTED": {
+        "title": "KYC已拒绝",
+        "body": "您的身份文件已被拒绝：{{reason}}"
+      },
+      "BOOKING_CREATED": {
+        "title": "预订已创建",
+        "body": "预订 #{{bookingId}} 已创建。"
+      },
+      "BOOKING_ACCEPTED": {
+        "title": "预订已接受",
+        "body": "旅行者已接受您的预订 #{{bookingId}}。"
+      },
+      "BOOKING_REJECTED": {
+        "title": "预订已拒绝",
+        "body": "您的预订 #{{bookingId}} 已被拒绝：{{reason}}"
+      },
+      "BOOKING_CONFIRMED": {
+        "title": "预订已确认",
+        "body": "您的预订 #{{bookingId}} 已确认。"
+      },
+      "BOOKING_CANCELLED": {
+        "title": "预订已取消",
+        "body": "预订 #{{bookingId}} 已取消。"
+      },
+      "PARCEL_PICKED_UP": {
+        "title": "包裹已揽收",
+        "body": "旅行者已揽收您的包裹。"
+      },
+      "PARCEL_IN_TRANSIT": {
+        "title": "包裹运输中",
+        "body": "您的包裹正在运输途中。"
+      },
+      "PARCEL_DELIVERED": {
+        "title": "包裹已送达",
+        "body": "您的包裹已成功送达！"
+      },
+      "PAYMENT_RELEASED": {
+        "title": "款项已释放",
+        "body": "款项已释放至您的账户。"
+      },
+      "PAYMENT_REFUNDED": {
+        "title": "款项已退还",
+        "body": "退款已处理完成。"
+      },
+      "NEW_MESSAGE": {
+        "title": "新消息",
+        "body": "您收到了来自 {{senderName}} 的新消息。"
+      },
+      "NEW_BOOKING_REQUEST": {
+        "title": "新预订请求",
+        "body": "您收到了一条新的包裹运输请求。"
+      },
+      "DELIVERY_REMINDER": {
+        "title": "送达提醒",
+        "body": "请不要忘记确认预订 #{{bookingId}} 的送达状态。"
+      },
+      "ACCOUNT_SUSPENDED": {
+        "title": "账户已封禁",
+        "body": "您的账户已被暂时封禁。",
+        "body_with_reason": "您的账户因以下原因已被封禁：{{reason}}"
+      },
+      "ACCOUNT_REACTIVATED": {
+        "title": "账户已解封",
+        "body": "您的账户已成功解封，现可正常使用所有服务。"
+      },
+      "PAYMENT_FAILED": {
+        "title": "支付失败",
+        "body": "预订 #{{bookingId}} 支付失败，请重试。"
+      }
+    }
+  },
+  "disputes": {
+    "title": "举报问题",
+    "subtitle": "告诉我们这次预订出了什么问题。我们的团队将进行调查并采取行动。",
+    "reason_label": "发生了什么？",
+    "description_label": "补充说明（可选）",
+    "description_placeholder": "描述发生的情况...",
+    "submit_button": "提交举报",
+    "submitted_title": "举报已提交",
+    "submitted_subtitle": "我们的团队将审核您的举报并尽快与您联系。",
+    "report_link": "举报此预订的问题",
+    "reasons": {
+      "PARCEL_DAMAGED": "包裹受损",
+      "PARCEL_LOST": "包裹丢失",
+      "NOT_DELIVERED": "未送达",
+      "WRONG_ITEM": "物品不符",
+      "TRAVELER_UNRESPONSIVE": "旅行者无回应",
+      "OTHER": "其他原因"
+    },
+    "errors": {
+      "reason_required": "请选择一个原因。"
+    }
+  },
+  "subscription": {
+    "title": "Go Bagage 高级版",
+    "status_active": "高级版已激活",
+    "status_free": "免费计划",
+    "days_remaining": "剩余 {{count}} 天",
+    "renews_on": "结束于 {{date}}",
+    "launch_offer_title": "上线优惠",
+    "launch_offer_subtitle": "剩余 {{count}} 个名额 · 截止 {{date}}",
+    "promo_placeholder": "输入促销代码",
+    "apply_promo": "应用",
+    "choose_method": "选择支付方式",
+    "subscribe_button": "订阅 — 35加元/年",
+    "cancel_button": "取消订阅",
+    "cancel_confirm_title": "取消订阅",
+    "cancel_confirm_msg": "您确定要取消高级版订阅吗？"
+  },
+  "payouts": {
+    "title": "我的收入",
+    "balance_available": "可用余额",
+    "withdraw_button": "提现",
+    "amount_label": "提现金额 (CAD)",
+    "amount_placeholder": "0.00",
+    "provider_label": "选择提现方式",
+    "provider_orange": "Orange Money",
+    "provider_mtn": "MTN MoMo",
+    "provider_interac": "Interac",
+    "provider_bank": "银行转账",
+    "phone_label": "电话号码",
+    "phone_placeholder": "+237 6XX XXX XXX",
+    "details_label": "银行信息",
+    "details_placeholder": "账户持有人姓名、IBAN/账号、银行",
+    "history_title": "提现记录",
+    "no_history": "暂无提现记录",
+    "status_pending": "待处理",
+    "status_processing": "处理中",
+    "status_completed": "已完成",
+    "status_failed": "失败",
+    "success_message": "{{amount}} 的提现已成功发送",
+    "failure_message": "提现失败：{{reason}}"
+  },
+  "roles": {
+    "traveler": "旅行者",
+    "sender": "寄件人",
+    "both": "旅行者和寄件人",
+    "admin": "管理员"
+  },
+  "kyc": {
+    "title": "身份认证",
+    "title_update": "更新证件",
+    "subtitle": "请选择您的证件类型并上传正反面。",
+    "verified_title": "身份已通过验证",
+    "verified_desc": "您的身份已成功验证。除非您的证件过期，否则无需重新提交。",
+    "update_anyway": "仍然更新证件",
+    "go_back": "返回",
+    "update_warning": "⚠️ 您正在更新已验证的证件，这将需要我们的团队重新审核。",
+    "doc_type": "证件类型",
+    "cni_label": "身份证",
+    "cni_desc": "有效身份证",
+    "passport_label": "护照",
+    "passport_desc": "有效国际护照",
+    "upload_section": "上传照片",
+    "encryption_notice": "您的证件已加密，仅用于身份验证。",
+    "front_cni": "身份证正面 *",
+    "back_cni": "身份证反面 *",
+    "front_passport": "护照信息页 *",
+    "back_passport": "护照第2页 *",
+    "front_error": "请上传证件正面。",
+    "back_error": "请上传证件反面。",
+    "doc_type_error": "请选择证件类型。",
+    "submit": "提交证件",
+    "submitting": "提交中...",
+    "skip": "暂且跳过",
+    "permission_photos": "Go Bagage需要访问您的照片以上传身份证明文件。",
+    "pending": {
+      "title": "正在审核中",
+      "desc": "我们的团队正在审核您的证件，通常需要1至24小时。通过审核后我们将立即通知您。",
+      "banner_title": "等待验证",
+      "banner_sub": "证件已成功提交",
+      "continue_btn": "继续前往应用"
+    },
+    "statuses": {
+      "pending": "等待验证",
+      "under_review": "审核中",
+      "verified": "已通过验证",
+      "rejected": "验证未通过"
+    }
+  },
+  "tracking": {
+    "title": "实时追踪",
+    "live": "实时",
+    "complete": "已完成",
+    "shipment_status": "货运状态",
+    "package_details": "包裹详情",
+    "category": "分类",
+    "recipient": "收件人",
+    "your_traveler": "您的旅行者",
+    "reviews": "条评价",
+    "confirm_delivery": "✅ 确认收货",
+    "confirm_delivery_pending": "⏳ 确认收货（送达后可用）",
+    "not_found": "未找到预订。",
+    "step_accepted": "预订已确认",
+    "step_accepted_sub": "请求已接受",
+    "step_picked_up": "包裹已取件",
+    "step_picked_up_sub": "已交给旅行者",
+    "step_in_transit": "运输中",
+    "step_in_transit_sub": "旅途中",
+    "step_delivered": "已送达收件人",
+    "step_delivered_sub": "已当面交付",
+    "step_confirmed": "款项已释放",
+    "step_confirmed_sub": "确认送达后"
+  },
+  "disputes": {
+    "detail": {
+      "title": "争议详情",
+      "dispute_id": "案件 #{{id}}",
+      "booking_ref": "预订 #{{id}}",
+      "status_under_review": "审核中",
+      "status_open": "争议已发起",
+      "status_resolved": "已解决",
+      "reason_label": "争议原因",
+      "description_label": "说明与详细信息",
+      "no_description": "未提供更多说明。",
+      "opened_on": "申报于 {{date}}",
+      "escrow_title": "🔒 资金已安全托管",
+      "escrow_text": "本笔交易的款项已安全冻结。GoBagage调解团队正在审查此争议，如有需要将与您联系。",
+      "view_chat": "打开对话",
+      "close": "关闭"
+    },
+    "reasons": {
+      "package_damaged": "包裹受损",
+      "package_lost": "未收到 / 包裹丢失",
+      "delivery_delay": "严重延误送达",
+      "non_compliant": "内容与申报不符",
+      "other": "其他争议原因",
+      "general": "争议处理中"
+    }
+  },
+  "notifications": {
+    "title": "通知",
+    "mark_all_read": "全部标为已读",
+    "empty_title": "暂无通知",
+    "empty_subtitle": "重要更新将在此处显示。"
   }
 }

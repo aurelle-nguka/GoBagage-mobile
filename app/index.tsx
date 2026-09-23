@@ -40,7 +40,11 @@ export default function Index() {
         }
 
         setUser(user)
-        router.replace('/(tabs)/')
+        if (user.roles.includes('ADMIN')) {
+          router.replace('/(admin)/dashboard')
+        } else {
+          router.replace('/(tabs)/')
+        }
       } catch {
         await tokenService.clearTokens()
         router.replace('/(auth)/onboarding')

@@ -1,3 +1,9 @@
+/**
+ * Go Bagage — TrackingScreen
+ * Suivi en temps réel du colis (CDC section 6.3 — "Suivi en temps réel du statut du colis").
+ * Migré depuis Tracking.tsx (maquette web) → React Native.
+ */
+
 import {
   View,
   Text,
@@ -6,7 +12,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ArrowLeft, Router } from 'lucide-react-native'
+import { ArrowLeft } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import { BookingStatus } from '../types/booking.type'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
@@ -42,34 +48,6 @@ interface TrackingScreenProps {
   onConfirmDelivery: () => void
 }
 
-const TIMELINE_STEPS = (t: (key: string) => string) => [
-  {
-    status: 'ACCEPTED' as BookingStatus,
-    label: t('tracking.step_confirmed'),
-    sublabel: t('tracking.step_confirmed_sub'),
-  },
-  {
-    status: 'PICKED_UP' as BookingStatus,
-    label: t('tracking.step_pickup'),
-    sublabel: t('tracking.step_pickup_sub'),
-  },
-  {
-    status: 'IN_TRANSIT' as BookingStatus,
-    label: t('tracking.step_transit'),
-    sublabel: t('tracking.step_transit_sub'),
-  },
-  {
-    status: 'DELIVERED' as BookingStatus,
-    label: t('tracking.step_delivered'),
-    sublabel: t('tracking.step_delivered_sub'),
-  },
-  {
-    status: 'CONFIRMED' as BookingStatus,
-    label: t('tracking.step_released'),
-    sublabel: t('tracking.step_released_sub'),
-  },
-]
-
 export function TrackingScreen({
   from,
   to,
@@ -85,8 +63,39 @@ export function TrackingScreen({
 }: TrackingScreenProps) {
   const { t } = useTranslation()
 
+  const statusKey = (status || '').toLowerCase()
+  const statusTranslated = t(`booking.status.${statusKey}`, { defaultValue: status })
+
+  const timelineSteps = [
+    {
+      status: 'ACCEPTED' as BookingStatus,
+      label: t('tracking.step_accepted', { defaultValue: 'Réservation confirmée' }),
+      sublabel: t('tracking.step_accepted_sub', { defaultValue: 'Demande acceptée' }),
+    },
+    {
+      status: 'PICKED_UP' as BookingStatus,
+      label: t('tracking.step_picked_up', { defaultValue: 'Colis récupéré' }),
+      sublabel: t('tracking.step_picked_up_sub', { defaultValue: 'Colis pris en charge par le voyageur' }),
+    },
+    {
+      status: 'IN_TRANSIT' as BookingStatus,
+      label: t('tracking.step_in_transit', { defaultValue: 'En transit' }),
+      sublabel: t('tracking.step_in_transit_sub', { defaultValue: 'Pendant le voyage' }),
+    },
+    {
+      status: 'DELIVERED' as BookingStatus,
+      label: t('tracking.step_delivered', { defaultValue: 'Livré au destinataire' }),
+      sublabel: t('tracking.step_delivered_sub', { defaultValue: 'Colis remis en main propre' }),
+    },
+    {
+      status: 'CONFIRMED' as BookingStatus,
+      label: t('tracking.step_confirmed', { defaultValue: 'Paiement libéré' }),
+      sublabel: t('tracking.step_confirmed_sub', { defaultValue: 'Après confirmation de livraison' }),
+    },
+  ]
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -96,15 +105,23 @@ export function TrackingScreen({
         </TouchableOpacity>
         <View style={styles.headerTextBlock}>
           <Text style={styles.headerTitle}>
-            {t('tracking.title', 'Live Tracking')}
+            {t('tracking.title', { defaultValue: 'Suivi en Direct' })}
           </Text>
-          <Text style={styles.headerSubtitle}>
-            <RouteLabel from={from} to={to} /> . {departureDate}
-          </Text>
+          <RouteLabel
+            from={from}
+            to={to}
+            suffix={` · ${departureDate}`}
+            size="xs"
+            color="#a7f3d0"
+            arrowColor="#a7f3d0"
+            fontWeight="normal"
+          />
         </View>
         <View style={styles.liveBadge}>
           <View style={styles.liveDot} />
-          <Text style={styles.liveText}>{t('tracking.live', 'Live')}</Text>
+          <Text style={styles.liveText}>
+            {t('tracking.live', { defaultValue: 'En Direct' })}
+          </Text>
         </View>
       </View>
 
@@ -113,17 +130,19 @@ export function TrackingScreen({
           from={from}
           to={to}
           progressPercent={progressPercent}
-          statusLabel={t('tracking.in_transit', { percent: progressPercent })}
+          statusLabel={`🔄 ${statusTranslated} — ${progressPercent}% ${t('tracking.complete', { defaultValue: 'complété' })}`}
         />
 
         <View style={styles.content}>
-          <TrackingTimeline steps={TIMELINE_STEPS(t)} currentStatus={status} />
+          <TrackingTimeline steps={timelineSteps} currentStatus={status} />
+
           <PackageDetailsCard
             description={parcel.description}
             category={parcel.category}
             weightKg={parcel.weightKg}
             recipientName={parcel.recipientName}
           />
+
           <TravelerContactCard
             initials={traveler.initials}
             name={traveler.name}
@@ -133,6 +152,7 @@ export function TrackingScreen({
             onChat={onChat}
             onCall={onCall}
           />
+
           <ConfirmDeliveryButton
             status={status}
             onConfirm={onConfirmDelivery}
@@ -144,7 +164,10 @@ export function TrackingScreen({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -154,14 +177,23 @@ const styles = StyleSheet.create({
     paddingTop: Spacing[4],
     paddingBottom: Spacing[4],
   },
-  headerTextBlock: { flex: 1 },
+  headerTextBlock: {
+    flex: 1,
+  },
   headerTitle: {
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
     color: Colors.white,
   },
-  headerSubtitle: { fontSize: FontSize.sm, color: 'rgba(255,255,255,0.8)' },
-  liveBadge: { flexDirection: 'row', alignItems: 'center', gap: Spacing[2] },
+  headerSubtitle: {
+    fontSize: FontSize.sm,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  liveBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
   liveDot: {
     width: 8,
     height: 8,
@@ -173,6 +205,11 @@ const styles = StyleSheet.create({
     color: Colors.white,
     fontWeight: FontWeight.semibold,
   },
-  scroll: { flex: 1 },
-  content: { paddingHorizontal: Spacing[5], paddingTop: Spacing[5] },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: Spacing[5],
+    paddingTop: Spacing[5],
+  },
 })

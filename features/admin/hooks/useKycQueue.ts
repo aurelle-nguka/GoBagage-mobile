@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { getKycQueue, reviewKyc } from '../api/admin.api';
 import type { KycQueueItem, KycQueueParams, KycDecision } from '../types/admin.types';
@@ -75,6 +76,19 @@ const load = useCallback(async (page: number, filter: KycStatus | 'ALL', isRefre
   useEffect(() => {
     load(0, activeFilter);
   }, [activeFilter]);
+
+  useFocusEffect(
+    useCallback(() => {
+      load(currentPage, activeFilter, true);
+    }, [currentPage, activeFilter, load])
+  );
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      load(currentPage, activeFilter, true);
+    }, 20000);
+    return () => clearInterval(interval);
+  }, [currentPage, activeFilter, load]);
 
   const setFilter = (status: KycStatus | 'ALL') => {
     setActiveFilter(status);

@@ -1,17 +1,18 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Bell, Hand, Package, Plane } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { Bell, MessageSquare, Package, Plane } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
-type DashboardView = 'sender' | 'traveler';
+type DashboardView = 'sender' | 'traveler'
 
 interface HomeHeaderProps {
-  firstName: string;
-  unreadNotifications: number;
-  showToggle: boolean;
-  view: DashboardView;
-  onChangeView: (view: DashboardView) => void;
-  onPressNotifications: () => void;
+  firstName: string
+  unreadNotifications: number
+  showToggle: boolean
+  view: DashboardView
+  onChangeView: (view: DashboardView) => void
+  onPressNotifications: () => void
+  onPressMessages?: () => void
 }
 
 export function HomeHeader({
@@ -21,59 +22,92 @@ export function HomeHeader({
   view,
   onChangeView,
   onPressNotifications,
+  onPressMessages,
 }: HomeHeaderProps) {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
+
   return (
     <View style={styles.header}>
       <View style={styles.topRow}>
         <View>
-          <Text style={styles.greeting}>{t('home.welcome_back', 'Welcome back,')}</Text>
-          <View style={styles.nameRow}>
-            <Text style={styles.name}>{firstName}</Text>
-            <Hand size={18} color={Colors.white} />
-          </View>
+          <Text style={styles.greeting}>
+            {t('home.welcome_back', 'Bon retour,')}
+          </Text>
+          <Text style={styles.name}>{firstName} 👋</Text>
         </View>
 
-        <TouchableOpacity style={styles.bellButton} onPress={onPressNotifications}>
-          <Bell size={20} color={Colors.white} />
-          {unreadNotifications > 0 && (
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{unreadNotifications}</Text>
-            </View>
-          )}
-        </TouchableOpacity>
+        <View style={styles.actionButtons}>
+          {onPressMessages ? (
+            <TouchableOpacity
+              style={styles.iconButton}
+              onPress={onPressMessages}
+              activeOpacity={0.8}
+            >
+              <MessageSquare size={20} color={Colors.white} />
+            </TouchableOpacity>
+          ) : null}
+
+          <TouchableOpacity
+            style={styles.iconButton}
+            onPress={onPressNotifications}
+            activeOpacity={0.8}
+          >
+            <Bell size={20} color={Colors.white} />
+            {unreadNotifications > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{unreadNotifications}</Text>
+              </View>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
 
       {showToggle && (
         <View style={styles.toggleRow}>
           <ToggleButton
-            Icon={Package}
-            label={t('home.role_sender', 'Sender')}
+            label={t('home.role_sender', 'Expéditeur')}
+            icon={
+              <Package
+                size={16}
+                color={
+                  view === 'sender' ? Colors.primary : 'rgba(255,255,255,0.9)'
+                }
+              />
+            }
             active={view === 'sender'}
             onPress={() => onChangeView('sender')}
           />
           <ToggleButton
-            Icon={Plane}
-            label={t('home.role_traveler', 'Traveler')}
+            label={t('home.role_traveler', 'Voyageur')}
+            icon={
+              <Plane
+                size={16}
+                color={
+                  view === 'traveler'
+                    ? Colors.primary
+                    : 'rgba(255,255,255,0.9)'
+                }
+              />
+            }
             active={view === 'traveler'}
             onPress={() => onChangeView('traveler')}
           />
         </View>
       )}
     </View>
-  );
+  )
 }
 
 function ToggleButton({
-  Icon,
   label,
+  icon,
   active,
   onPress,
 }: {
-  Icon: React.ComponentType<{ size?: number; color?: string }>;
-  label: string;
-  active: boolean;
-  onPress: () => void;
+  label: string
+  icon: React.ReactNode
+  active: boolean
+  onPress: () => void
 }) {
   return (
     <TouchableOpacity
@@ -81,12 +115,14 @@ function ToggleButton({
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <View style={styles.toggleContent}>
-        <Icon size={14} color={active ? Colors.primary : 'rgba(255,255,255,0.9)'} />
-        <Text style={[styles.toggleText, active && styles.toggleTextActive]}>{label}</Text>
+      <View style={styles.toggleInner}>
+        {icon}
+        <Text style={[styles.toggleText, active && styles.toggleTextActive]}>
+          {label}
+        </Text>
       </View>
     </TouchableOpacity>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -106,17 +142,17 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.8)',
     fontSize: FontSize.base,
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
   name: {
     color: Colors.white,
     fontSize: FontSize.xl,
     fontWeight: FontWeight.bold,
   },
-  bellButton: {
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: Radius.full,
@@ -157,11 +193,10 @@ const styles = StyleSheet.create({
   toggleButtonActive: {
     backgroundColor: Colors.white,
   },
-  toggleContent: {
+  toggleInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 4,
+    gap: 6,
   },
   toggleText: {
     fontSize: FontSize.sm,

@@ -13,6 +13,8 @@ export const Routes = {
 
   DECLARE_PARCEL: '/(modals)/parcel-declare',
   PAYMENT:        '/(modals)/payment',
+  NOTIFICATIONS:  '/(modals)/notifications',
+  CONVERSATIONS:  '/(modals)/conversations',
   TRACKING:       (bookingId: string) => `/(modals)/tracking/${bookingId}` as const,
   CHAT:           (bookingId: string) => `/(modals)/chat/${bookingId}` as const,
   REVIEW:         (bookingId: string) => `/(modals)/review/${bookingId}` as const,

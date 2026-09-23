@@ -1,10 +1,15 @@
 import { useState, useCallback } from 'react'
-import { ScrollView, StyleSheet, RefreshControl } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useFocusEffect } from 'expo-router'
 import { Colors, Spacing } from '../../../theme'
 import { HomeHeader } from '../components/HomeHeader'
 import { TravelerDashboard } from '../components/TravelerDashboard'
-import { SenderDashboard } from '../components/SenderDashboard'
+import {
+  SenderDashboard,
+  SearchNavigationParams,
+} from '../components/SenderDashboard'
+import { notificationService } from '../../../shared/services/notification.service'
 
 type DashboardView = 'sender' | 'traveler'
 type UserRole = 'TRAVELER' | 'SENDER' | 'BOTH'
@@ -13,12 +18,12 @@ interface HomeScreenProps {
   role: UserRole
   firstName: string
   onPublish: () => void
-  onSearch: (query?: string) => void
+  onSearch: (params?: SearchNavigationParams | string) => void
   onTripPress: (tripId: string) => void
   onParcelTracking: (parcelId: string) => void
   onNotifications: () => void
-  onSeeAllTrips: () => void
-  onSeeAllActivity: () => void
+  onMessages?: () => void
+  onSeeAllActivity?: () => void
 }
 
 export function HomeScreen({
@@ -29,59 +34,59 @@ export function HomeScreen({
   onTripPress,
   onParcelTracking,
   onNotifications,
-  onSeeAllTrips,
+  onMessages,
   onSeeAllActivity,
 }: HomeScreenProps) {
   const defaultView: DashboardView = role === 'TRAVELER' ? 'traveler' : 'sender'
   const [view, setView] = useState<DashboardView>(defaultView)
-  const [refreshing, setRefreshing] = useState(false)
+  const [unreadCount, setUnreadCount] = useState(0)
 
   const activeDashboard: DashboardView =
     role === 'SENDER' ? 'sender' : role === 'TRAVELER' ? 'traveler' : view
 
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setRefreshing(false)
+  const loadUnreadCount = useCallback(async () => {
+    try {
+      const count = await notificationService.getUnreadCount()
+      setUnreadCount(count)
+    } catch {
+      // Ignorer l'erreur sur le dashboard
+    }
   }, [])
 
+  useFocusEffect(
+    useCallback(() => {
+      loadUnreadCount()
+    }, [loadUnreadCount]),
+  )
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <HomeHeader
         firstName={firstName}
-        unreadNotifications={0}
+        unreadNotifications={unreadCount}
         showToggle={role === 'BOTH'}
         view={activeDashboard}
         onChangeView={setView}
         onPressNotifications={onNotifications}
+        onPressMessages={onMessages}
       />
 
       <ScrollView
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={[Colors.primary]}
-            tintColor={Colors.primary}
-          />
-        }
       >
         {activeDashboard === 'sender' ? (
           <SenderDashboard
             onSearch={onSearch}
             onTracking={onParcelTracking}
-            onSeeAllActivity={onSeeAllActivity}
-            refreshing={refreshing}
+            onSeeAll={onSeeAllActivity}
           />
         ) : (
           <TravelerDashboard
             onPublish={onPublish}
             onTracking={onTripPress}
-            onSeeAllTrips={onSeeAllTrips}
-            refreshing={refreshing}
+            onSeeAll={onSeeAllActivity}
           />
         )}
       </ScrollView>
@@ -90,8 +95,14 @@ export function HomeScreen({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.primary },
-  content: { flex: 1, backgroundColor: Colors.background },
+  container: {
+    flex: 1,
+    backgroundColor: Colors.primary,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: Colors.background,
+  },
   contentContainer: {
     paddingHorizontal: Spacing[5],
     paddingVertical: Spacing[5],

@@ -27,7 +27,7 @@ export function SearchBar({
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder ?? t('search.placeholder', 'e.g. Montreal -> Douala')}
+        placeholder={placeholder ?? t('search.placeholder', 'e.g. Montreal - Douala')}
         placeholderTextColor="#9ca3af"
         editable={editable}
         onSubmitEditing={onSubmit}

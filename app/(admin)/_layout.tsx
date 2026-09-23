@@ -20,6 +20,10 @@ export default function AdminLayout() {
       <Stack.Screen name='dashboard' />
       <Stack.Screen name='kyc-queue' />
       <Stack.Screen name='corridors' />
+      <Stack.Screen name='users/index' />
+      <Stack.Screen name='users/[id]' />
+      <Stack.Screen name='disputes/index' />
+      <Stack.Screen name='disputes/[id]' />
     </Stack>
   )
 }

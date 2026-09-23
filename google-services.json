@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "281070449626",
+    "project_id": "go-bagage",
+    "storage_bucket": "go-bagage.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281070449626:android:5443e2bef25ec7cd1f86e3",
+        "android_client_info": {
+          "package_name": "com.gobagage"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR_C9kE7tr6lPrGyl8u3jw-KojZUvUAjc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

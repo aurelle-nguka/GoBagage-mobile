@@ -18,6 +18,7 @@ interface AuthState {
   isLoading: boolean;
 
   setUser: (user: User) => void;
+  updateProfilePhoto: (profilePhoto?: string) => void;
   updateKycStatus: (status: KycStatus) => void;
   setSelectedRole: (roles: UserRole[]) => void;
   logout: () => Promise<void>;
@@ -32,6 +33,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   setUser: (user) =>
     set({ user, isAuthenticated: true, isLoading: false }),
+
+  updateProfilePhoto: (profilePhoto) =>
+    set((state) => ({
+      user: state.user ? { ...state.user, profilePhoto } : state.user,
+    })),
 
   setSelectedRole: (roles) =>
     set((state) => ({

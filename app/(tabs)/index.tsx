@@ -18,14 +18,28 @@ export default function HomePage() {
       role={role}
       firstName={user?.firstName ?? 'there'}
       onPublish={() => router.push('/(tabs)/publish')}
-      onSearch={() => router.push('/(tabs)/search')}
+      onSearch={(params) => {
+        if (params && typeof params === 'object') {
+          router.push({
+            pathname: '/(tabs)/search',
+            params: params as any,
+          })
+        } else if (typeof params === 'string' && params) {
+          router.push({
+            pathname: '/(tabs)/search',
+            params: { query: params },
+          })
+        } else {
+          router.push('/(tabs)/search')
+        }
+      }}
       onTripPress={(tripId) => router.push(`/(modals)/trip-requests/${tripId}`)}
       onParcelTracking={(bookingId) =>
         router.push(`/(modals)/tracking/${bookingId}`)
       }
-      onSeeAllTrips={() => router.push('/(tabs)/trips')}
+      onNotifications={() => router.push('/(modals)/notifications')}
+      onMessages={() => router.push('/(modals)/conversations')}
       onSeeAllActivity={() => router.push('/(modals)/activity')}
-      onNotifications={() => {}}
     />
   )
 }

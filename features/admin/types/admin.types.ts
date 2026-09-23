@@ -3,7 +3,19 @@
  * Alignés sur le contrat OpenAPI v1.0.0 — /admin/*
  */
 
-import { KycStatus } from "../../../types/user.types";
+import { KycStatus, UserRole } from "../../../types/user.types";
+import type { Dispute, DisputeStatus } from "../../disputes/types/dispute.types";
+
+export type { Dispute, DisputeStatus };
+
+export interface DecideDisputeRequest {
+  decision: 'RELEASE_FUNDS' | 'REFUND';
+  note?: string;
+}
+
+export interface CloseDisputeRequest {
+  note?: string;
+}
 
 export type KycDocumentType = 'CNI' | 'PASSPORT';
 export type KycDecision = 'VERIFIED' | 'REJECTED';
@@ -50,4 +62,49 @@ export interface KycQueueParams {
   page?: number;
   size?: number;
   status?: KycStatus;
+}
+
+export interface AdminStatsResponse {
+  totalUsers: number;
+  activeUsers30d: number;
+  newUsersToday: number;
+  activeTrips: number;
+  totalTrips: number;
+  todayTransactions: number;
+  pendingBookings: number;
+  todayRevenueCad: number;
+  totalRevenueCad: number;
+  conversionRate: number;
+  avgBookingValue: number;
+}
+
+export interface AdminUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  roles: UserRole[];
+  kycStatus: KycStatus;
+  isActive: boolean;
+  suspensionReason: string | null;
+  averageRating: number | null;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminUserPage {
+  content: AdminUser[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}
+
+export interface AdminUserParams {
+  search?: string;
+  role?: UserRole;
+  isActive?: boolean;
+  page?: number;
+  size?: number;
 }

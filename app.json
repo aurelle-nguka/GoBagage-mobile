@@ -18,12 +18,7 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "usesCleartextTraffic": true,
-      "statusBar": {
-        "translucent": false,
-        "backgroundColor": "#00C853",
-        "barStyle": "light-content"
-      }
+      "usesCleartextTraffic": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,7 +35,19 @@
           "enableGooglePay": false
         }
       ],
-      "expo-localization"
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Autoriser GoBagage à accéder à votre microphone pour les messages vocaux."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Autoriser Go Bagage à accéder à vos photos.",
+          "cameraPermission": "Autoriser Go Bagage à accéder à votre appareil photo."
+        }
+      ]
     ]
   }
 }

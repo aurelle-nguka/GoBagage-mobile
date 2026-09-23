@@ -9,6 +9,7 @@ export default function ActivityPage() {
       onOpenBooking={(bookingId) =>
         router.push(`/(modals)/tracking/${bookingId}`)
       }
+      onOpenReview={(bookingId) => router.push(`/(modals)/review/${bookingId}`)}
     />
   )
 }
