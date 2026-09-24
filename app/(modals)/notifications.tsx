@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   View,
   Text,
@@ -16,14 +16,12 @@ import {
   CheckCheck,
   UserPlus,
   ShieldCheck,
-  AlertTriangle,
-  FileText,
-  Package,
-  CreditCard,
   MessageSquare,
   Scale,
   Plane,
   Clock,
+  CreditCard,
+  Package,
 } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
 import {
@@ -34,17 +32,19 @@ import {
   DisputeDetailModal,
   DisputeDetailData,
 } from '../../features/messaging/components/DisputeDetailModal'
+import { useAuthStore } from '../../store/auth.store'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../theme'
 
 export default function NotificationsModal() {
   const router = useRouter()
   const { t, i18n } = useTranslation()
+  const { user } = useAuthStore()
   const [notifications, setNotifications] = useState<NotificationDTO[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
 
-  // Dispute modal state
-  const [selectedDispute, setSelectedDispute] = useState<DisputeDetailData | null>(null)
+  const [selectedDispute, setSelectedDispute] =
+    useState<DisputeDetailData | null>(null)
   const [showDisputeModal, setShowDisputeModal] = useState(false)
 
   const fetchNotifications = useCallback(async () => {
@@ -113,16 +113,22 @@ export default function NotificationsModal() {
       data.conversation_id ||
       (item as any).bookingId
 
-    // 1. Litiges : ouvrir le pop-up de détail
     if (
       type === 'DISPUTE' ||
       type === 'DISPUTE_OPENED' ||
+      type === 'DISPUTE_RESOLVED' ||
       type === 'REPORT_FILED' ||
       data.disputeId ||
+      data.reportId ||
       data.reason ||
       data.disputeReason ||
       data.dispute_reason
     ) {
+      if (user?.roles?.includes('ADMIN')) {
+        router.push('/(admin)/disputes')
+        return
+      }
+
       let extractedReason =
         data.reason ||
         data.disputeReason ||
@@ -132,10 +138,7 @@ export default function NotificationsModal() {
         ''
 
       let extractedStatus =
-        data.status ||
-        data.disputeStatus ||
-        data.dispute_status ||
-        'OPEN'
+        data.status || data.disputeStatus || data.dispute_status || 'OPEN'
 
       let extractedDescription =
         data.description ||
@@ -146,15 +149,22 @@ export default function NotificationsModal() {
         ''
 
       if (!extractedReason && item.body) {
-        if (/endommag|damage/i.test(item.body)) extractedReason = 'PACKAGE_DAMAGED'
-        else if (/perdu|non re[cç]u|lost/i.test(item.body)) extractedReason = 'PACKAGE_LOST'
-        else if (/retard|delay/i.test(item.body)) extractedReason = 'DELIVERY_DELAY'
-        else if (/non[- ]conforme|conform|compliant/i.test(item.body)) extractedReason = 'NON_COMPLIANT'
+        if (/endommag|damage/i.test(item.body))
+          extractedReason = 'PACKAGE_DAMAGED'
+        else if (/perdu|non re[cç]u|lost/i.test(item.body))
+          extractedReason = 'PACKAGE_LOST'
+        else if (/retard|delay/i.test(item.body))
+          extractedReason = 'DELIVERY_DELAY'
+        else if (/non[- ]conforme|conform|compliant/i.test(item.body))
+          extractedReason = 'NON_COMPLIANT'
+        else if (/inappropri|offens/i.test(item.body))
+          extractedReason = 'INAPPROPRIATE_CONTENT'
+        else if (/fraud|escroqu/i.test(item.body)) extractedReason = 'FRAUD'
       }
 
       setSelectedDispute({
         id: item.id,
-        disputeId: data.disputeId || item.id,
+        disputeId: data.disputeId || data.reportId || item.id,
         bookingId: bookingId,
         reason: extractedReason,
         description: extractedDescription,
@@ -167,7 +177,6 @@ export default function NotificationsModal() {
       return
     }
 
-    // 2. Messages : ouvrir le chat de la réservation ou la liste des conversations
     if (
       type === 'NEW_MESSAGE' ||
       type === 'MESSAGE_RECEIVED' ||
@@ -183,7 +192,6 @@ export default function NotificationsModal() {
       return
     }
 
-    // 3. Suivi de réservation / Colis
     if (
       type === 'BOOKING_CREATED' ||
       type === 'BOOKING_ACCEPTED' ||
@@ -201,7 +209,6 @@ export default function NotificationsModal() {
       return
     }
 
-    // 4. Demandes pour le voyageur
     if (type === 'NEW_BOOKING_REQUEST') {
       if (data.tripId) {
         router.push(`/(modals)/trip-requests/${data.tripId}`)
@@ -211,7 +218,6 @@ export default function NotificationsModal() {
       return
     }
 
-    // 5. KYC
     if (
       type === 'KYC_SUBMITTED' ||
       type === 'KYC_APPROVED' ||
@@ -326,7 +332,10 @@ export default function NotificationsModal() {
             {t('notifications.empty_title', 'Aucune notification')}
           </Text>
           <Text style={styles.emptySubtitle}>
-            {t('notifications.empty_subtitle', 'Vous recevrez ici les mises à jour importantes.')}
+            {t(
+              'notifications.empty_subtitle',
+              'Vous recevrez ici les mises à jour importantes.',
+            )}
           </Text>
         </View>
       ) : (
@@ -346,7 +355,6 @@ export default function NotificationsModal() {
         />
       )}
 
-      {/* Pop-up de détail du litige */}
       <DisputeDetailModal
         visible={showDisputeModal}
         dispute={selectedDispute}

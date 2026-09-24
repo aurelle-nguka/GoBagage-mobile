@@ -14,9 +14,7 @@ import {
   X,
   AlertTriangle,
   ShieldAlert,
-  Clock,
   MessageCircle,
-  FileText,
   Calendar,
   CheckCircle2,
   XCircle,
@@ -51,11 +49,19 @@ const REASON_LABELS: Record<string, string> = {
   PACKAGE_LOST: 'Colis non reçu / perdu',
   DELIVERY_DELAY: 'Retard important de livraison',
   NON_COMPLIANT: 'Contenu non conforme à la déclaration',
+  FRAUD: 'Fraude ou escroquerie',
+  INAPPROPRIATE_CONTENT: 'Contenu inapproprié ou offensant',
+  NO_SHOW: 'Absence au rendez-vous',
+  DANGEROUS_ITEMS: 'Objets interdits ou dangereux',
   OTHER: 'Autre motif de litige',
   package_damaged: 'Colis endommagé',
   package_lost: 'Colis non reçu / perdu',
   delivery_delay: 'Retard important de livraison',
   non_compliant: 'Contenu non conforme à la déclaration',
+  fraud: 'Fraude ou escroquerie',
+  inappropriate_content: 'Contenu inapproprié ou offensant',
+  no_show: 'Absence au rendez-vous',
+  dangerous_items: 'Objets interdits ou dangereux',
   other: 'Autre motif de litige',
 }
 
@@ -77,7 +83,6 @@ export function DisputeDetailModal({
 
     setLiveData(dispute)
 
-    // Charger les détails réels du litige depuis l'API si l'ID ou le bookingId est disponible
     const fetchLiveDispute = async () => {
       const targetDisputeId = dispute.disputeId || dispute.id
       try {
@@ -87,9 +92,7 @@ export function DisputeDetailModal({
         if (targetDisputeId) {
           try {
             response = await apiClient.get(`/disputes/${targetDisputeId}`)
-          } catch {
-            // Ignorer si endpoint ID direct non dispo
-          }
+          } catch {}
         }
 
         if (!response?.data && dispute.bookingId) {
@@ -97,13 +100,13 @@ export function DisputeDetailModal({
             response = await apiClient.get('/disputes', {
               params: { bookingId: dispute.bookingId },
             })
-          } catch {
-            // Ignorer
-          }
+          } catch {}
         }
 
         if (response?.data) {
-          const raw = Array.isArray(response.data) ? response.data[0] : response.data
+          const raw = Array.isArray(response.data)
+            ? response.data[0]
+            : response.data
           if (raw) {
             setLiveData((prev) => ({
               ...prev,
@@ -119,7 +122,6 @@ export function DisputeDetailModal({
           }
         }
       } catch {
-        // En cas d'erreur réseau, conserver les données de la notification
       } finally {
         setLoading(false)
       }
@@ -134,25 +136,52 @@ export function DisputeDetailModal({
   const disputeId = activeDispute.disputeId || activeDispute.id
   const bookingId = activeDispute.bookingId
 
-  // Normalisation du motif
   const rawReason = (activeDispute.reason || '').trim()
   const reasonUpper = rawReason.toUpperCase()
   const reasonKey = rawReason.toLowerCase()
 
   const reasonLabel =
+    REASON_LABELS[rawReason] ||
+    REASON_LABELS[reasonUpper] ||
+    REASON_LABELS[reasonKey] ||
     t(`disputes.reasons.${reasonKey}`, {
       defaultValue:
-        REASON_LABELS[rawReason] ||
-        REASON_LABELS[reasonUpper] ||
-        (rawReason ? rawReason.replace(/_/g, ' ') : t('disputes.reasons.general', 'Litige déclaré')),
+        rawReason && !/^[A-Z_]+$/.test(rawReason)
+          ? rawReason
+          : rawReason
+            ? rawReason.replace(/_/g, ' ')
+            : t('disputes.reasons.general', 'Litige déclaré'),
     })
 
-  const descriptionText =
-    activeDispute.description ||
-    activeDispute.body ||
-    t('disputes.detail.no_description', 'Aucun commentaire supplémentaire fourni.')
+  const rawDesc = (activeDispute.description || activeDispute.body || '').trim()
+  const rawDescUpper = rawDesc.toUpperCase()
 
-  // Configuration du statut réel
+  const isDescEnumOrSame =
+    !rawDesc ||
+    rawDescUpper === rawReason.toUpperCase() ||
+    rawDescUpper === reasonUpper ||
+    rawDescUpper === (activeDispute.reason || '').toUpperCase() ||
+    REASON_LABELS[rawDesc] !== undefined ||
+    REASON_LABELS[rawDescUpper] !== undefined ||
+    [
+      'INAPPROPRIATE_CONTENT',
+      'PACKAGE_DAMAGED',
+      'PACKAGE_LOST',
+      'DELIVERY_DELAY',
+      'NON_COMPLIANT',
+      'FRAUD',
+      'NO_SHOW',
+      'DANGEROUS_ITEMS',
+      'OTHER',
+    ].includes(rawDescUpper)
+
+  const descriptionText = !isDescEnumOrSame
+    ? rawDesc
+    : t(
+        'disputes.detail.no_description',
+        'Aucun commentaire supplémentaire fourni.',
+      )
+
   const statusUpper = (activeDispute.status || 'OPEN').toUpperCase()
 
   const getStatusConfig = (st: string) => {
@@ -233,7 +262,6 @@ export function DisputeDetailModal({
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable style={styles.card} onPress={(e) => e.stopPropagation()}>
-          {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
               <View style={styles.iconCircle}>
@@ -245,7 +273,9 @@ export function DisputeDetailModal({
                 </Text>
                 {disputeId ? (
                   <Text style={styles.disputeNumber}>
-                    {t('disputes.detail.dispute_id', 'Dossier #{{id}}', { id: disputeId })}
+                    {t('disputes.detail.dispute_id', 'Dossier #{{id}}', {
+                      id: disputeId,
+                    })}
                   </Text>
                 ) : null}
               </View>
@@ -261,7 +291,6 @@ export function DisputeDetailModal({
           </View>
 
           <ScrollView style={styles.body} showsVerticalScrollIndicator={false}>
-            {/* Status & Booking Badge Row */}
             <View style={styles.badgesRow}>
               <View
                 style={[
@@ -271,10 +300,7 @@ export function DisputeDetailModal({
               >
                 <statusConfig.Icon size={14} color={statusConfig.iconColor} />
                 <Text
-                  style={[
-                    styles.statusText,
-                    { color: statusConfig.color },
-                  ]}
+                  style={[styles.statusText, { color: statusConfig.color }]}
                 >
                   {statusConfig.label}
                 </Text>
@@ -283,13 +309,14 @@ export function DisputeDetailModal({
               {bookingId ? (
                 <View style={styles.bookingBadge}>
                   <Text style={styles.bookingBadgeText}>
-                    {t('disputes.detail.booking_ref', 'Réservation #{{id}}', { id: bookingId })}
+                    {t('disputes.detail.booking_ref', 'Réservation #{{id}}', {
+                      id: bookingId,
+                    })}
                   </Text>
                 </View>
               ) : null}
             </View>
 
-            {/* Motif */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
                 {t('disputes.detail.reason_label', 'Motif du litige')}
@@ -300,41 +327,45 @@ export function DisputeDetailModal({
               </View>
             </View>
 
-            {/* Description / Explication */}
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>
-                {t('disputes.detail.description_label', 'Explication & Détails')}
+                {t(
+                  'disputes.detail.description_label',
+                  'Explication & Détails',
+                )}
               </Text>
               <View style={styles.descriptionBox}>
                 <Text style={styles.descriptionText}>{descriptionText}</Text>
               </View>
             </View>
 
-            {/* Date */}
             {formattedDate ? (
               <View style={styles.dateRow}>
                 <Calendar size={14} color='#9ca3af' />
                 <Text style={styles.dateText}>
-                  {t('disputes.detail.opened_on', 'Signalé le {{date}}', { date: formattedDate })}
+                  {t('disputes.detail.opened_on', 'Signalé le {{date}}', {
+                    date: formattedDate,
+                  })}
                 </Text>
               </View>
             ) : null}
 
-            {/* Notice Séquestre */}
             <View style={styles.escrowNotice}>
               <Text style={styles.escrowTitle}>
-                {t('disputes.detail.escrow_title', '🔒 Fonds sécurisés sous séquestre')}
+                {t(
+                  'disputes.detail.escrow_title',
+                  '🔒 Fonds sécurisés sous séquestre',
+                )}
               </Text>
               <Text style={styles.escrowText}>
                 {t(
                   'disputes.detail.escrow_text',
-                  'Les fonds associés à cette transaction restent bloqués. L\'équipe de médiation GoBagage examine la réclamation et vous contactera si des pièces supplémentaires sont requises.'
+                  "Les fonds associés à cette transaction restent bloqués. L'équipe de médiation GoBagage examine la réclamation et vous contactera si des pièces supplémentaires sont requises.",
                 )}
               </Text>
             </View>
           </ScrollView>
 
-          {/* Action Buttons */}
           <View style={styles.footer}>
             {bookingId && onOpenChat ? (
               <TouchableOpacity
@@ -485,12 +516,12 @@ const styles = StyleSheet.create({
   reasonBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing[2.5],
+    gap: 10,
     backgroundColor: '#fef2f2',
     borderWidth: 1,
     borderColor: '#fecaca',
-    paddingHorizontal: Spacing[3.5],
-    paddingVertical: Spacing[2.5],
+    paddingHorizontal: 14,
+    paddingVertical: 10,
     borderRadius: Radius.xl,
   },
   reasonText: {
@@ -504,7 +535,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#e5e7eb',
     borderRadius: Radius.xl,
-    padding: Spacing[3.5],
+    padding: 14,
   },
   descriptionText: {
     fontSize: FontSize.sm,

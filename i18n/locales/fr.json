@@ -1004,6 +1004,10 @@
       "package_lost": "Colis non reçu / perdu",
       "delivery_delay": "Retard important de livraison",
       "non_compliant": "Contenu non conforme à la déclaration",
+      "inappropriate_content": "Contenu inapproprié ou offensant",
+      "fraud": "Fraude ou escroquerie",
+      "no_show": "Absence au rendez-vous",
+      "dangerous_items": "Objets interdits ou dangereux",
       "other": "Autre motif de litige",
       "general": "Litige en cours"
     }

@@ -1004,6 +1004,10 @@
       "package_lost": "Package Not Received / Lost",
       "delivery_delay": "Major Delivery Delay",
       "non_compliant": "Content Not Matching Declaration",
+      "inappropriate_content": "Inappropriate or Offensive Content",
+      "fraud": "Fraud or Scam",
+      "no_show": "No Show / Missed Meeting",
+      "dangerous_items": "Prohibited or Dangerous Items",
       "other": "Other Dispute Reason",
       "general": "Ongoing Dispute"
     }

@@ -1004,6 +1004,10 @@
       "package_lost": "未收到 / 包裹丢失",
       "delivery_delay": "严重延误送达",
       "non_compliant": "内容与申报不符",
+      "inappropriate_content": "不当或冒犯性内容",
+      "fraud": "欺诈或诈骗",
+      "no_show": "未按时赴约",
+      "dangerous_items": "违禁或危险物品",
       "other": "其他争议原因",
       "general": "争议处理中"
     }

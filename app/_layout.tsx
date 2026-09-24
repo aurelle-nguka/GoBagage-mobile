@@ -35,9 +35,7 @@ function AppContent() {
   const notificationListener = useRef<Notifications.EventSubscription | null>(
     null,
   )
-  const responseListener = useRef<Notifications.EventSubscription | null>(
-    null,
-  )
+  const responseListener = useRef<Notifications.EventSubscription | null>(null)
 
   useEffect(() => {
     if (Platform.OS === 'android') {
@@ -50,7 +48,6 @@ function AppContent() {
   useEffect(() => {
     if (!user || isExpoGo) return
 
-    // require() dynamique : voir shared/services/notification.service.ts pour le pourquoi.
     const NotificationsModule: typeof Notifications = require('expo-notifications')
 
     registerForPushNotifications().then((token) => {
@@ -63,11 +60,13 @@ function AppContent() {
       })
 
     responseListener.current =
-      NotificationsModule.addNotificationResponseReceivedListener((response) => {
-        const data = response.notification.request.content.data as any
-        console.log('[NOTIF] Clicked:', data)
-        handleNotificationNavigation(data, router)
-      })
+      NotificationsModule.addNotificationResponseReceivedListener(
+        (response) => {
+          const data = response.notification.request.content.data as any
+          console.log('[NOTIF] Clicked:', data)
+          handleNotificationNavigation(data, router)
+        },
+      )
 
     return () => {
       notificationListener.current?.remove()

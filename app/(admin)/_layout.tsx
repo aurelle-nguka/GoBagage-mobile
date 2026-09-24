@@ -19,11 +19,9 @@ export default function AdminLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name='dashboard' />
       <Stack.Screen name='kyc-queue' />
+      <Stack.Screen name='kyc-review/[kycId]' />
       <Stack.Screen name='corridors' />
-      <Stack.Screen name='users/index' />
-      <Stack.Screen name='users/[id]' />
-      <Stack.Screen name='disputes/index' />
-      <Stack.Screen name='disputes/[id]' />
+      <Stack.Screen name='disputes' />
     </Stack>
   )
 }

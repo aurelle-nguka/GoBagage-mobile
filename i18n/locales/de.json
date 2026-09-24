@@ -1004,6 +1004,10 @@
       "package_lost": "Paket nicht erhalten / verloren",
       "delivery_delay": "Erhebliche Lieferverzögerung",
       "non_compliant": "Inhalt entspricht nicht der Angabe",
+      "inappropriate_content": "Unangemessener oder beleidigender Inhalt",
+      "fraud": "Betrug oder Täuschung",
+      "no_show": "Nicht zum Treffpunkt erschienen",
+      "dangerous_items": "Verbotene oder gefährliche Gegenstände",
       "other": "Anderer Grund",
       "general": "Laufender Streitfall"
     }
