@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ContactProfileModal
- * Fiche d'informations du contact (Style WhatsApp / GoBagage) : profil, statut KYC, détails du trajet et actions.
- */
-
 import React from 'react'
 import {
   View,
@@ -33,7 +28,10 @@ import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 import { toAbsoluteFileUrl } from '../../../shared/utils/url.utils'
-import { ConversationParticipant, CorridorSummary } from '../types/message.types'
+import {
+  ConversationParticipant,
+  CorridorSummary,
+} from '../types/message.types'
 
 interface ContactProfileModalProps {
   visible: boolean
@@ -93,12 +91,16 @@ export function ContactProfileModal({
   return (
     <Modal
       visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
+      animationType='slide'
+      presentationStyle='pageSheet'
       onRequestClose={onClose}
     >
-      <View style={[styles.container, { paddingTop: Math.max(insets.top, Spacing[4]) }]}>
-        {/* Header */}
+      <View
+        style={[
+          styles.container,
+          { paddingTop: Math.max(insets.top, Spacing[4]) },
+        ]}
+      >
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.closeBtn}
@@ -120,14 +122,15 @@ export function ContactProfileModal({
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {/* Section Profil Principal */}
           <View style={styles.profileCard}>
             <View style={styles.avatarLarge}>
               {participant?.profilePhotoUrl ? (
                 <Image
-                  source={{ uri: toAbsoluteFileUrl(participant.profilePhotoUrl) }}
+                  source={{
+                    uri: toAbsoluteFileUrl(participant.profilePhotoUrl),
+                  }}
                   style={styles.avatarLargeImage}
-                  resizeMode="cover"
+                  resizeMode='cover'
                 />
               ) : (
                 <Text style={styles.avatarLargeText}>{initials}</Text>
@@ -138,30 +141,41 @@ export function ContactProfileModal({
 
             {participant?.kycVerified ? (
               <View style={styles.verifiedBadge}>
-                <ShieldCheck size={14} color="#16a34a" />
+                <ShieldCheck size={14} color='#16a34a' />
                 <Text style={styles.verifiedText}>
-                  {t('messaging.contact.identity_verified', 'Identité vérifiée (KYC)')}
+                  {t(
+                    'messaging.contact.identity_verified',
+                    'Identité vérifiée (KYC)',
+                  )}
                 </Text>
               </View>
             ) : (
-              <View style={[styles.verifiedBadge, { backgroundColor: '#fef3c7', borderColor: '#fde68a' }]}>
-                <ShieldAlert size={14} color="#d97706" />
+              <View
+                style={[
+                  styles.verifiedBadge,
+                  { backgroundColor: '#fef3c7', borderColor: '#fde68a' },
+                ]}
+              >
+                <ShieldAlert size={14} color='#d97706' />
                 <Text style={[styles.verifiedText, { color: '#b45309' }]}>
-                  {t('messaging.contact.identity_pending', 'Identité non certifiée')}
+                  {t(
+                    'messaging.contact.identity_pending',
+                    'Identité non certifiée',
+                  )}
                 </Text>
               </View>
             )}
 
-            {typeof participant?.averageRating === 'number' && participant.averageRating > 0 && (
-              <View style={styles.ratingRow}>
-                <Star size={16} color="#eab308" fill="#eab308" />
-                <Text style={styles.ratingText}>
-                  {participant.averageRating.toFixed(1)} / 5.0
-                </Text>
-              </View>
-            )}
+            {typeof participant?.averageRating === 'number' &&
+              participant.averageRating > 0 && (
+                <View style={styles.ratingRow}>
+                  <Star size={16} color='#eab308' fill='#eab308' />
+                  <Text style={styles.ratingText}>
+                    {participant.averageRating.toFixed(1)} / 5.0
+                  </Text>
+                </View>
+              )}
 
-            {/* Bouton Appel */}
             <TouchableOpacity
               style={styles.callButton}
               onPress={handleCall}
@@ -174,7 +188,6 @@ export function ContactProfileModal({
             </TouchableOpacity>
           </View>
 
-          {/* Section Réservation & Trajet */}
           <View style={styles.sectionCard}>
             <Text style={styles.sectionTitle}>
               {t('messaging.contact.trip_section', 'Trajet associé')}
@@ -191,25 +204,41 @@ export function ContactProfileModal({
                   </Text>
                   <View style={{ marginTop: 2 }}>
                     <RouteLabel
-                      from={(corridor.departureCity || '').replace(/\\n/g, '').replace(/\n/g, ' ').trim()}
-                      to={(corridor.arrivalCity || '').replace(/\\n/g, '').replace(/\n/g, ' ').trim()}
-                      size="sm"
-                      fontWeight="bold"
+                      from={(corridor.departureCity || '')
+                        .replace(/\\n/g, '')
+                        .replace(/\n/g, ' ')
+                        .trim()}
+                      to={(corridor.arrivalCity || '')
+                        .replace(/\\n/g, '')
+                        .replace(/\n/g, ' ')
+                        .trim()}
+                      size='sm'
+                      fontWeight='bold'
                     />
                   </View>
                   {(corridor.departureCountry || corridor.arrivalCountry) && (
                     <View style={styles.countryRow}>
                       {corridor.departureCountry ? (
                         <Text style={styles.countrySubText}>
-                          {corridor.departureCountry.replace(/\\n/g, '').replace(/\n/g, ' ').trim()}
+                          {corridor.departureCountry
+                            .replace(/\\n/g, '')
+                            .replace(/\n/g, ' ')
+                            .trim()}
                         </Text>
                       ) : null}
                       {corridor.departureCountry && corridor.arrivalCountry && (
-                        <ArrowRight size={11} color={Colors.mutedForeground} strokeWidth={2} />
+                        <ArrowRight
+                          size={11}
+                          color={Colors.mutedForeground}
+                          strokeWidth={2}
+                        />
                       )}
                       {corridor.arrivalCountry ? (
                         <Text style={styles.countrySubText}>
-                          {corridor.arrivalCountry.replace(/\\n/g, '').replace(/\n/g, ' ').trim()}
+                          {corridor.arrivalCountry
+                            .replace(/\\n/g, '')
+                            .replace(/\n/g, ' ')
+                            .trim()}
                         </Text>
                       ) : null}
                     </View>
@@ -226,7 +255,10 @@ export function ContactProfileModal({
                     {t('messaging.contact.route', 'Itinéraire')}
                   </Text>
                   <Text style={styles.infoValue}>
-                    {t('messaging.contact.booking_trip', 'Réservation en cours')}
+                    {t(
+                      'messaging.contact.booking_trip',
+                      'Réservation en cours',
+                    )}
                   </Text>
                 </View>
               </View>
@@ -248,17 +280,20 @@ export function ContactProfileModal({
 
             <View style={styles.bookingBadgeRow}>
               <Text style={styles.bookingBadgeText}>
-                {t('messaging.contact.booking_ref', 'Réservation #')}{bookingId}
+                {t('messaging.contact.booking_ref', 'Réservation #')}
+                {bookingId}
               </Text>
             </View>
           </View>
 
-          {/* Section Sécurité & Confidentialité */}
           <View style={styles.sectionCard}>
             <View style={styles.securityHeader}>
               <Lock size={16} color={Colors.primary} />
               <Text style={styles.securityTitle}>
-                {t('messaging.contact.security_title', 'Garantie & Sécurité GoBagage')}
+                {t(
+                  'messaging.contact.security_title',
+                  'Garantie & Sécurité GoBagage',
+                )}
               </Text>
             </View>
             <Text style={styles.securityDesc}>
@@ -269,7 +304,6 @@ export function ContactProfileModal({
             </Text>
           </View>
 
-          {/* Section Actions de Sécurité */}
           <View style={styles.dangerSection}>
             <TouchableOpacity
               style={styles.actionItem}

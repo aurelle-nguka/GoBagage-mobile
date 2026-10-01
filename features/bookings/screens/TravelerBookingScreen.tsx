@@ -1,10 +1,3 @@
-/**
- * Go Bagage — TravelerBookingScreen
- * Vue voyageur d'une réservation acceptée : timeline + détails colis + actions de progression.
- * Symétrique de TrackingScreen (vue expéditeur), mais avec des actions au lieu d'un bouton confirm.
- * Écran absent de la maquette — complète le parcours voyageur défini au CDC section 3.1, étapes 5-7.
- */
-
 import {
   View,
   Text,
@@ -42,7 +35,6 @@ interface TravelerBookingScreenProps {
   onMarkDelivered: () => void
 }
 
-// Réutilise le même référentiel d'étapes que la vue expéditeur (TrackingScreen)
 const TIMELINE_STEPS = [
   {
     status: 'ACCEPTED' as BookingStatus,
@@ -98,10 +90,10 @@ export function TravelerBookingScreen({
             from={from}
             to={to}
             suffix={` · ${departureDate}`}
-            size="xs"
+            size='xs'
             color={Colors.mutedForeground}
             arrowColor={Colors.mutedForeground}
-            fontWeight="normal"
+            fontWeight='normal'
           />
         </View>
         <TouchableOpacity

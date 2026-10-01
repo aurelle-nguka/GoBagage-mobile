@@ -4,10 +4,6 @@ import { Platform } from 'react-native'
 import apiClient from './api.client'
 
 export const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient
-
-// `expo-notifications` lève une exception rien qu'en étant importé sous Expo Go
-// (Android, depuis le SDK 53) — un `import` statique s'exécute toujours, peu importe
-// une condition après coup. On ne le require() que si on n'est pas dans Expo Go.
 const Notifications: typeof import('expo-notifications') | null = isExpoGo
   ? null
   : require('expo-notifications')
@@ -124,7 +120,6 @@ export function handleNotificationNavigation(data: any, router: any) {
     return
   }
 
-  // Regular user (Sender / Traveler)
   switch (type) {
     case 'BOOKING_CREATED':
     case 'BOOKING_ACCEPTED':
@@ -187,4 +182,4 @@ export const notificationService = {
   async markAllAsRead(): Promise<void> {
     await apiClient.post('/notifications/read-all')
   },
-}
+}

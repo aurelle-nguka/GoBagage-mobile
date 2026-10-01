@@ -1,9 +1,3 @@
-/**
- * Go Bagage — TrackingMapPlaceholder
- * Visualisation simplifiée du trajet (origine → avion → destination + % de progression).
- * En V2, ceci sera remplacé par une vraie carte (react-native-maps) avec position GPS réelle.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { MapPin, Plane } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'

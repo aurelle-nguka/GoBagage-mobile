@@ -1,10 +1,13 @@
-/**
- * Go Bagage — MessageBubble
- * Bulle de message : 3 variantes (système, moi, interlocuteur) + support des images et notes vocales (Audio).
- */
-
 import React, { useState } from 'react'
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, Pressable } from 'react-native'
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Pressable,
+} from 'react-native'
 import { Lock, X } from 'lucide-react-native'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 import { API_BASE_URL } from '../../../shared/constants/api.constants'
@@ -24,7 +27,11 @@ interface MessageBubbleProps {
 
 function resolveMediaUrl(url?: string): string | null {
   if (!url) return null
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('file://')
+  ) {
     return url
   }
   const serverOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
@@ -55,7 +62,13 @@ export function MessageBubble({
   }
 
   const isMe = sender === 'me'
-  const isAudio = contentType === 'AUDIO' || (mediaUrl && (mediaUrl.endsWith('.m4a') || mediaUrl.endsWith('.aac') || mediaUrl.endsWith('.mp3') || mediaUrl.endsWith('.wav')))
+  const isAudio =
+    contentType === 'AUDIO' ||
+    (mediaUrl &&
+      (mediaUrl.endsWith('.m4a') ||
+        mediaUrl.endsWith('.aac') ||
+        mediaUrl.endsWith('.mp3') ||
+        mediaUrl.endsWith('.wav')))
 
   return (
     <View style={[styles.messageRow, isMe ? styles.rowEnd : styles.rowStart]}>
@@ -85,12 +98,22 @@ export function MessageBubble({
               onPress={() => setModalVisible(true)}
               style={styles.imageContainer}
             >
-              <Image source={{ uri: fullMediaUrl }} style={styles.bubbleImage} resizeMode='cover' />
+              <Image
+                source={{ uri: fullMediaUrl }}
+                style={styles.bubbleImage}
+                resizeMode='cover'
+              />
             </TouchableOpacity>
           ) : null}
 
           {text && !isAudio ? (
-            <Text style={[styles.text, isMe ? styles.textMe : styles.textOther, fullMediaUrl ? { marginTop: 6 } : null]}>
+            <Text
+              style={[
+                styles.text,
+                isMe ? styles.textMe : styles.textOther,
+                fullMediaUrl ? { marginTop: 6 } : null,
+              ]}
+            >
               {text}
             </Text>
           ) : null}
@@ -101,12 +124,27 @@ export function MessageBubble({
       </View>
 
       {fullMediaUrl && !isAudio && (
-        <Modal visible={modalVisible} transparent animationType='fade' onRequestClose={() => setModalVisible(false)}>
-          <Pressable style={styles.modalOverlay} onPress={() => setModalVisible(false)}>
-            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+        <Modal
+          visible={modalVisible}
+          transparent
+          animationType='fade'
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <Pressable
+            style={styles.modalOverlay}
+            onPress={() => setModalVisible(false)}
+          >
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
               <X size={24} color={Colors.white} />
             </TouchableOpacity>
-            <Image source={{ uri: fullMediaUrl }} style={styles.fullImage} resizeMode='contain' />
+            <Image
+              source={{ uri: fullMediaUrl }}
+              style={styles.fullImage}
+              resizeMode='contain'
+            />
           </Pressable>
         </Modal>
       )}

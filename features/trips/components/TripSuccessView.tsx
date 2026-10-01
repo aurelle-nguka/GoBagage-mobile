@@ -1,8 +1,3 @@
-/**
- * Go Bagage — TripSuccessView
- * Écran de confirmation après publication réussie d'un trajet.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CheckCircle2 } from 'lucide-react-native'
@@ -22,7 +17,9 @@ export function TripSuccessView({ origin, destination }: TripSuccessViewProps) {
       <View style={styles.iconCircle}>
         <CheckCircle2 size={48} color={Colors.primary} />
       </View>
-      <Text style={styles.title}>{t('trip.published_title', 'Trip Published!')}</Text>
+      <Text style={styles.title}>
+        {t('trip.published_title', 'Trip Published!')}
+      </Text>
       <Text style={styles.description}>
         {t('trip.published_desc_prefix', 'Your trip from')}{' '}
         <Text style={styles.bold}>{origin}</Text>{' '}

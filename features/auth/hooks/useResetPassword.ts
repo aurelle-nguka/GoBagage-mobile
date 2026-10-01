@@ -1,7 +1,3 @@
-/**
- * Go Bagage — useResetPassword
- */
-
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { resetPassword } from '../api/auth.api';

@@ -1,8 +1,3 @@
-/**
- * Go Bagage — TripStatusFilter
- * Filtre horizontal scrollable par statut de trajet.
- */
-
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'

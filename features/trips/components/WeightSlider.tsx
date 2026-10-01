@@ -1,8 +1,3 @@
-/**
- * Go Bagage — WeightSlider
- * Slider natif pour le poids disponible (remplace <input type="range">).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import Slider from '@react-native-community/slider'
 import { useTranslation } from 'react-i18next'
@@ -20,16 +15,20 @@ export function WeightSlider({
   value,
   onChange,
   min = 1,
-  max = MAX_PARCEL_WEIGHT_KG + 20, // 50 kg comme la maquette (bagage voyageur, pas colis)
+  max = MAX_PARCEL_WEIGHT_KG + 20,
 }: WeightSliderProps) {
   const { t } = useTranslation()
 
   return (
     <View>
       <View style={styles.headerRow}>
-        <Text style={styles.label}>{t('trip.available_weight', 'Available Weight')}</Text>
+        <Text style={styles.label}>
+          {t('trip.available_weight', 'Available Weight')}
+        </Text>
         <View style={styles.valueBadge}>
-          <Text style={styles.valueText}>{t('trip.weight_kg', '{{value}} kg', { value })}</Text>
+          <Text style={styles.valueText}>
+            {t('trip.weight_kg', '{{value}} kg', { value })}
+          </Text>
         </View>
       </View>
 
@@ -45,8 +44,12 @@ export function WeightSlider({
       />
 
       <View style={styles.boundsRow}>
-        <Text style={styles.boundsText}>{t('trip.weight_kg', '{{value}} kg', { value: min })}</Text>
-        <Text style={styles.boundsText}>{t('trip.weight_kg', '{{value}} kg', { value: max })}</Text>
+        <Text style={styles.boundsText}>
+          {t('trip.weight_kg', '{{value}} kg', { value: min })}
+        </Text>
+        <Text style={styles.boundsText}>
+          {t('trip.weight_kg', '{{value}} kg', { value: max })}
+        </Text>
       </View>
     </View>
   )

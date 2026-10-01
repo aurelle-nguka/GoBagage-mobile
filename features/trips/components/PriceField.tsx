@@ -1,8 +1,3 @@
-/**
- * Go Bagage — PriceField
- * Champ numérique avec préfixe $ + calcul des gains potentiels (après commission).
- */
-
 import { useState } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
@@ -28,7 +23,9 @@ export function PriceField({
 
   return (
     <View>
-      <Text style={styles.label}>{t('trip.price_per_kg_cad', 'Price per kg (CAD)')}</Text>
+      <Text style={styles.label}>
+        {t('trip.price_per_kg_cad', 'Price per kg (CAD)')}
+      </Text>
       <View style={styles.inputWrapper}>
         <Text style={styles.dollarSign}>$</Text>
         <TextInput
@@ -46,7 +43,10 @@ export function PriceField({
           {t(
             'trip.potential_earnings',
             'Potential earnings: ${{amount}} CAD (after {{percent}}% fee)',
-            { amount: potentialEarnings.toFixed(0), percent: COMMISSION_RATE * 100 },
+            {
+              amount: potentialEarnings.toFixed(0),
+              percent: COMMISSION_RATE * 100,
+            },
           )}
         </Text>
       )}

@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ChatInput
- * Champ de saisie de message + bouton pièce jointe + bouton envoyer / micro enregistrement vocal avec expo-audio (Expo SDK 56).
- */
-
 import React, { useState, useEffect, useRef } from 'react'
 import {
   View,
@@ -29,7 +24,10 @@ interface ChatInputProps {
   onChangeText: (text: string) => void
   onSend: () => void
   onAttach: () => void
-  onSendVoice?: (audioUri: string, durationSeconds: number) => Promise<void> | void
+  onSendVoice?: (
+    audioUri: string,
+    durationSeconds: number,
+  ) => Promise<void> | void
 }
 
 function formatDuration(seconds: number): string {
@@ -55,7 +53,6 @@ export function ChatInput({
   const timerRef = useRef<any>(null)
   const pulseAnim = useRef(new Animated.Value(1)).current
 
-  // Animation pulsation pour le voyant rouge
   useEffect(() => {
     if (isRecording) {
       Animated.loop(
@@ -91,13 +88,16 @@ export function ChatInput({
           t('common.permission_denied', 'Permission requise'),
           t(
             'messaging.voice.permission_desc',
-            'Veuillez autoriser l\'accès au microphone pour envoyer des notes vocales.',
+            "Veuillez autoriser l'accès au microphone pour envoyer des notes vocales.",
           ),
         )
         return
       }
 
-      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true })
+      await setAudioModeAsync({
+        allowsRecording: true,
+        playsInSilentMode: true,
+      })
       await recorder.prepareToRecordAsync()
       await recorder.record()
 
@@ -110,7 +110,10 @@ export function ChatInput({
     } catch {
       Alert.alert(
         t('common.error', 'Erreur'),
-        t('messaging.voice.start_error', 'Impossible de démarrer l\'enregistrement audio.'),
+        t(
+          'messaging.voice.start_error',
+          "Impossible de démarrer l'enregistrement audio.",
+        ),
       )
     }
   }
@@ -122,7 +125,10 @@ export function ChatInput({
 
     try {
       await recorder.stop()
-      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true })
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
+      })
     } catch {}
   }
 
@@ -134,7 +140,10 @@ export function ChatInput({
 
     try {
       await recorder.stop()
-      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true })
+      await setAudioModeAsync({
+        allowsRecording: false,
+        playsInSilentMode: true,
+      })
       const uri = recorder.uri
 
       if (uri && onSendVoice && duration >= 1) {
@@ -143,12 +152,11 @@ export function ChatInput({
     } catch {
       Alert.alert(
         t('common.error', 'Erreur'),
-        t('messaging.voice.send_error', 'Échec de l\'envoi de la note vocale.'),
+        t('messaging.voice.send_error', "Échec de l'envoi de la note vocale."),
       )
     }
   }
 
-  // --- Vue pendant l'enregistrement vocal (Style WhatsApp) ---
   if (isRecording) {
     return (
       <View
@@ -185,9 +193,13 @@ export function ChatInput({
     )
   }
 
-  // --- Vue saisie texte normale ---
   return (
-    <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, Spacing[3]) }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingBottom: Math.max(insets.bottom, Spacing[3]) },
+      ]}
+    >
       <TouchableOpacity
         style={styles.attachButton}
         onPress={onAttach}

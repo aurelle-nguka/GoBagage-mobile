@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ConversationMediaModal
- * Galerie des médias et notes vocales partagés dans la conversation (Style WhatsApp).
- */
-
 import React, { useState, useMemo } from 'react'
 import {
   View,
@@ -35,7 +30,11 @@ const GRID_ITEM_SIZE = (SCREEN_WIDTH - 8) / 3
 
 function resolveMediaUrl(url?: string): string | null {
   if (!url) return null
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('file://')
+  ) {
     return url
   }
   const serverOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
@@ -53,7 +52,6 @@ export function ConversationMediaModal({
   const [activeTab, setActiveTab] = useState<'images' | 'audios'>('images')
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null)
 
-  // Filtrer les images et audios parmi les messages
   const imageMessages = useMemo(() => {
     return messages.filter((m) => {
       const isAudio =
@@ -87,12 +85,16 @@ export function ConversationMediaModal({
   return (
     <Modal
       visible={visible}
-      animationType="slide"
-      presentationStyle="pageSheet"
+      animationType='slide'
+      presentationStyle='pageSheet'
       onRequestClose={onClose}
     >
-      <View style={[styles.container, { paddingTop: Math.max(insets.top, Spacing[4]) }]}>
-        {/* Header */}
+      <View
+        style={[
+          styles.container,
+          { paddingTop: Math.max(insets.top, Spacing[4]) },
+        ]}
+      >
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backBtn}
@@ -106,22 +108,27 @@ export function ConversationMediaModal({
               {t('messaging.media.title', 'Médias et documents')}
             </Text>
             <Text style={styles.headerSubtitle}>
-              {participantName} · {totalCount} {t('messaging.media.items_count', 'éléments')}
+              {participantName} · {totalCount}{' '}
+              {t('messaging.media.items_count', 'éléments')}
             </Text>
           </View>
           <View style={{ width: 36 }} />
         </View>
 
-        {/* Onglets (Photos vs Audios) */}
         <View style={styles.tabBar}>
           <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'images' && styles.tabItemActive]}
+            style={[
+              styles.tabItem,
+              activeTab === 'images' && styles.tabItemActive,
+            ]}
             onPress={() => setActiveTab('images')}
             activeOpacity={0.7}
           >
             <ImageIcon
               size={16}
-              color={activeTab === 'images' ? Colors.primary : Colors.mutedForeground}
+              color={
+                activeTab === 'images' ? Colors.primary : Colors.mutedForeground
+              }
             />
             <Text
               style={[
@@ -129,18 +136,24 @@ export function ConversationMediaModal({
                 activeTab === 'images' && styles.tabTextActive,
               ]}
             >
-              {t('messaging.media.tab_photos', 'Photos')} ({imageMessages.length})
+              {t('messaging.media.tab_photos', 'Photos')} (
+              {imageMessages.length})
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.tabItem, activeTab === 'audios' && styles.tabItemActive]}
+            style={[
+              styles.tabItem,
+              activeTab === 'audios' && styles.tabItemActive,
+            ]}
             onPress={() => setActiveTab('audios')}
             activeOpacity={0.7}
           >
             <Mic
               size={16}
-              color={activeTab === 'audios' ? Colors.primary : Colors.mutedForeground}
+              color={
+                activeTab === 'audios' ? Colors.primary : Colors.mutedForeground
+              }
             />
             <Text
               style={[
@@ -148,20 +161,23 @@ export function ConversationMediaModal({
                 activeTab === 'audios' && styles.tabTextActive,
               ]}
             >
-              {t('messaging.media.tab_audios', 'Notes vocales')} ({audioMessages.length})
+              {t('messaging.media.tab_audios', 'Notes vocales')} (
+              {audioMessages.length})
             </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Contenu de l'onglet Photos */}
-        {activeTab === 'images' && (
-          imageMessages.length === 0 ? (
+        {activeTab === 'images' &&
+          (imageMessages.length === 0 ? (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyIconBox}>
                 <ImageIcon size={32} color={Colors.mutedForeground} />
               </View>
               <Text style={styles.emptyTitle}>
-                {t('messaging.media.empty_photos_title', 'Aucune photo partagée')}
+                {t(
+                  'messaging.media.empty_photos_title',
+                  'Aucune photo partagée',
+                )}
               </Text>
               <Text style={styles.emptySubtitle}>
                 {t(
@@ -193,12 +209,10 @@ export function ConversationMediaModal({
                 )
               }}
             />
-          )
-        )}
+          ))}
 
-        {/* Contenu de l'onglet Audios */}
-        {activeTab === 'audios' && (
-          audioMessages.length === 0 ? (
+        {activeTab === 'audios' &&
+          (audioMessages.length === 0 ? (
             <View style={styles.emptyContainer}>
               <View style={styles.emptyIconBox}>
                 <Mic size={32} color={Colors.mutedForeground} />
@@ -229,7 +243,9 @@ export function ConversationMediaModal({
                   <View style={styles.audioCard}>
                     <View style={styles.audioHeader}>
                       <Text style={styles.audioSender}>
-                        {isMe ? t('messaging.media.you', 'Vous') : participantName}
+                        {isMe
+                          ? t('messaging.media.you', 'Vous')
+                          : participantName}
                       </Text>
                       <Text style={styles.audioTime}>{item.time}</Text>
                     </View>
@@ -240,15 +256,13 @@ export function ConversationMediaModal({
                 )
               }}
             />
-          )
-        )}
+          ))}
 
-        {/* Modale plein écran pour les photos */}
         {fullscreenImage && (
           <Modal
             visible={!!fullscreenImage}
             transparent
-            animationType="fade"
+            animationType='fade'
             onRequestClose={() => setFullscreenImage(null)}
           >
             <Pressable
@@ -264,7 +278,7 @@ export function ConversationMediaModal({
               <Image
                 source={{ uri: fullscreenImage }}
                 style={styles.fullImage}
-                resizeMode="contain"
+                resizeMode='contain'
               />
             </Pressable>
           </Modal>

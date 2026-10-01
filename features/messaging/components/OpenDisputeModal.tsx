@@ -1,9 +1,3 @@
-/**
- * Go Bagage — OpenDisputeModal
- * Modale d'ouverture de litige depuis le chat (CDC section 6.6).
- * Connecté à POST /api/v1/disputes.
- */
-
 import React, { useState } from 'react'
 import {
   View,
@@ -40,7 +34,8 @@ export function OpenDisputeModal({
   bookingId,
 }: OpenDisputeModalProps) {
   const { t } = useTranslation()
-  const [selectedReason, setSelectedReason] = useState<string>('PACKAGE_DAMAGED')
+  const [selectedReason, setSelectedReason] =
+    useState<string>('PACKAGE_DAMAGED')
   const [description, setDescription] = useState('')
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -71,7 +66,10 @@ export function OpenDisputeModal({
         handleClose()
       }, 1500)
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? t('messaging.dispute.failed', 'Échec de l\'ouverture du litige.'))
+      setError(
+        err?.response?.data?.message ??
+          t('messaging.dispute.failed', "Échec de l'ouverture du litige."),
+      )
     } finally {
       setLoading(false)
     }
@@ -89,9 +87,14 @@ export function OpenDisputeModal({
           <View style={styles.header}>
             <View style={styles.headerTitleRow}>
               <AlertTriangle size={20} color={Colors.warning} />
-              <Text style={styles.title}>{t('messaging.dispute.title', 'Déclarer un litige')}</Text>
+              <Text style={styles.title}>
+                {t('messaging.dispute.title', 'Déclarer un litige')}
+              </Text>
             </View>
-            <TouchableOpacity onPress={handleClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <TouchableOpacity
+              onPress={handleClose}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
               <X size={20} color={Colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -99,15 +102,24 @@ export function OpenDisputeModal({
           {success ? (
             <View style={styles.successContainer}>
               <CheckCircle2 size={48} color={Colors.primary} />
-              <Text style={styles.successTitle}>{t('messaging.dispute.opened', 'Litige ouvert')}</Text>
+              <Text style={styles.successTitle}>
+                {t('messaging.dispute.opened', 'Litige ouvert')}
+              </Text>
               <Text style={styles.successSub}>
-                {t('messaging.dispute.opened_sub', 'Votre réclamation a été transmise aux administrateurs. Les fonds sous séquestre sont bloqués jusqu\'à la résolution.')}
+                {t(
+                  'messaging.dispute.opened_sub',
+                  "Votre réclamation a été transmise aux administrateurs. Les fonds sous séquestre sont bloqués jusqu'à la résolution.",
+                )}
               </Text>
             </View>
           ) : (
             <View style={styles.content}>
               <Text style={styles.subtext}>
-                {t('messaging.dispute.prompt', 'Sélectionnez le motif du litige pour la réservation')} #{bookingId} :
+                {t(
+                  'messaging.dispute.prompt',
+                  'Sélectionnez le motif du litige pour la réservation',
+                )}{' '}
+                #{bookingId} :
               </Text>
 
               <View style={styles.reasonsList}>
@@ -116,14 +128,27 @@ export function OpenDisputeModal({
                   return (
                     <TouchableOpacity
                       key={r.id}
-                      style={[styles.reasonItem, isSelected && styles.reasonItemSelected]}
+                      style={[
+                        styles.reasonItem,
+                        isSelected && styles.reasonItemSelected,
+                      ]}
                       onPress={() => setSelectedReason(r.id)}
                       activeOpacity={0.8}
                     >
-                      <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                      <View
+                        style={[
+                          styles.radio,
+                          isSelected && styles.radioSelected,
+                        ]}
+                      >
                         {isSelected && <View style={styles.radioInner} />}
                       </View>
-                      <Text style={[styles.reasonText, isSelected && styles.reasonTextSelected]}>
+                      <Text
+                        style={[
+                          styles.reasonText,
+                          isSelected && styles.reasonTextSelected,
+                        ]}
+                      >
                         {t(`disputes.reasons.${r.id.toLowerCase()}`, r.label)}
                       </Text>
                     </TouchableOpacity>
@@ -131,10 +156,18 @@ export function OpenDisputeModal({
                 })}
               </View>
 
-              <Text style={styles.label}>{t('messaging.dispute.details_label', 'Explication du problème')}</Text>
+              <Text style={styles.label}>
+                {t(
+                  'messaging.dispute.details_label',
+                  'Explication du problème',
+                )}
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder={t('messaging.dispute.details_placeholder', 'Décrivez en détail la situation...')}
+                placeholder={t(
+                  'messaging.dispute.details_placeholder',
+                  'Décrivez en détail la situation...',
+                )}
                 placeholderTextColor='#9ca3af'
                 value={description}
                 onChangeText={setDescription}
@@ -152,11 +185,16 @@ export function OpenDisputeModal({
                   disabled={loading}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.cancelBtnText}>{t('common.cancel', 'Annuler')}</Text>
+                  <Text style={styles.cancelBtnText}>
+                    {t('common.cancel', 'Annuler')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+                  style={[
+                    styles.submitBtn,
+                    loading && styles.submitBtnDisabled,
+                  ]}
                   onPress={handleSubmit}
                   disabled={loading}
                   activeOpacity={0.85}
@@ -164,7 +202,9 @@ export function OpenDisputeModal({
                   {loading ? (
                     <ActivityIndicator size='small' color={Colors.white} />
                   ) : (
-                    <Text style={styles.submitBtnText}>{t('messaging.dispute.submit', 'Ouvrir le litige')}</Text>
+                    <Text style={styles.submitBtnText}>
+                      {t('messaging.dispute.submit', 'Ouvrir le litige')}
+                    </Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -227,7 +267,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing[3],
-    paddingVertical: Spacing[2.5],
+    paddingVertical: 10,
     borderRadius: Radius.lg,
     borderWidth: 1,
     borderColor: '#e5e7eb',

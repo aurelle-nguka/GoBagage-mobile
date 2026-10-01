@@ -1,10 +1,3 @@
-/**
- * Go Bagage — ChatScreen
- * Messagerie sécurisée entre voyageur et expéditeur (CDC section 6.5).
- * Branché sur features/messaging/hooks/useChat(bookingId) — historique REST + WebSocket temps réel.
- * Support des pièces jointes / photos avec aperçu WhatsApp, légende combinée, appel direct et modération.
- */
-
 import { useMemo, useState } from 'react'
 import {
   FlatList,
@@ -49,7 +42,15 @@ export function ChatScreen({
   onViewProfile,
 }: ChatScreenProps) {
   const { t, i18n } = useTranslation()
-  const { messages, conversation, loading, error, send, sendAttachment, sendVoiceNote } = useChat(bookingId)
+  const {
+    messages,
+    conversation,
+    loading,
+    error,
+    send,
+    sendAttachment,
+    sendVoiceNote,
+  } = useChat(bookingId)
   const [input, setInput] = useState('')
 
   const [optionsVisible, setOptionsVisible] = useState(false)
@@ -58,7 +59,6 @@ export function ChatScreen({
   const [reportVisible, setReportVisible] = useState(false)
   const [disputeVisible, setDisputeVisible] = useState(false)
 
-  // Aperçu WhatsApp pour les photos sélectionnées
   const [selectedImages, setSelectedImages] = useState<string[]>([])
 
   const handleSend = () => {
@@ -74,7 +74,10 @@ export function ChatScreen({
       if (!permission.granted) {
         Alert.alert(
           t('common.permission_denied', 'Permission requise'),
-          t('messaging.permission_gallery', 'Veuillez autoriser l\'accès à la galerie pour envoyer une photo.')
+          t(
+            'messaging.permission_gallery',
+            "Veuillez autoriser l'accès à la galerie pour envoyer une photo.",
+          ),
         )
         return
       }
@@ -92,22 +95,26 @@ export function ChatScreen({
         }
       }
     } catch {
-      Alert.alert(t('common.error', 'Erreur'), t('messaging.attach_error', 'Impossible d\'ouvrir la galerie.'))
+      Alert.alert(
+        t('common.error', 'Erreur'),
+        t('messaging.attach_error', "Impossible d'ouvrir la galerie."),
+      )
     }
   }
 
   const handleSendPreview = async (images: string[], caption: string) => {
     try {
-      // La première image reçoit la légende (saisie dans l'aperçu)
       if (images.length > 0) {
         await sendAttachment(images[0], caption || undefined)
       }
-      // Les images supplémentaires suivantes sont envoyées ensuite
       for (let i = 1; i < images.length; i++) {
         await sendAttachment(images[i])
       }
     } catch {
-      Alert.alert(t('common.error', 'Erreur'), t('messaging.attach_error', 'Impossible d\'envoyer les photos.'))
+      Alert.alert(
+        t('common.error', 'Erreur'),
+        t('messaging.attach_error', "Impossible d'envoyer les photos."),
+      )
     }
   }
 
@@ -128,8 +135,8 @@ export function ChatScreen({
         t('messaging.call.title', 'Appel téléphonique'),
         t(
           'messaging.call.unavailable',
-          'Le numéro de téléphone sera accessible dès que la réservation sera confirmée et acceptée par le voyageur.'
-        )
+          'Le numéro de téléphone sera accessible dès que la réservation sera confirmée et acceptée par le voyageur.',
+        ),
       )
     }
   }
@@ -180,7 +187,7 @@ export function ChatScreen({
       <ConversationHeader
         initials={participantInitials}
         name={participantName}
-        profilePhotoUrl={conversation?.participant?.profilePhotoUrl}
+        profilePhotoUrl={other?.profilePhotoUrl}
         corridor={conversation?.corridor}
         suffix={dateSuffix}
         routeLabel={fallbackRouteLabel}

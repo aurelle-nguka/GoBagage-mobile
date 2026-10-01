@@ -1,9 +1,3 @@
-/**
- * Go Bagage — TrackingTimeline
- * Stepper de suivi du colis, aligné sur le workflow réel de BookingStatus (CDC section 10.2) :
- * PENDING → ACCEPTED → PICKED_UP → IN_TRANSIT → DELIVERED → CONFIRMED
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { BookingStatus } from '../types/booking.type'
@@ -38,7 +32,9 @@ export function TrackingTimeline({
   return (
     <View style={styles.card}>
       <Text style={styles.title}>
-        {t('tracking.shipment_status', { defaultValue: 'Statut de l’expédition' })}
+        {t('tracking.shipment_status', {
+          defaultValue: 'Statut de l’expédition',
+        })}
       </Text>
 
       {steps.map((step, idx) => {

@@ -1,9 +1,3 @@
-/**
- * Go Bagage — TrackingScreen
- * Suivi en temps réel du colis (CDC section 6.3 — "Suivi en temps réel du statut du colis").
- * Migré depuis Tracking.tsx (maquette web) → React Native.
- */
-
 import {
   View,
   Text,
@@ -64,33 +58,49 @@ export function TrackingScreen({
   const { t } = useTranslation()
 
   const statusKey = (status || '').toLowerCase()
-  const statusTranslated = t(`booking.status.${statusKey}`, { defaultValue: status })
+  const statusTranslated = t(`booking.status.${statusKey}`, {
+    defaultValue: status,
+  })
 
   const timelineSteps = [
     {
       status: 'ACCEPTED' as BookingStatus,
-      label: t('tracking.step_accepted', { defaultValue: 'Réservation confirmée' }),
-      sublabel: t('tracking.step_accepted_sub', { defaultValue: 'Demande acceptée' }),
+      label: t('tracking.step_accepted', {
+        defaultValue: 'Réservation confirmée',
+      }),
+      sublabel: t('tracking.step_accepted_sub', {
+        defaultValue: 'Demande acceptée',
+      }),
     },
     {
       status: 'PICKED_UP' as BookingStatus,
       label: t('tracking.step_picked_up', { defaultValue: 'Colis récupéré' }),
-      sublabel: t('tracking.step_picked_up_sub', { defaultValue: 'Colis pris en charge par le voyageur' }),
+      sublabel: t('tracking.step_picked_up_sub', {
+        defaultValue: 'Colis pris en charge par le voyageur',
+      }),
     },
     {
       status: 'IN_TRANSIT' as BookingStatus,
       label: t('tracking.step_in_transit', { defaultValue: 'En transit' }),
-      sublabel: t('tracking.step_in_transit_sub', { defaultValue: 'Pendant le voyage' }),
+      sublabel: t('tracking.step_in_transit_sub', {
+        defaultValue: 'Pendant le voyage',
+      }),
     },
     {
       status: 'DELIVERED' as BookingStatus,
-      label: t('tracking.step_delivered', { defaultValue: 'Livré au destinataire' }),
-      sublabel: t('tracking.step_delivered_sub', { defaultValue: 'Colis remis en main propre' }),
+      label: t('tracking.step_delivered', {
+        defaultValue: 'Livré au destinataire',
+      }),
+      sublabel: t('tracking.step_delivered_sub', {
+        defaultValue: 'Colis remis en main propre',
+      }),
     },
     {
       status: 'CONFIRMED' as BookingStatus,
       label: t('tracking.step_confirmed', { defaultValue: 'Paiement libéré' }),
-      sublabel: t('tracking.step_confirmed_sub', { defaultValue: 'Après confirmation de livraison' }),
+      sublabel: t('tracking.step_confirmed_sub', {
+        defaultValue: 'Après confirmation de livraison',
+      }),
     },
   ]
 
@@ -111,10 +121,10 @@ export function TrackingScreen({
             from={from}
             to={to}
             suffix={` · ${departureDate}`}
-            size="xs"
-            color="#a7f3d0"
-            arrowColor="#a7f3d0"
-            fontWeight="normal"
+            size='xs'
+            color='#a7f3d0'
+            arrowColor='#a7f3d0'
+            fontWeight='normal'
           />
         </View>
         <View style={styles.liveBadge}>

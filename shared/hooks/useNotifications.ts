@@ -15,14 +15,12 @@ export function useNotifications() {
     clearBadge,
   } = useNotificationStore()
 
-  // Refresh whenever screen comes into focus
   useFocusEffect(
     useCallback(() => {
       fetchNotifications(true)
     }, [fetchNotifications])
   )
 
-  // Background polling every 15s to keep notifications fresh
   useEffect(() => {
     if (!isInitialized) {
       fetchNotifications()

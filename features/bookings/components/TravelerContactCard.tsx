@@ -1,10 +1,3 @@
-/**
- * Go Bagage — TravelerContactCard
- * Carte voyageur avec actions chat + appel.
- * Note CDC 6.5 : les coordonnées personnelles ne sont visibles qu'après réservation acceptée —
- * le bouton "Phone" affiché ici doit rester désactivé/masqué tant que ce n'est pas le cas en amont.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { MessageCircle, Phone } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -44,8 +37,11 @@ export function TravelerContactCard({
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.meta}>
-            ⭐ {rating.toFixed(1)} · {reviewCount} {t('tracking.reviews', { defaultValue: 'avis' })}{' '}
-            {verified ? `· ${t('profile.kyc_verified', { defaultValue: 'Vérifié' })} ✅` : ''}
+            ⭐ {rating.toFixed(1)} · {reviewCount}{' '}
+            {t('tracking.reviews', { defaultValue: 'avis' })}{' '}
+            {verified
+              ? `· ${t('profile.kyc_verified', { defaultValue: 'Vérifié' })}`
+              : ''}
           </Text>
         </View>
 

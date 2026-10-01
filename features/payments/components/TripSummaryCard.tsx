@@ -1,7 +1,3 @@
-/**
- * Go Bagage — TripSummaryCard
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Plane } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -57,7 +53,9 @@ export function TripSummaryCard({
 
   return (
     <View style={styles.card}>
-      <Text style={styles.title}>{t('payment.trip_summary', 'Trip Summary')}</Text>
+      <Text style={styles.title}>
+        {t('payment.trip_summary', 'Trip Summary')}
+      </Text>
 
       <View style={styles.tripRow}>
         <Plane size={24} color={Colors.primary} style={styles.planeIcon} />

@@ -1,9 +1,3 @@
-/**
- * Go Bagage — ReportUserModal
- * Modale de signalement d'utilisateur (CDC section 6.7).
- * Connecté à POST /api/v1/reports.
- */
-
 import React, { useState } from 'react'
 import {
   View,
@@ -76,7 +70,10 @@ export function ReportUserModal({
         handleClose()
       }, 1500)
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? t('messaging.report.failed', 'Échec de l\'envoi du signalement.'))
+      setError(
+        err?.response?.data?.message ??
+          t('messaging.report.failed', "Échec de l'envoi du signalement."),
+      )
     } finally {
       setLoading(false)
     }
@@ -94,9 +91,14 @@ export function ReportUserModal({
           <View style={styles.header}>
             <View style={styles.headerTitleRow}>
               <ShieldAlert size={20} color={Colors.destructive} />
-              <Text style={styles.title}>{t('messaging.report.title', 'Signaler')}</Text>
+              <Text style={styles.title}>
+                {t('messaging.report.title', 'Signaler')}
+              </Text>
             </View>
-            <TouchableOpacity onPress={handleClose} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+            <TouchableOpacity
+              onPress={handleClose}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            >
               <X size={20} color={Colors.mutedForeground} />
             </TouchableOpacity>
           </View>
@@ -104,15 +106,24 @@ export function ReportUserModal({
           {success ? (
             <View style={styles.successContainer}>
               <CheckCircle2 size={48} color={Colors.primary} />
-              <Text style={styles.successTitle}>{t('messaging.report.sent', 'Signalement envoyé')}</Text>
+              <Text style={styles.successTitle}>
+                {t('messaging.report.sent', 'Signalement envoyé')}
+              </Text>
               <Text style={styles.successSub}>
-                {t('messaging.report.sent_sub', 'Merci de nous aider à maintenir la communauté GoBagage en toute sécurité. Notre équipe va examiner ce dossier sous 24h.')}
+                {t(
+                  'messaging.report.sent_sub',
+                  'Merci de nous aider à maintenir la communauté GoBagage en toute sécurité. Notre équipe va examiner ce dossier sous 24h.',
+                )}
               </Text>
             </View>
           ) : (
             <View style={styles.content}>
               <Text style={styles.subtext}>
-                {t('messaging.report.user_prompt', 'Pourquoi souhaitez-vous signaler')} <Text style={{ fontWeight: '700' }}>{reportedUserName}</Text> ?
+                {t(
+                  'messaging.report.user_prompt',
+                  'Pourquoi souhaitez-vous signaler',
+                )}{' '}
+                <Text style={{ fontWeight: '700' }}>{reportedUserName}</Text> ?
               </Text>
 
               <View style={styles.reasonsList}>
@@ -121,14 +132,27 @@ export function ReportUserModal({
                   return (
                     <TouchableOpacity
                       key={r.id}
-                      style={[styles.reasonItem, isSelected && styles.reasonItemSelected]}
+                      style={[
+                        styles.reasonItem,
+                        isSelected && styles.reasonItemSelected,
+                      ]}
                       onPress={() => setSelectedReason(r.id)}
                       activeOpacity={0.8}
                     >
-                      <View style={[styles.radio, isSelected && styles.radioSelected]}>
+                      <View
+                        style={[
+                          styles.radio,
+                          isSelected && styles.radioSelected,
+                        ]}
+                      >
                         {isSelected && <View style={styles.radioInner} />}
                       </View>
-                      <Text style={[styles.reasonText, isSelected && styles.reasonTextSelected]}>
+                      <Text
+                        style={[
+                          styles.reasonText,
+                          isSelected && styles.reasonTextSelected,
+                        ]}
+                      >
                         {t(`reports.reasons.${r.id.toLowerCase()}`, r.label)}
                       </Text>
                     </TouchableOpacity>
@@ -136,10 +160,18 @@ export function ReportUserModal({
                 })}
               </View>
 
-              <Text style={styles.label}>{t('messaging.report.details_label', 'Détails ou précisions (optionnel)')}</Text>
+              <Text style={styles.label}>
+                {t(
+                  'messaging.report.details_label',
+                  'Détails ou précisions (optionnel)',
+                )}
+              </Text>
               <TextInput
                 style={styles.input}
-                placeholder={t('messaging.report.details_placeholder', 'Expliquez ce qui s\'est passé...')}
+                placeholder={t(
+                  'messaging.report.details_placeholder',
+                  "Expliquez ce qui s'est passé...",
+                )}
                 placeholderTextColor='#9ca3af'
                 value={description}
                 onChangeText={setDescription}
@@ -157,11 +189,16 @@ export function ReportUserModal({
                   disabled={loading}
                   activeOpacity={0.8}
                 >
-                  <Text style={styles.cancelBtnText}>{t('common.cancel', 'Annuler')}</Text>
+                  <Text style={styles.cancelBtnText}>
+                    {t('common.cancel', 'Annuler')}
+                  </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={[styles.submitBtn, loading && styles.submitBtnDisabled]}
+                  style={[
+                    styles.submitBtn,
+                    loading && styles.submitBtnDisabled,
+                  ]}
                   onPress={handleSubmit}
                   disabled={loading}
                   activeOpacity={0.85}
@@ -169,7 +206,9 @@ export function ReportUserModal({
                   {loading ? (
                     <ActivityIndicator size='small' color={Colors.white} />
                   ) : (
-                    <Text style={styles.submitBtnText}>{t('messaging.report.submit', 'Confirmer le signalement')}</Text>
+                    <Text style={styles.submitBtnText}>
+                      {t('messaging.report.submit', 'Confirmer le signalement')}
+                    </Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -232,7 +271,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: Spacing[3],
-    paddingVertical: Spacing[2.5],
+    paddingVertical: 10,
     borderRadius: Radius.lg,
     borderWidth: 1,
     borderColor: '#e5e7eb',

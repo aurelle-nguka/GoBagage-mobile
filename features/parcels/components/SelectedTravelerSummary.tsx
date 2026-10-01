@@ -1,7 +1,3 @@
-/**
- * Go Bagage — SelectedTravelerSummary
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'

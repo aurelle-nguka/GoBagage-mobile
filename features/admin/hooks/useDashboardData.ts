@@ -57,14 +57,12 @@ export function useDashboardData(): UseDashboardDataResult {
     }
   }, [t])
 
-  // Refresh whenever screen gains focus
   useFocusEffect(
     useCallback(() => {
       load()
     }, [load])
   )
 
-  // Periodic polling every 15s to update stats & unread notifications in real-time
   useEffect(() => {
     const interval = setInterval(() => {
       useNotificationStore.getState().fetchNotifications(true)

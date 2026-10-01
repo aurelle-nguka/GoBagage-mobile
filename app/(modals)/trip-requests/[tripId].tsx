@@ -1,7 +1,3 @@
-/**
- * Go Bagage — Modale Trip Requests
- */
-
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { TripRequestsScreen } from '../../../features/trips/screens/TripRequestsScreen'
 
@@ -9,7 +5,6 @@ export default function TripRequestsPage() {
   const router = useRouter()
   const { tripId } = useLocalSearchParams<{ tripId: string }>()
 
-  // TODO: remplacer par features/trips/hooks/useTripDetail(tripId) → GET /trips/{id}
   return (
     <TripRequestsScreen
       tripId={tripId}

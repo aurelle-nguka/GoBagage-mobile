@@ -105,7 +105,6 @@ export function useAdminUsers(): UseAdminUsersResult {
       setUsers((prev) => [...prev, ...data.content])
       setPage(nextPage)
     } catch {
-      // silencieux — l'utilisateur peut réessayer en scrollant à nouveau
     } finally {
       setLoadingMore(false)
     }

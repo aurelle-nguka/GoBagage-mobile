@@ -1,8 +1,3 @@
-/**
- * Go Bagage — EscrowBadge
- * Bandeau explicatif du mécanisme de séquestre (CDC section 6.4).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Shield } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'

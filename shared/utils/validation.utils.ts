@@ -1,8 +1,3 @@
-/**
- * Go Bagage — Schémas de validation Zod
- * Alignés sur les règles du CDC et du contrat OpenAPI backend.
- */
-
 import { z } from 'zod';
 
 export const emailSchema = z

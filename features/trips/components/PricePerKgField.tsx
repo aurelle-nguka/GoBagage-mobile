@@ -1,8 +1,3 @@
-/**
- * Go Bagage — PricePerKgField
- * Champ de saisie du prix/kg en CAD avec estimation des gains après commission.
- */
-
 import { useState } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
@@ -30,7 +25,9 @@ export function PricePerKgField({
 
   return (
     <View>
-      <Text style={styles.label}>{t('trip.price_per_kg_cad', 'Price per kg (CAD)')}</Text>
+      <Text style={styles.label}>
+        {t('trip.price_per_kg_cad', 'Price per kg (CAD)')}
+      </Text>
 
       <View style={styles.inputWrapper}>
         <Text style={styles.dollarSign}>$</Text>

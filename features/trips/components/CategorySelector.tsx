@@ -1,23 +1,21 @@
-/**
- * Go Bagage — CategorySelector
- * Sélection multiple des catégories de colis acceptées par le voyageur.
- * Utilise l'enum ParcelCategory défini dans le cahier des charges (section 10.1).
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { ParcelCategory } from '../../../types/common.types'
 
-const CATEGORY_KEYS: Record<ParcelCategory, { key: string; fallback: string }> = {
-  CLOTHING: { key: 'parcel.categories.clothing', fallback: 'Clothing' },
-  FOOD: { key: 'parcel.categories.food', fallback: 'Food' },
-  ELECTRONICS: { key: 'parcel.categories.electronics', fallback: 'Electronics' },
-  COSMETICS: { key: 'parcel.categories.cosmetics', fallback: 'Cosmetics' },
-  DOCUMENTS: { key: 'parcel.categories.documents', fallback: 'Documents' },
-  BOOKS: { key: 'parcel.categories.books', fallback: 'Books' },
-  OTHER: { key: 'parcel.categories.other', fallback: 'Other' },
-}
+const CATEGORY_KEYS: Record<ParcelCategory, { key: string; fallback: string }> =
+  {
+    CLOTHING: { key: 'parcel.categories.clothing', fallback: 'Clothing' },
+    FOOD: { key: 'parcel.categories.food', fallback: 'Food' },
+    ELECTRONICS: {
+      key: 'parcel.categories.electronics',
+      fallback: 'Electronics',
+    },
+    COSMETICS: { key: 'parcel.categories.cosmetics', fallback: 'Cosmetics' },
+    DOCUMENTS: { key: 'parcel.categories.documents', fallback: 'Documents' },
+    BOOKS: { key: 'parcel.categories.books', fallback: 'Books' },
+    OTHER: { key: 'parcel.categories.other', fallback: 'Other' },
+  }
 
 const ALL_CATEGORIES = Object.keys(CATEGORY_KEYS) as ParcelCategory[]
 

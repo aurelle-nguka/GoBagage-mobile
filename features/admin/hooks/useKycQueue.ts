@@ -1,8 +1,3 @@
-/**
- * Go Bagage — useKycQueue
- * Gère la file KYC : chargement, filtrage, pagination, refresh.
- */
-
 import { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -49,23 +44,13 @@ const load = useCallback(async (page: number, filter: KycStatus | 'ALL', isRefre
         ...(filter !== 'ALL' ? { status: filter } : {}),
       };
       
-      // ── LOG ──────────────────────────────────────────
-      console.log('=== KYC QUEUE LOAD ===');
-      console.log('params:', JSON.stringify(params));
-      
       const data = await getKycQueue(params);
-      console.log('premier item:', JSON.stringify(data.content[0]));
-      
-      console.log('response:', JSON.stringify(data));
-      console.log('items count:', data.content?.length);
-      // ─────────────────────────────────────────────────
       
       setItems(data.content);
       setTotalElements(data.totalElements);
       setTotalPages(data.totalPages);
       setCurrentPage(data.page);
     } catch (err: any) {
-      console.log('❌ KYC Queue error:', err?.response?.status, JSON.stringify(err?.response?.data));
       setError(err?.response?.data?.message ?? t('admin.errors.load_kyc_failed', 'Failed to load KYC queue.'));
     } finally {
       setLoading(false);

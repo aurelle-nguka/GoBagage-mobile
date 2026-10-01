@@ -1,8 +1,3 @@
-/**
- * Go Bagage — DeliveryConfirmedBanner
- * Bandeau confirmant que le paiement a été libéré vers le voyageur (CDC étape 8).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { CheckCircle } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'

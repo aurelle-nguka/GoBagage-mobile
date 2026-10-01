@@ -1,8 +1,3 @@
-/**
- * Go Bagage — Types Admin
- * Alignés sur le contrat OpenAPI v1.0.0 — /admin/*
- */
-
 import { KycStatus, UserRole } from "../../../types/user.types";
 import type { Dispute, DisputeStatus } from "../../disputes/types/dispute.types";
 

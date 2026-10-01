@@ -1,9 +1,3 @@
-/**
- * Go Bagage — AudioMessagePlayer
- * Lecteur de note vocale intégré dans les bulles de messages avec expo-audio (Expo SDK 56).
- * Supporte le Play / Pause, la barre de progression interactive et le formatage temporel.
- */
-
 import React from 'react'
 import {
   View,
@@ -12,7 +6,11 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native'
-import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio'
+import {
+  useAudioPlayer,
+  useAudioPlayerStatus,
+  setAudioModeAsync,
+} from 'expo-audio'
 import { Play, Pause, Mic } from 'lucide-react-native'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 import { API_BASE_URL } from '../../../shared/constants/api.constants'
@@ -25,7 +23,11 @@ interface AudioMessagePlayerProps {
 
 function resolveAudioUrl(url: string): string {
   if (!url) return ''
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('file://')) {
+  if (
+    url.startsWith('http://') ||
+    url.startsWith('https://') ||
+    url.startsWith('file://')
+  ) {
     return url
   }
   const serverOrigin = API_BASE_URL.replace(/\/api\/v1\/?$/, '')
@@ -55,9 +57,12 @@ export function AudioMessagePlayer({
   const isPlaying = status.playing
   const isBuffering = status.isBuffering
   const currentTime = status.currentTime ?? 0
-  const totalDuration = (status.duration && status.duration > 0)
-    ? status.duration
-    : (durationSeconds && durationSeconds > 0 ? durationSeconds : 0)
+  const totalDuration =
+    status.duration && status.duration > 0
+      ? status.duration
+      : durationSeconds && durationSeconds > 0
+        ? durationSeconds
+        : 0
 
   const handleTogglePlay = async () => {
     try {
@@ -70,7 +75,10 @@ export function AudioMessagePlayer({
           interruptionMode: 'doNotMix',
         })
 
-        if (status.didJustFinish || (totalDuration > 0 && currentTime >= totalDuration - 0.2)) {
+        if (
+          status.didJustFinish ||
+          (totalDuration > 0 && currentTime >= totalDuration - 0.2)
+        ) {
           await player.seekTo(0)
         }
         player.play()
@@ -98,9 +106,10 @@ export function AudioMessagePlayer({
     }
   }
 
-  const progressPercent = totalDuration > 0
-    ? Math.min(100, Math.max(0, (currentTime / totalDuration) * 100))
-    : 0
+  const progressPercent =
+    totalDuration > 0
+      ? Math.min(100, Math.max(0, (currentTime / totalDuration) * 100))
+      : 0
 
   const primaryIconColor = isMe ? Colors.primary : Colors.white
   const buttonBgColor = isMe ? Colors.white : Colors.primary
@@ -108,8 +117,9 @@ export function AudioMessagePlayer({
   const trackBgColor = isMe ? 'rgba(255, 255, 255, 0.35)' : '#d1d5db'
   const trackFillColor = isMe ? Colors.white : Colors.primary
 
-  // Barres d'onde pour style WhatsApp
-  const waveHeights = [10, 16, 10, 22, 14, 20, 12, 18, 12, 24, 16, 12, 20, 14, 10, 16, 10]
+  const waveHeights = [
+    10, 16, 10, 22, 14, 20, 12, 18, 12, 24, 16, 12, 20, 14, 10, 16, 10,
+  ]
 
   return (
     <View style={styles.container}>
@@ -118,20 +128,24 @@ export function AudioMessagePlayer({
         onPress={handleTogglePlay}
         activeOpacity={0.8}
         hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        accessibilityRole="button"
+        accessibilityRole='button'
         accessibilityLabel={isPlaying ? 'Pause' : 'Play'}
       >
         {isBuffering && !isPlaying ? (
-          <ActivityIndicator size="small" color={primaryIconColor} />
+          <ActivityIndicator size='small' color={primaryIconColor} />
         ) : isPlaying ? (
           <Pause size={16} color={primaryIconColor} fill={primaryIconColor} />
         ) : (
-          <Play size={16} color={primaryIconColor} fill={primaryIconColor} style={{ marginLeft: 2 }} />
+          <Play
+            size={16}
+            color={primaryIconColor}
+            fill={primaryIconColor}
+            style={{ marginLeft: 2 }}
+          />
         )}
       </TouchableOpacity>
 
       <View style={styles.rightContent}>
-        {/* Visualisation Waveform interactive */}
         <View style={styles.waveformRow}>
           {waveHeights.map((h, i) => {
             const barPercent = (i / waveHeights.length) * 100
@@ -157,7 +171,6 @@ export function AudioMessagePlayer({
           })}
         </View>
 
-        {/* Ligne durée & icône micro */}
         <View style={styles.timeRow}>
           <Text style={[styles.timeText, { color: textColor }]}>
             {isPlaying || currentTime > 0

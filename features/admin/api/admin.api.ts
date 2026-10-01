@@ -1,9 +1,3 @@
-/**
- * Go Bagage — Admin API
- * Endpoints réservés au rôle ADMIN.
- * Contrat OpenAPI v1.0.0 — /admin/*
- */
-
 import apiClient from '../../../shared/services/api.client';
 import type {
   AdminStatsResponse,

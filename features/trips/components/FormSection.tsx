@@ -1,8 +1,3 @@
-/**
- * Go Bagage — FormSection
- * Section de formulaire avec titre en majuscules et carte blanche.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 

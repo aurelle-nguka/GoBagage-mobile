@@ -1,11 +1,3 @@
-/**
- * Go Bagage — AvatarActionModal
- * Modal style WhatsApp pour la gestion de la photo de profil :
- * - Prendre une photo (Appareil photo)
- * - Choisir depuis la galerie
- * - Supprimer la photo actuelle
- */
-
 import React from 'react'
 import {
   Modal,
@@ -46,7 +38,7 @@ export function AvatarActionModal({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType='fade'
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
@@ -55,10 +47,12 @@ export function AvatarActionModal({
             <View
               style={[
                 styles.sheet,
-                { paddingBottom: Math.max(insets.bottom, Spacing[4]) + Spacing[2] },
+                {
+                  paddingBottom:
+                    Math.max(insets.bottom, Spacing[4]) + Spacing[2],
+                },
               ]}
             >
-              {/* Header */}
               <View style={styles.header}>
                 <Text style={styles.title}>
                   {t('profile.avatar.title', 'Photo de profil')}
@@ -72,9 +66,7 @@ export function AvatarActionModal({
                 </TouchableOpacity>
               </View>
 
-              {/* Options Grid (Style WhatsApp) */}
               <View style={styles.optionsRow}>
-                {/* 1. Appareil Photo */}
                 <TouchableOpacity
                   style={styles.optionItem}
                   onPress={() => {
@@ -85,7 +77,12 @@ export function AvatarActionModal({
                   }}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.iconCircle, { borderColor: '#bbf7d0', backgroundColor: '#f0fdf4' }]}>
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { borderColor: '#bbf7d0', backgroundColor: '#f0fdf4' },
+                    ]}
+                  >
                     <Camera size={26} color={Colors.primary} />
                   </View>
                   <Text style={styles.optionLabel}>
@@ -93,7 +90,6 @@ export function AvatarActionModal({
                   </Text>
                 </TouchableOpacity>
 
-                {/* 2. Galerie */}
                 <TouchableOpacity
                   style={styles.optionItem}
                   onPress={() => {
@@ -104,15 +100,19 @@ export function AvatarActionModal({
                   }}
                   activeOpacity={0.7}
                 >
-                  <View style={[styles.iconCircle, { borderColor: '#bfdbfe', backgroundColor: '#eff6ff' }]}>
-                    <ImageIcon size={26} color="#2563eb" />
+                  <View
+                    style={[
+                      styles.iconCircle,
+                      { borderColor: '#bfdbfe', backgroundColor: '#eff6ff' },
+                    ]}
+                  >
+                    <ImageIcon size={26} color='#2563eb' />
                   </View>
                   <Text style={styles.optionLabel}>
                     {t('profile.avatar.gallery', 'Galerie')}
                   </Text>
                 </TouchableOpacity>
 
-                {/* 3. Supprimer la photo (si présente) */}
                 {hasPhoto && (
                   <TouchableOpacity
                     style={styles.optionItem}
@@ -124,10 +124,20 @@ export function AvatarActionModal({
                     }}
                     activeOpacity={0.7}
                   >
-                    <View style={[styles.iconCircle, { borderColor: '#fecaca', backgroundColor: '#fef2f2' }]}>
+                    <View
+                      style={[
+                        styles.iconCircle,
+                        { borderColor: '#fecaca', backgroundColor: '#fef2f2' },
+                      ]}
+                    >
                       <Trash2 size={26} color={Colors.destructive} />
                     </View>
-                    <Text style={[styles.optionLabel, { color: Colors.destructive }]}>
+                    <Text
+                      style={[
+                        styles.optionLabel,
+                        { color: Colors.destructive },
+                      ]}
+                    >
                       {t('profile.avatar.delete', 'Supprimer')}
                     </Text>
                   </TouchableOpacity>

@@ -1,10 +1,3 @@
-/**
- * Go Bagage — StarRating
- * Sélecteur de note à 5 étoiles avec libellé dynamique.
- * Pas de hover (n'existe pas sur mobile) — le tap définit directement la note,
- * contrairement à la maquette web qui utilisait onMouseEnter/onMouseLeave.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Star } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'

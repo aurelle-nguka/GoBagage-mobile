@@ -1,8 +1,3 @@
-/**
- * Go Bagage — useOtpVerify
- * Gère la vérification OTP et le renvoi de code.
- */
-
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { verifyOtp, sendOtp } from '../api/auth.api';

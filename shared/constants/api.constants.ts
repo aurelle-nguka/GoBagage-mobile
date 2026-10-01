@@ -5,9 +5,6 @@ console.log('typeof', typeof process.env.EXPO_PUBLIC_API_URL)
 
 export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://192.168.86.1:8080/api/v1';
 
-console.log('API_BASE_URL final', API_BASE_URL);
-console.log('===============================')
-
 export const API_TIMEOUT = 15_000; // 15s
 
 export const Endpoints = {

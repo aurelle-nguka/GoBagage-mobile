@@ -1,8 +1,3 @@
-/**
- * Go Bagage — RevieweeProfileHeader
- * En-tête centré présentant la personne évaluée (gros avatar + nom + contexte du trajet).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 

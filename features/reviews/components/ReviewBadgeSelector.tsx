@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ReviewBadgeSelector
- * Sélection multiple de qualificatifs mis en avant dans l'évaluation (optionnel).
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import {
   Clock,
@@ -64,7 +59,9 @@ export function ReviewBadgeSelector({
     <View style={styles.section}>
       <Text style={styles.title}>
         {t('review.badges_prompt', 'What stood out?')}{' '}
-        <Text style={styles.optional}>({t('common.optional', 'optional')})</Text>
+        <Text style={styles.optional}>
+          ({t('common.optional', 'optional')})
+        </Text>
       </Text>
       <View style={styles.row}>
         {reviewBadges.map((badge) => {

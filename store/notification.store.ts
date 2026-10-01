@@ -1,10 +1,3 @@
-/**
- * Go Bagage — Notification Store (Zustand)
- * Centralise l'état des notifications et du badge pour toute l'application.
- * Fournit une mise à jour instantanée (optimiste), un cache en mémoire,
- * et une synchronisation automatique en temps réel.
- */
-
 import { create } from 'zustand'
 import {
   getNotifications,
@@ -59,7 +52,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   },
 
   readOne: async (id: string) => {
-    // Mise à jour optimiste instantanée de l'UI
     set((state) => ({
       notifications: state.notifications.map((n) =>
         n.id === id ? { ...n, read: true } : n
@@ -72,7 +64,6 @@ export const useNotificationStore = create<NotificationState>((set, get) => ({
   },
 
   readAll: async () => {
-    // Mise à jour optimiste instantanée de l'UI
     set((state) => ({
       notifications: state.notifications.map((n) => ({ ...n, read: true })),
       unreadCount: 0,

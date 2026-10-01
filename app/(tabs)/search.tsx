@@ -22,7 +22,6 @@ export default function SearchPage() {
   const [selectedCorridor, setSelectedCorridor] =
     useState<CorridorResponse | null>(null)
 
-  // Dès qu'une route ou un corridor est reçu en paramètres, passer directement aux résultats
   useEffect(() => {
     if (params.corridorId || (params.from && params.to)) {
       const match = corridors.find(
@@ -31,7 +30,7 @@ export default function SearchPage() {
           (params.from &&
             params.to &&
             c.departureCity.toLowerCase() === params.from.toLowerCase() &&
-            c.arrivalCity.toLowerCase() === params.to.toLowerCase())
+            c.arrivalCity.toLowerCase() === params.to.toLowerCase()),
       )
 
       if (match) {

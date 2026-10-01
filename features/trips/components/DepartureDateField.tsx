@@ -1,8 +1,3 @@
-/**
- * Go Bagage — DepartureDateField
- * Sélecteur de date natif (DateTimePicker), avec minimum = aujourd'hui.
- */
-
 import { useState } from 'react'
 import {
   View,
@@ -42,7 +37,9 @@ export function DepartureDateField({
 
   return (
     <View>
-      <Text style={styles.label}>{`${t('trip.departure_date', 'Departure Date')} *`}</Text>
+      <Text
+        style={styles.label}
+      >{`${t('trip.departure_date', 'Departure Date')} *`}</Text>
 
       <TouchableOpacity
         style={styles.fieldButton}

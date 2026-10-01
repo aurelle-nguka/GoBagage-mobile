@@ -1,9 +1,3 @@
-/**
- * Go Bagage — KycGateBanner
- * Bannière affichée sur les écrans qui nécessitent un KYC vérifié (CDC section 3.3).
- * Bloque visuellement l'action et explique pourquoi.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { ShieldAlert, Clock, XCircle, CheckCircle2 } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'

@@ -112,7 +112,6 @@ export function SenderDashboard({
 
       setParcels(mapped)
     } catch {
-      // silencieux sur le dashboard
     } finally {
       setLoading(false)
     }
@@ -124,7 +123,11 @@ export function SenderDashboard({
     }, [load]),
   )
 
-  const handleSelectRoute = (route: { id?: string; from: string; to: string }) => {
+  const handleSelectRoute = (route: {
+    id?: string
+    from: string
+    to: string
+  }) => {
     onSearch({
       corridorId: route.id,
       from: route.from,
@@ -134,7 +137,6 @@ export function SenderDashboard({
 
   return (
     <>
-      {/* Recherche */}
       <View style={styles.searchCard}>
         <Text style={styles.searchTitle}>
           {t('home.find_corridor', 'Trouver un corridor')}
@@ -145,14 +147,18 @@ export function SenderDashboard({
             <Search size={16} color='#9ca3af' />
             <Text
               style={styles.searchInput}
-              onPress={() => onSearch(searchQuery ? { query: searchQuery } : undefined)}
+              onPress={() =>
+                onSearch(searchQuery ? { query: searchQuery } : undefined)
+              }
             >
               {searchQuery || 'Montreal - Douala'}
             </Text>
           </View>
           <TouchableOpacity
             style={styles.searchButton}
-            onPress={() => onSearch(searchQuery ? { query: searchQuery } : undefined)}
+            onPress={() =>
+              onSearch(searchQuery ? { query: searchQuery } : undefined)
+            }
             activeOpacity={0.85}
           >
             <Text style={styles.searchButtonText}>
@@ -178,15 +184,12 @@ export function SenderDashboard({
         </View>
       </View>
 
-      {/* Colis récents */}
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>
           {t('home.recent_parcels', 'Colis Récents')}
         </Text>
         <TouchableOpacity onPress={onSeeAll} activeOpacity={0.7}>
-          <Text style={styles.seeAll}>
-            {t('home.see_all', 'Tout voir')}
-          </Text>
+          <Text style={styles.seeAll}>{t('home.see_all', 'Tout voir')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -213,7 +216,7 @@ export function SenderDashboard({
         <View style={styles.emptyState}>
           <Package size={48} color='#d1d5db' />
           <Text style={styles.emptyText}>
-            {t('home.no_parcels', 'Aucun colis pour l\'instant')}
+            {t('home.no_parcels', "Aucun colis pour l'instant")}
           </Text>
           <PrimaryButton
             label={t('home.send_first', 'Envoyez votre premier colis')}

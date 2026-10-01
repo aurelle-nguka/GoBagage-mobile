@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ReviewSuccessView
- * Écran de remerciement après soumission de l'évaluation.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Star, PartyPopper } from 'lucide-react-native'
@@ -25,7 +20,9 @@ export function ReviewSuccessView({
       <View style={styles.iconCircle}>
         <PartyPopper size={48} color={Colors.primary} />
       </View>
-      <Text style={styles.title}>{t('review.thank_you_title', 'Thank you!')}</Text>
+      <Text style={styles.title}>
+        {t('review.thank_you_title', 'Thank you!')}
+      </Text>
       <Text style={styles.description}>
         {t(
           'review.thank_you_desc',

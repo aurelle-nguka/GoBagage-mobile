@@ -1,10 +1,3 @@
-/**
- * Go Bagage — Auth Store (Zustand)
- * Store d'authentification dynamique — aucun mock.
- * L'état initial est "non connecté" (user: null).
- * Le store est alimenté par useLogin() après POST /auth/login + GET /users/me.
- */
-
 import { create } from 'zustand';
 import { KycStatus, User, UserRole } from '../types/user.types';
 import { tokenService } from '../shared/services/token.service';

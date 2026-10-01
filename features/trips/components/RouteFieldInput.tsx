@@ -1,8 +1,3 @@
-/**
- * Go Bagage — RouteFieldInput
- * Champ texte avec emoji-icône préfixe (origine/destination de trajet).
- */
-
 import { useState } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'

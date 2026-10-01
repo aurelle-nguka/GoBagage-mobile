@@ -10,7 +10,6 @@ export default function KycPage() {
   const router = useRouter()
   const params = useLocalSearchParams<{ role?: RoleChoice }>()
 
-  // Détermine dynamiquement le rôle réel de l'utilisateur connecté
   const resolvedRole: RoleChoice = useMemo(() => {
     if (params.role) return params.role
     if (user?.roles && user.roles.length > 0) {
@@ -33,4 +32,3 @@ export default function KycPage() {
     />
   )
 }
-

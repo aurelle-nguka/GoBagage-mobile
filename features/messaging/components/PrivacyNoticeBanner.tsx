@@ -1,8 +1,3 @@
-/**
- * Go Bagage — PrivacyNoticeBanner
- * Rappel que les coordonnées restent masquées (CDC section 6.5).
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Lock } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'

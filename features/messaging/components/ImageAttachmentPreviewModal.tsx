@@ -1,9 +1,3 @@
-/**
- * Go Bagage — ImageAttachmentPreviewModal
- * Écran de prévisualisation façon WhatsApp : aperçu plein écran, sélection multiple,
- * ajout d'une légende textuelle et envoi groupé/combiné.
- */
-
 import React, { useState } from 'react'
 import {
   View,
@@ -44,7 +38,6 @@ export function ImageAttachmentPreviewModal({
   const [caption, setCaption] = useState('')
   const [sending, setSending] = useState(false)
 
-  // S'assurer que selectedIndex est toujours valide
   const activeIndex = Math.min(selectedIndex, Math.max(0, images.length - 1))
   const activeUri = images[activeIndex]
 
@@ -88,7 +81,6 @@ export function ImageAttachmentPreviewModal({
       statusBarTranslucent
     >
       <View style={styles.container}>
-        {/* Barre d'en-tête */}
         <SafeAreaView edges={['top']} style={styles.headerSafeArea}>
           <View style={styles.header}>
             <TouchableOpacity
@@ -123,7 +115,6 @@ export function ImageAttachmentPreviewModal({
           </View>
         </SafeAreaView>
 
-        {/* Aperçu grand format de l'image active */}
         <View style={styles.previewContainer}>
           {activeUri ? (
             <Image
@@ -134,13 +125,11 @@ export function ImageAttachmentPreviewModal({
           ) : null}
         </View>
 
-        {/* Barre de miniatures + champ de saisie avec gestion du clavier */}
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           keyboardVerticalOffset={0}
           style={styles.bottomContainer}
         >
-          {/* Bandeau de miniatures si plusieurs images */}
           {images.length > 1 && (
             <View style={styles.thumbnailsWrapper}>
               <ScrollView
@@ -168,7 +157,6 @@ export function ImageAttachmentPreviewModal({
             </View>
           )}
 
-          {/* Zone de saisie de légende & bouton d'envoi */}
           <View
             style={[
               styles.inputBar,
@@ -192,10 +180,7 @@ export function ImageAttachmentPreviewModal({
             </View>
 
             <TouchableOpacity
-              style={[
-                styles.sendButton,
-                sending && styles.sendButtonDisabled,
-              ]}
+              style={[styles.sendButton, sending && styles.sendButtonDisabled]}
               onPress={handleSend}
               disabled={sending}
               activeOpacity={0.85}

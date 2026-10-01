@@ -1,9 +1,3 @@
-/**
- * Go Bagage — ConfirmDeliveryButton
- * Bouton de confirmation de réception (CDC étape 7 du parcours, POST /bookings/{id}/confirm).
- * Reste désactivé tant que le statut n'est pas DELIVERED.
- */
-
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
 import { useTranslation } from 'react-i18next'
 import { BookingStatus } from '../types/booking.type'
@@ -38,9 +32,11 @@ export function ConfirmDeliveryButton({
         ]}
       >
         {isEnabled
-          ? t('tracking.confirm_delivery', { defaultValue: '✅ Confirmer la Réception' })
+          ? t('tracking.confirm_delivery', {
+              defaultValue: 'Confirmer la Réception',
+            })
           : t('tracking.confirm_delivery_pending', {
-              defaultValue: '⏳ Confirmer la Réception (disponible à l’arrivée)',
+              defaultValue: 'Confirmer la Réception (disponible à l’arrivée)',
             })}
       </Text>
     </TouchableOpacity>

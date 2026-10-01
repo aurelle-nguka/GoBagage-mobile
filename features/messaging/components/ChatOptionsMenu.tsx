@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ChatOptionsMenu
- * Menu contextuel déroulant flottant (Style WhatsApp) ancré en haut à droite lors du clic sur les 3 points.
- */
-
 import React from 'react'
 import {
   View,
@@ -51,12 +46,11 @@ export function ChatOptionsMenu({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType='fade'
       onRequestClose={onClose}
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         <View style={[styles.menuContainer, { top: topOffset }]}>
-          {/* 1. Afficher le contact */}
           <TouchableOpacity
             style={styles.menuItem}
             activeOpacity={0.65}
@@ -71,7 +65,6 @@ export function ChatOptionsMenu({
             </Text>
           </TouchableOpacity>
 
-          {/* 2. Médias, liens et documents */}
           <TouchableOpacity
             style={styles.menuItem}
             activeOpacity={0.65}
@@ -80,7 +73,11 @@ export function ChatOptionsMenu({
               onViewMedia()
             }}
           >
-            <ImageIcon size={18} color={Colors.foreground} style={styles.menuIcon} />
+            <ImageIcon
+              size={18}
+              color={Colors.foreground}
+              style={styles.menuIcon}
+            />
             <Text style={styles.menuItemText}>
               {t('messaging.options.media_links', 'Médias et documents')}
             </Text>
@@ -88,7 +85,6 @@ export function ChatOptionsMenu({
 
           <View style={styles.divider} />
 
-          {/* 3. Déclarer le litige */}
           <TouchableOpacity
             style={styles.menuItem}
             activeOpacity={0.65}
@@ -97,13 +93,16 @@ export function ChatOptionsMenu({
               onDispute()
             }}
           >
-            <AlertTriangle size={18} color={Colors.warning} style={styles.menuIcon} />
+            <AlertTriangle
+              size={18}
+              color={Colors.warning}
+              style={styles.menuIcon}
+            />
             <Text style={styles.menuItemText}>
               {t('messaging.options.open_dispute', 'Déclarer un litige')}
             </Text>
           </TouchableOpacity>
 
-          {/* 4. Signaler l'utilisateur */}
           <TouchableOpacity
             style={styles.menuItem}
             activeOpacity={0.65}
@@ -112,7 +111,11 @@ export function ChatOptionsMenu({
               onReport()
             }}
           >
-            <ShieldAlert size={18} color={Colors.destructive} style={styles.menuIcon} />
+            <ShieldAlert
+              size={18}
+              color={Colors.destructive}
+              style={styles.menuIcon}
+            />
             <Text style={[styles.menuItemText, { color: Colors.destructive }]}>
               {t('messaging.options.report_user', "Signaler l'utilisateur")}
             </Text>

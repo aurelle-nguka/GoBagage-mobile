@@ -63,32 +63,43 @@ export function KycUploadScreen({
     }
   }, [role, t])
 
-  const documentTypes = useMemo<{
-    id: DocumentType
-    label: string
-    emoji: string
-    description: string
-  }[]>(() => [
+  const documentTypes = useMemo<
     {
-      id: 'CNI',
-      label: t('kyc.cni_label', { defaultValue: 'National ID Card' }),
-      emoji: '🪪',
-      description: t('kyc.cni_desc', { defaultValue: "Carte Nationale d'Identité" }),
-    },
-    {
-      id: 'PASSPORT',
-      label: t('kyc.passport_label', { defaultValue: 'Passport' }),
-      emoji: '📔',
-      description: t('kyc.passport_desc', { defaultValue: 'Valid international passport' }),
-    },
-  ], [t])
+      id: DocumentType
+      label: string
+      emoji: string
+      description: string
+    }[]
+  >(
+    () => [
+      {
+        id: 'CNI',
+        label: t('kyc.cni_label', { defaultValue: 'National ID Card' }),
+        emoji: '🪪',
+        description: t('kyc.cni_desc', {
+          defaultValue: "Carte Nationale d'Identité",
+        }),
+      },
+      {
+        id: 'PASSPORT',
+        label: t('kyc.passport_label', { defaultValue: 'Passport' }),
+        emoji: '📔',
+        description: t('kyc.passport_desc', {
+          defaultValue: 'Valid international passport',
+        }),
+      },
+    ],
+    [t],
+  )
 
   const pickImage = async (side: 'front' | 'back') => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
     if (status !== 'granted') {
       Alert.alert(
         t('kyc.permission_title', { defaultValue: 'Permission required' }),
-        t('kyc.permission_photos', { defaultValue: 'Go Bagage needs access to your photos.' }),
+        t('kyc.permission_photos', {
+          defaultValue: 'Go Bagage needs access to your photos.',
+        }),
       )
       return
     }
@@ -115,21 +126,33 @@ export function KycUploadScreen({
     let valid = true
 
     if (!documentType) {
-      setDocTypeError(t('kyc.doc_type_error', { defaultValue: 'Please select a document type.' }))
+      setDocTypeError(
+        t('kyc.doc_type_error', {
+          defaultValue: 'Please select a document type.',
+        }),
+      )
       valid = false
     } else {
       setDocTypeError('')
     }
 
     if (!idFrontUri) {
-      setFrontError(t('kyc.front_error', { defaultValue: 'Please upload the front of your document.' }))
+      setFrontError(
+        t('kyc.front_error', {
+          defaultValue: 'Please upload the front of your document.',
+        }),
+      )
       valid = false
     } else {
       setFrontError('')
     }
 
     if (!idBackUri) {
-      setBackError(t('kyc.back_error', { defaultValue: 'Please upload the back of your document.' }))
+      setBackError(
+        t('kyc.back_error', {
+          defaultValue: 'Please upload the back of your document.',
+        }),
+      )
       valid = false
     } else {
       setBackError('')
@@ -165,7 +188,9 @@ export function KycUploadScreen({
     } catch (err: any) {
       setApiError(
         err?.response?.data?.message ??
-          t('common.error', { defaultValue: 'Failed to submit documents. Please try again.' }),
+          t('common.error', {
+            defaultValue: 'Failed to submit documents. Please try again.',
+          }),
       )
     } finally {
       setLoading(false)
@@ -180,10 +205,15 @@ export function KycUploadScreen({
           <View style={styles.verifiedIconCircle}>
             <CheckCircle size={48} color={Colors.primary} />
           </View>
-          <Text style={styles.verifiedTitle}>{t('kyc.verified_title', { defaultValue: 'Identity already verified' })}</Text>
+          <Text style={styles.verifiedTitle}>
+            {t('kyc.verified_title', {
+              defaultValue: 'Identity already verified',
+            })}
+          </Text>
           <Text style={styles.verifiedSubtitle}>
             {t('kyc.verified_desc', {
-              defaultValue: "Your identity has been successfully verified. You don't need to submit new documents unless your ID has expired or changed.",
+              defaultValue:
+                "Your identity has been successfully verified. You don't need to submit new documents unless your ID has expired or changed.",
             })}
           </Text>
           <View style={styles.verifiedActions}>
@@ -193,7 +223,9 @@ export function KycUploadScreen({
               activeOpacity={0.85}
             >
               <Text style={styles.updateButtonText}>
-                {t('kyc.update_anyway', { defaultValue: 'Update my documents anyway' })}
+                {t('kyc.update_anyway', {
+                  defaultValue: 'Update my documents anyway',
+                })}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -201,7 +233,9 @@ export function KycUploadScreen({
               onPress={onBack}
               activeOpacity={0.85}
             >
-              <Text style={styles.backButtonText}>{t('kyc.go_back', { defaultValue: 'Go back' })}</Text>
+              <Text style={styles.backButtonText}>
+                {t('kyc.go_back', { defaultValue: 'Go back' })}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -224,7 +258,8 @@ export function KycUploadScreen({
           <View style={styles.updateBanner}>
             <Text style={styles.updateBannerText}>
               {t('kyc.update_warning', {
-                defaultValue: '⚠️ You are updating your already verified documents. This will require a new review.',
+                defaultValue:
+                  'You are updating your already verified documents. This will require a new review.',
               })}
             </Text>
           </View>
@@ -236,7 +271,9 @@ export function KycUploadScreen({
             : t('kyc.title', { defaultValue: 'Verify your identity' })}
         </Text>
         <Text style={styles.subtitle}>
-          {t('kyc.subtitle', { defaultValue: 'Select your document type and upload both sides.' })}
+          {t('kyc.subtitle', {
+            defaultValue: 'Select your document type and upload both sides.',
+          })}
         </Text>
 
         <Text style={styles.sectionLabel}>
@@ -290,7 +327,7 @@ export function KycUploadScreen({
           })}
         </View>
         {docTypeError ? (
-          <Text style={styles.fieldError}>⚠ {docTypeError}</Text>
+          <Text style={styles.fieldError}>{docTypeError}</Text>
         ) : null}
 
         {documentType && (
@@ -299,10 +336,11 @@ export function KycUploadScreen({
               {t('kyc.upload_section', { defaultValue: 'Upload photos' })}
             </Text>
             <View style={styles.infoBanner}>
-              <Text style={styles.infoEmoji}>ℹ️</Text>
+              <Text style={styles.infoEmoji}></Text>
               <Text style={styles.infoText}>
                 {t('kyc.encryption_notice', {
-                  defaultValue: 'Your documents are encrypted and only used for identity verification.',
+                  defaultValue:
+                    'Your documents are encrypted and only used for identity verification.',
                 })}
               </Text>
             </View>
@@ -312,14 +350,18 @@ export function KycUploadScreen({
                 <IdUploadCard
                   label={
                     documentType === 'CNI'
-                      ? t('kyc.front_cni', { defaultValue: 'Front of ID Card *' })
-                      : t('kyc.front_passport', { defaultValue: 'Passport Identity Page *' })
+                      ? t('kyc.front_cni', {
+                          defaultValue: 'Front of ID Card *',
+                        })
+                      : t('kyc.front_passport', {
+                          defaultValue: 'Passport Identity Page *',
+                        })
                   }
                   uploadedUri={idFrontUri}
                   onPress={() => pickImage('front')}
                 />
                 {frontError ? (
-                  <Text style={styles.fieldError}>⚠ {frontError}</Text>
+                  <Text style={styles.fieldError}>{frontError}</Text>
                 ) : null}
               </View>
 
@@ -328,13 +370,15 @@ export function KycUploadScreen({
                   label={
                     documentType === 'CNI'
                       ? t('kyc.back_cni', { defaultValue: 'Back of ID Card *' })
-                      : t('kyc.back_passport', { defaultValue: 'Passport Page 2 *' })
+                      : t('kyc.back_passport', {
+                          defaultValue: 'Passport Page 2 *',
+                        })
                   }
                   uploadedUri={idBackUri}
                   onPress={() => pickImage('back')}
                 />
                 {backError ? (
-                  <Text style={styles.fieldError}>⚠ {backError}</Text>
+                  <Text style={styles.fieldError}>{backError}</Text>
                 ) : null}
               </View>
             </View>
@@ -343,7 +387,7 @@ export function KycUploadScreen({
 
         {apiError ? (
           <Text style={[styles.fieldError, { marginTop: Spacing[3] }]}>
-            ⚠ {apiError}
+            {apiError}
           </Text>
         ) : null}
 

@@ -1,8 +1,3 @@
-/**
- * Go Bagage — ConversationHeader
- * Header de la conversation : avatar, nom, trajet, actions (appel, menu).
- */
-
 import React from 'react'
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native'
 import { ArrowLeft, Phone, MoreVertical } from 'lucide-react-native'
@@ -56,7 +51,7 @@ export function ConversationHeader({
             <Image
               source={{ uri: resolvedPhoto }}
               style={styles.avatarImage}
-              resizeMode="cover"
+              resizeMode='cover'
             />
           ) : (
             <Text style={styles.avatarText}>{initials}</Text>
@@ -72,10 +67,10 @@ export function ConversationHeader({
               from={corridor.departureCity}
               to={corridor.arrivalCity}
               suffix={suffix}
-              size="xs"
+              size='xs'
               color={Colors.mutedForeground}
               arrowColor={Colors.mutedForeground}
-              fontWeight="normal"
+              fontWeight='normal'
             />
           ) : typeof routeLabel === 'string' ? (
             <Text style={styles.route} numberOfLines={1}>

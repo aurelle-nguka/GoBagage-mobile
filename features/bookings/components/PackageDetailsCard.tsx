@@ -1,8 +1,3 @@
-/**
- * Go Bagage — PackageDetailsCard
- * Récapitulatif du colis suivi.
- */
-
 import { View, Text, StyleSheet } from 'react-native'
 import { Package } from 'lucide-react-native'
 import { useTranslation } from 'react-i18next'
@@ -35,10 +30,12 @@ export function PackageDetailsCard({
         <View style={styles.info}>
           <Text style={styles.description}>{description}</Text>
           <Text style={styles.meta}>
-            {t('tracking.category', { defaultValue: 'Catégorie' })}: {category} · {weightKg} kg
+            {t('tracking.category', { defaultValue: 'Catégorie' })}: {category}{' '}
+            · {weightKg} kg
           </Text>
           <Text style={styles.recipient}>
-            {t('tracking.recipient', { defaultValue: 'Destinataire' })}: {recipientName}
+            {t('tracking.recipient', { defaultValue: 'Destinataire' })}:{' '}
+            {recipientName}
           </Text>
         </View>
       </View>
