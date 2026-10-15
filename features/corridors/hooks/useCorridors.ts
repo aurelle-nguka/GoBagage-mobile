@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getActiveCorridors } from '../api/corridors.api';
 import type { CorridorResponse } from '../types/corridor.types';
 
@@ -10,6 +11,7 @@ interface UseCorridorsResult {
 }
 
 export function useCorridors(): UseCorridorsResult {
+  const { t } = useTranslation();
   const [corridors, setCorridors] = useState<CorridorResponse[]>([]);
   const [loading, setLoading]     = useState(true);
   const [error, setError]         = useState('');
@@ -22,7 +24,7 @@ export function useCorridors(): UseCorridorsResult {
     getActiveCorridors()
       .then((data) => setCorridors(data))
       .catch((err) => {
-        setError(err?.response?.data?.message ?? 'Failed to load corridors.');
+        setError(err?.response?.data?.message ?? t('corridor.errors.load_failed', 'Failed to load corridors.'));
       })
       .finally(() => setLoading(false));
   }, [tick]);

@@ -1,43 +1,15 @@
-/**
- * Go Bagage — KycQueueCard
- * Carte d'un dossier KYC dans la file d'attente admin.
- */
-
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { ChevronRight, Clock, CheckCircle, XCircle } from 'lucide-react-native'
+import {
+  ChevronRight,
+  Clock,
+  CheckCircle,
+  XCircle,
+  CreditCard,
+} from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { KycQueueItem } from '../types/admin.types'
 import type { KycStatus } from '../../../types/user.types'
-
-const STATUS_CONFIG: Record<
-  KycStatus,
-  { color: string; bg: string; icon: any; label: string }
-> = {
-  PENDING: {
-    color: Colors.warning,
-    bg: '#fff8e8',
-    icon: Clock,
-    label: 'Pending',
-  },
-  UNDER_REVIEW: {
-    color: Colors.secondary,
-    bg: '#e8f4fd',
-    icon: Clock,
-    label: 'Under Review',
-  },
-  VERIFIED: {
-    color: Colors.primary,
-    bg: '#e8faf0',
-    icon: CheckCircle,
-    label: 'Verified',
-  },
-  REJECTED: {
-    color: Colors.destructive,
-    bg: '#fef2f2',
-    icon: XCircle,
-    label: 'Rejected',
-  },
-}
 
 interface KycQueueCardProps {
   item: KycQueueItem
@@ -45,17 +17,51 @@ interface KycQueueCardProps {
 }
 
 export function KycQueueCard({ item, onPress }: KycQueueCardProps) {
+  const { t, i18n } = useTranslation()
+
+  const STATUS_CONFIG: Record<
+    KycStatus,
+    { color: string; bg: string; Icon: any; label: string }
+  > = {
+    PENDING: {
+      color: Colors.warning,
+      bg: '#fff8e8',
+      Icon: Clock,
+      label: t('admin.pending'),
+    },
+    UNDER_REVIEW: {
+      color: Colors.secondary,
+      bg: '#e8f4fd',
+      Icon: Clock,
+      label: t('admin.under_review'),
+    },
+    VERIFIED: {
+      color: Colors.primary,
+      bg: '#e8faf0',
+      Icon: CheckCircle,
+      label: t('admin.verified'),
+    },
+    REJECTED: {
+      color: Colors.destructive,
+      bg: '#fef2f2',
+      Icon: XCircle,
+      label: t('admin.rejected'),
+    },
+  }
+
   const config = STATUS_CONFIG[item.status]
-  const Icon = config.icon
+  const { Icon } = config
   const initials =
     `${item.userFirstName[0] ?? ''}${item.userLastName[0] ?? ''}`.toUpperCase()
 
-  const submittedAt = new Intl.DateTimeFormat('en', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(item.submittedAt))
+  const submittedAt = item.submittedAt
+    ? new Intl.DateTimeFormat(i18n.language, {
+        day: 'numeric',
+        month: 'short',
+        hour: '2-digit',
+        minute: '2-digit',
+      }).format(new Date(item.submittedAt))
+    : '—'
 
   return (
     <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
@@ -72,7 +78,8 @@ export function KycQueueCard({ item, onPress }: KycQueueCardProps) {
             {item.userEmail}
           </Text>
           <View style={styles.metaRow}>
-            <Text style={styles.docType}>🪪 {item.documentType}</Text>
+            <CreditCard size={12} color={Colors.mutedForeground} />
+            <Text style={styles.docType}>{item.documentType ?? '—'}</Text>
             <Text style={styles.date}>· {submittedAt}</Text>
           </View>
         </View>
@@ -107,11 +114,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing[3],
-  },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Spacing[3] },
   avatar: {
     width: 48,
     height: 48,
@@ -131,27 +134,11 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  email: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    marginTop: 2,
-  },
-  docType: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
-  date: {
-    fontSize: FontSize.sm,
-    color: '#9ca3af',
-  },
-  right: {
-    alignItems: 'flex-end',
-  },
+  email: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 },
+  docType: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  date: { fontSize: FontSize.sm, color: '#9ca3af' },
+  right: { alignItems: 'flex-end' },
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -160,8 +147,5 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: Radius.full,
   },
-  statusText: {
-    fontSize: 10,
-    fontWeight: FontWeight.bold,
-  },
+  statusText: { fontSize: 10, fontWeight: FontWeight.bold },
 })

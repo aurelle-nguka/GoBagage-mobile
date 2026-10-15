@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { getKycQueue, reviewKyc } from '../api/admin.api';
 import type { KycQueueItem, KycQueueParams, KycDecision } from '../types/admin.types';
 import type { KycStatus } from '../../../types/user.types';
@@ -25,6 +26,7 @@ interface UseKycQueueResult {
 }
 
 export function useKycQueue(): UseKycQueueResult {
+  const { t } = useTranslation();
   const [items, setItems]               = useState<KycQueueItem[]>([]);
   const [loading, setLoading]           = useState(true);
   const [refreshing, setRefreshing]     = useState(false);
@@ -63,7 +65,7 @@ const load = useCallback(async (page: number, filter: KycStatus | 'ALL', isRefre
       setCurrentPage(data.page);
     } catch (err: any) {
       console.log('❌ KYC Queue error:', err?.response?.status, JSON.stringify(err?.response?.data));
-      setError(err?.response?.data?.message ?? 'Failed to load KYC queue.');
+      setError(err?.response?.data?.message ?? t('admin.errors.load_kyc_failed', 'Failed to load KYC queue.'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -94,7 +96,7 @@ const load = useCallback(async (page: number, filter: KycStatus | 'ALL', isRefre
       setTotalElements((prev) => prev - 1);
       return true;
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Failed to approve KYC.');
+      setError(err?.response?.data?.message ?? t('admin.errors.approve_failed', 'Failed to approve KYC.'));
       return false;
     }
   };
@@ -106,7 +108,7 @@ const load = useCallback(async (page: number, filter: KycStatus | 'ALL', isRefre
       setTotalElements((prev) => prev - 1);
       return true;
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Failed to reject KYC.');
+      setError(err?.response?.data?.message ?? t('admin.errors.reject_failed', 'Failed to reject KYC.'));
       return false;
     }
   };

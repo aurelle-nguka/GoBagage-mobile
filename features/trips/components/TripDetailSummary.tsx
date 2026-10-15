@@ -3,6 +3,8 @@
  */
 
 import { View, Text, StyleSheet } from 'react-native'
+import { Plane } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
@@ -21,13 +23,14 @@ export function TripDetailSummary({
   availableKg,
   bookedKg,
 }: TripDetailSummaryProps) {
+  const { t } = useTranslation()
   const remainingKg = Math.max(availableKg - bookedKg, 0)
   const progress = availableKg > 0 ? Math.min(bookedKg / availableKg, 1) : 0
 
   return (
     <View style={styles.header}>
       <View style={styles.topRow}>
-        <Text style={styles.planeEmoji}>✈️</Text>
+        <Plane size={28} color={Colors.primary} />
         <View style={styles.routeBlock}>
           <RouteLabel
             from={from}
@@ -45,7 +48,11 @@ export function TripDetailSummary({
       </View>
 
       <Text style={styles.weightText}>
-        {bookedKg} kg booked · {remainingKg} kg remaining of {availableKg} kg
+        {t(
+          'trip.weight_summary',
+          '{{booked}} kg booked · {{remaining}} kg remaining of {{available}} kg',
+          { booked: bookedKg, remaining: remainingKg, available: availableKg },
+        )}
       </Text>
     </View>
   )
@@ -68,9 +75,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing[3],
     marginBottom: Spacing[3],
-  },
-  planeEmoji: {
-    fontSize: 28,
   },
   routeBlock: {
     flex: 1,

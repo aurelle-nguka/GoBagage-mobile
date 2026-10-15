@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Bell } from 'lucide-react-native';
+import { Bell, Hand, Package, Plane } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
 
 type DashboardView = 'sender' | 'traveler';
@@ -21,12 +22,16 @@ export function HomeHeader({
   onChangeView,
   onPressNotifications,
 }: HomeHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.header}>
       <View style={styles.topRow}>
         <View>
-          <Text style={styles.greeting}>Welcome back,</Text>
-          <Text style={styles.name}>{firstName} 👋</Text>
+          <Text style={styles.greeting}>{t('home.welcome_back', 'Welcome back,')}</Text>
+          <View style={styles.nameRow}>
+            <Text style={styles.name}>{firstName}</Text>
+            <Hand size={18} color={Colors.white} />
+          </View>
         </View>
 
         <TouchableOpacity style={styles.bellButton} onPress={onPressNotifications}>
@@ -42,12 +47,14 @@ export function HomeHeader({
       {showToggle && (
         <View style={styles.toggleRow}>
           <ToggleButton
-            label="📦 Sender"
+            Icon={Package}
+            label={t('home.role_sender', 'Sender')}
             active={view === 'sender'}
             onPress={() => onChangeView('sender')}
           />
           <ToggleButton
-            label="✈️ Traveler"
+            Icon={Plane}
+            label={t('home.role_traveler', 'Traveler')}
             active={view === 'traveler'}
             onPress={() => onChangeView('traveler')}
           />
@@ -58,10 +65,12 @@ export function HomeHeader({
 }
 
 function ToggleButton({
+  Icon,
   label,
   active,
   onPress,
 }: {
+  Icon: React.ComponentType<{ size?: number; color?: string }>;
   label: string;
   active: boolean;
   onPress: () => void;
@@ -72,7 +81,10 @@ function ToggleButton({
       onPress={onPress}
       activeOpacity={0.8}
     >
-      <Text style={[styles.toggleText, active && styles.toggleTextActive]}>{label}</Text>
+      <View style={styles.toggleContent}>
+        <Icon size={14} color={active ? Colors.primary : 'rgba(255,255,255,0.9)'} />
+        <Text style={[styles.toggleText, active && styles.toggleTextActive]}>{label}</Text>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -93,6 +105,11 @@ const styles = StyleSheet.create({
   greeting: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: FontSize.base,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
   name: {
     color: Colors.white,
@@ -139,6 +156,12 @@ const styles = StyleSheet.create({
   },
   toggleButtonActive: {
     backgroundColor: Colors.white,
+  },
+  toggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
   },
   toggleText: {
     fontSize: FontSize.sm,

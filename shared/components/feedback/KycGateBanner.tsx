@@ -5,6 +5,8 @@
  */
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { AlertTriangle, Clock, XCircle, CheckCircle2 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { KycStatus } from '../../../types/user.types'
 
@@ -13,57 +15,79 @@ interface KycGateBannerProps {
   onGoToKyc: () => void
 }
 
-const CONFIG: Record<
+function getConfig(t: (key: string, fallback: string) => string): Record<
   KycStatus,
   {
     bg: string
     border: string
-    icon: string
+    Icon: React.ComponentType<{ size: number; color: string }>
+    iconColor: string
     title: string
     subtitle: string
     showButton: boolean
   }
-> = {
-  PENDING: {
-    bg: '#fff8e8',
-    border: '#ffe0b2',
-    icon: '⚠️',
-    title: 'Identity verification required',
-    subtitle:
-      'You must verify your identity before performing any transaction.',
-    showButton: true,
-  },
-  UNDER_REVIEW: {
-    bg: '#e8f4fd',
-    border: '#bbdefb',
-    icon: '⏳',
-    title: 'Verification in progress',
-    subtitle:
-      'Your documents are being reviewed. This usually takes 1–24 hours.',
-    showButton: false,
-  },
-  REJECTED: {
-    bg: '#fef2f2',
-    border: '#fecaca',
-    icon: '❌',
-    title: 'Verification failed',
-    subtitle: 'Your documents were rejected. Please resubmit clear photos.',
-    showButton: true,
-  },
-  VERIFIED: {
-    bg: '#e8faf0',
-    border: '#c8f5df',
-    icon: '✅',
-    title: 'Verified',
-    subtitle: '',
-    showButton: false,
-  },
+> {
+  return {
+    PENDING: {
+      bg: '#fff8e8',
+      border: '#ffe0b2',
+      Icon: AlertTriangle,
+      iconColor: Colors.warning,
+      title: t(
+        'common.kyc_gate.pending_title',
+        'Identity verification required',
+      ),
+      subtitle: t(
+        'common.kyc_gate.pending_subtitle',
+        'You must verify your identity before performing any transaction.',
+      ),
+      showButton: true,
+    },
+    UNDER_REVIEW: {
+      bg: '#e8f4fd',
+      border: '#bbdefb',
+      Icon: Clock,
+      iconColor: Colors.secondary,
+      title: t(
+        'common.kyc_gate.under_review_title',
+        'Verification in progress',
+      ),
+      subtitle: t(
+        'common.kyc_gate.under_review_subtitle',
+        'Your documents are being reviewed. This usually takes 1–24 hours.',
+      ),
+      showButton: false,
+    },
+    REJECTED: {
+      bg: '#fef2f2',
+      border: '#fecaca',
+      Icon: XCircle,
+      iconColor: Colors.destructive,
+      title: t('common.kyc_gate.rejected_title', 'Verification failed'),
+      subtitle: t(
+        'common.kyc_gate.rejected_subtitle',
+        'Your documents were rejected. Please resubmit clear photos.',
+      ),
+      showButton: true,
+    },
+    VERIFIED: {
+      bg: '#e8faf0',
+      border: '#c8f5df',
+      Icon: CheckCircle2,
+      iconColor: Colors.primary,
+      title: t('common.kyc_gate.verified_title', 'Verified'),
+      subtitle: '',
+      showButton: false,
+    },
+  }
 }
 
 export function KycGateBanner({ kycStatus, onGoToKyc }: KycGateBannerProps) {
+  const { t } = useTranslation()
   if (kycStatus === 'VERIFIED') return null
 
-  const config = CONFIG[kycStatus]
+  const config = getConfig(t)[kycStatus]
+  const { Icon } = config
 
   return (
     <View
@@ -72,7 +96,7 @@ export function KycGateBanner({ kycStatus, onGoToKyc }: KycGateBannerProps) {
         { backgroundColor: config.bg, borderColor: config.border },
       ]}
     >
-      <Text style={styles.icon}>{config.icon}</Text>
+      <Icon size={22} color={config.iconColor} />
       <View style={styles.textBlock}>
         <Text style={styles.title}>{config.title}</Text>
         <Text style={styles.subtitle}>{config.subtitle}</Text>
@@ -82,7 +106,9 @@ export function KycGateBanner({ kycStatus, onGoToKyc }: KycGateBannerProps) {
             onPress={onGoToKyc}
             activeOpacity={0.85}
           >
-            <Text style={styles.buttonText}>Verify my identity →</Text>
+            <Text style={styles.buttonText}>
+              {t('common.kyc_gate.verify_cta', 'Verify my identity →')}
+            </Text>
           </TouchableOpacity>
         )}
       </View>
@@ -102,7 +128,6 @@ const styles = StyleSheet.create({
     marginBottom: Spacing[4],
     marginTop: Spacing[3],
   },
-  icon: { fontSize: 22, marginTop: 2 },
   textBlock: { flex: 1 },
   title: {
     fontSize: FontSize.base,

@@ -14,6 +14,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ArrowLeft, Plus, Edit2 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { useAdminCorridors } from '../hooks/useAdminCorridors'
 import type { CorridorResponse, CorridorRequest } from '../types/corridor.types'
@@ -34,6 +35,7 @@ const EMPTY_FORM: CorridorRequest = {
 }
 
 export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
+  const { t } = useTranslation()
   const {
     corridors,
     loading,
@@ -73,7 +75,10 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
 
   const handleSave = async () => {
     if (!form.departureCity || !form.arrivalCity || !form.code) {
-      Alert.alert('Error', 'Please fill all required fields.')
+      Alert.alert(
+        t('corridor.errors.validation_title', 'Error'),
+        t('corridor.errors.fill_required', 'Please fill all required fields.'),
+      )
       return
     }
     setSaving(true)
@@ -90,7 +95,7 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container}>
         <Header onBack={onBack} onAdd={openCreate} />
         <View style={styles.centered}>
           <ActivityIndicator size='large' color={Colors.primary} />
@@ -100,7 +105,7 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <Header onBack={onBack} onAdd={openCreate} />
 
       {error ? (
@@ -156,7 +161,9 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
                 />
                 {item.basePricePerKg && (
                   <Text style={styles.priceText}>
-                    Base: ${item.basePricePerKg}/kg
+                    {t('corridor.base_price', 'Base: ${{price}}/kg', {
+                      price: item.basePricePerKg,
+                    })}
                   </Text>
                 )}
               </View>
@@ -180,12 +187,12 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
           )}
           ListEmptyComponent={
             <View style={styles.centered}>
-              <Text style={styles.emptyText}>No corridors yet.</Text>
+              <Text style={styles.emptyText}>{t('corridor.empty', 'No corridors yet.')}</Text>
               <TouchableOpacity
                 style={styles.addFirstButton}
                 onPress={openCreate}
               >
-                <Text style={styles.addFirstText}>Add first corridor</Text>
+                <Text style={styles.addFirstText}>{t('corridor.add_first', 'Add first corridor')}</Text>
               </TouchableOpacity>
             </View>
           }
@@ -200,47 +207,49 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>
-              {editingCorridor ? 'Edit Corridor' : 'New Corridor'}
+              {editingCorridor
+                ? t('corridor.edit_title', 'Edit Corridor')
+                : t('corridor.new_title', 'New Corridor')}
             </Text>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
-              <Text style={styles.cancelText}>Cancel</Text>
+              <Text style={styles.cancelText}>{t('common.cancel', 'Cancel')}</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.modalContent}>
             <FormField
-              label='Code *'
+              label={`${t('corridor.code', 'Code')} *`}
               value={form.code}
               onChangeText={(v) => setForm({ ...form, code: v.toUpperCase() })}
-              placeholder='ex: MTL-DLA'
+              placeholder={t('corridor.code_placeholder', 'ex: MTL-DLA')}
             />
 
             <FormField
-              label='Departure City *'
+              label={`${t('corridor.departure_city', 'Departure City')} *`}
               value={form.departureCity}
               onChangeText={(v) => setForm({ ...form, departureCity: v })}
-              placeholder='Montreal'
+              placeholder={t('corridor.departure_city_placeholder', 'Montreal')}
             />
 
             <FormField
-              label='Departure Country *'
+              label={`${t('corridor.departure_country', 'Departure Country')} *`}
               value={form.departureCountry}
               onChangeText={(v) => setForm({ ...form, departureCountry: v })}
-              placeholder='Canada'
+              placeholder={t('corridor.departure_country_placeholder', 'Canada')}
             />
 
             <FormField
-              label='Arrival City *'
+              label={`${t('corridor.arrival_city', 'Arrival City')} *`}
               value={form.arrivalCity}
               onChangeText={(v) => setForm({ ...form, arrivalCity: v })}
-              placeholder='Douala'
+              placeholder={t('corridor.arrival_city_placeholder', 'Douala')}
             />
 
             <FormField
-              label='Arrival Country *'
+              label={`${t('corridor.arrival_country', 'Arrival Country')} *`}
               value={form.arrivalCountry}
               onChangeText={(v) => setForm({ ...form, arrivalCountry: v })}
-              placeholder='Cameroun'
+              placeholder={t('corridor.arrival_country_placeholder', 'Cameroun')}
             />
 
             <TouchableOpacity
@@ -253,7 +262,9 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
                 <ActivityIndicator size='small' color={Colors.white} />
               ) : (
                 <Text style={styles.saveButtonText}>
-                  {editingCorridor ? 'Save Changes' : 'Create Corridor'}
+                  {editingCorridor
+                    ? t('trip.save', 'Save Changes')
+                    : t('corridor.create', 'Create Corridor')}
                 </Text>
               )}
             </TouchableOpacity>
@@ -265,6 +276,7 @@ export function AdminCorridorsScreen({ onBack }: AdminCorridorsScreenProps) {
 }
 
 function Header({ onBack, onAdd }: { onBack: () => void; onAdd: () => void }) {
+  const { t } = useTranslation()
   return (
     <View style={styles.header}>
       <TouchableOpacity
@@ -273,7 +285,7 @@ function Header({ onBack, onAdd }: { onBack: () => void; onAdd: () => void }) {
       >
         <ArrowLeft size={22} color={Colors.foreground} />
       </TouchableOpacity>
-      <Text style={styles.headerTitle}>Corridors</Text>
+      <Text style={styles.headerTitle}>{t('corridor.title', 'Corridors')}</Text>
       <TouchableOpacity
         onPress={onAdd}
         style={styles.addButton}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { View, ActivityIndicator, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
 import { TravelerBookingScreen } from '../../../features/bookings/screens/TravelerBookingScreen'
 import { useBookingActions } from '../../../features/bookings/hooks/useBookingActions'
 import { getBooking } from '../../../features/bookings/api/bookings.api'
@@ -9,6 +10,7 @@ import { Colors, FontSize, Spacing } from '../../../theme'
 import { BookingDTO } from '../../../features/bookings/types/booking.type'
 
 export default function TravelerBookingPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
@@ -25,7 +27,10 @@ export default function TravelerBookingPage() {
       console.log('=== BOOKING DETAIL ===', JSON.stringify(data))
       setBooking(data)
     } catch (err: any) {
-      setError(err?.response?.data?.message ?? 'Failed to load booking.')
+      setError(
+        err?.response?.data?.message ??
+          t('booking.errors.load_failed', 'Failed to load booking.'),
+      )
     } finally {
       setLoading(false)
     }
@@ -46,7 +51,9 @@ export default function TravelerBookingPage() {
   if (error || !booking) {
     return (
       <SafeAreaView style={styles.centered}>
-        <Text style={styles.errorText}>{error || 'Booking not found.'}</Text>
+        <Text style={styles.errorText}>
+          {error || t('booking.errors.not_found', 'Booking not found.')}
+        </Text>
       </SafeAreaView>
     )
   }

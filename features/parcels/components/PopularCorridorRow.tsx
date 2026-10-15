@@ -1,5 +1,5 @@
-import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { ChevronRight } from 'lucide-react-native'
+import { TouchableOpacity, View, StyleSheet } from 'react-native'
+import { ChevronRight, Plane } from 'lucide-react-native'
 import { Colors, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
@@ -17,7 +17,7 @@ export function PopularCorridorRow({
   return (
     <TouchableOpacity style={styles.row} onPress={onPress} activeOpacity={0.85}>
       <View style={styles.left}>
-        <Text style={styles.emoji}>✈️</Text>
+        <Plane size={18} color={Colors.primary} />
         <RouteLabel from={from} to={to} size='md' />
       </View>
       <ChevronRight size={16} color='#9ca3af' />
@@ -45,8 +45,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing[3],
     flex: 1,
-  },
-  emoji: {
-    fontSize: 20,
   },
 })

@@ -8,7 +8,8 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
-import { ArrowLeft } from 'lucide-react-native'
+import { ArrowLeft, Star } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { ReviewSuccessView } from '../components/ReviewSuccessView'
 import { Colors } from '../../../theme/colors'
 import { DeliveryConfirmedBanner } from '../components/DeliveryConfirmedBanner'
@@ -45,6 +46,7 @@ export function ReviewScreen({
   onBack,
   onSubmit,
 }: ReviewScreenProps) {
+  const { t } = useTranslation()
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState('')
   const [selectedBadges, setSelectedBadges] = useState<string[]>([])
@@ -60,7 +62,7 @@ export function ReviewScreen({
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      setError('Please select a star rating.')
+      setError(t('review.errors.rating_required', 'Please select a star rating.'))
       return
     }
     setError('')
@@ -70,7 +72,12 @@ export function ReviewScreen({
       await onSubmit({ rating, badges: selectedBadges, comment })
       setDone(true)
     } catch {
-      setError('Failed to submit review. Please try again.')
+      setError(
+        t(
+          'review.errors.submit_failed',
+          'Failed to submit review. Please try again.',
+        ),
+      )
     } finally {
       setLoading(false)
     }
@@ -81,7 +88,7 @@ export function ReviewScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -90,7 +97,9 @@ export function ReviewScreen({
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>Rate Your Experience</Text>
+          <Text style={styles.headerTitle}>
+            {t('review.title', 'Rate Your Experience')}
+          </Text>
           <Text style={styles.headerSubtitle}>
             {routeLabel} · {departureDate}
           </Text>
@@ -119,14 +128,18 @@ export function ReviewScreen({
 
         <View style={styles.commentSection}>
           <Text style={styles.commentLabel}>
-            Leave a comment <Text style={styles.optional}>(optional)</Text>
+            {t('review.comment_label', 'Leave a comment')}{' '}
+            <Text style={styles.optional}>({t('common.optional', 'optional')})</Text>
           </Text>
           <TextInput
             value={comment}
             onChangeText={setComment}
             multiline
             numberOfLines={4}
-            placeholder='Share your experience to help the community...'
+            placeholder={t(
+              'review.comment_placeholder',
+              'Share your experience to help the community...',
+            )}
             placeholderTextColor='#9ca3af'
             style={styles.textarea}
           />
@@ -135,11 +148,12 @@ export function ReviewScreen({
         {error ? <ErrorBanner message={error} /> : null}
 
         <PrimaryButton
-          label='⭐ Submit Review'
-          loadingLabel='Submitting...'
+          label={t('review.submit_button', 'Submit Review')}
+          loadingLabel={t('review.submitting', 'Submitting...')}
           loading={loading}
           onPress={handleSubmit}
           style={styles.submitButton}
+          icon={<Star size={16} color={Colors.white} fill={Colors.white} />}
         />
       </KeyboardAwareScrollView>
     </SafeAreaView>

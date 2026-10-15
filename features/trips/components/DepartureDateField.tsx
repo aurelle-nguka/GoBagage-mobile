@@ -12,6 +12,7 @@ import {
   Platform,
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface DepartureDateFieldProps {
@@ -23,6 +24,7 @@ export function DepartureDateField({
   value,
   onChange,
 }: DepartureDateFieldProps) {
+  const { t } = useTranslation()
   const [showPicker, setShowPicker] = useState(false)
 
   const handleChange = (_event: unknown, selectedDate?: Date) => {
@@ -40,7 +42,7 @@ export function DepartureDateField({
 
   return (
     <View>
-      <Text style={styles.label}>Departure Date *</Text>
+      <Text style={styles.label}>{`${t('trip.departure_date', 'Departure Date')} *`}</Text>
 
       <TouchableOpacity
         style={styles.fieldButton}
@@ -48,7 +50,7 @@ export function DepartureDateField({
         activeOpacity={0.8}
       >
         <Text style={[styles.fieldText, !value && styles.placeholderText]}>
-          {formattedValue || 'Select a date'}
+          {formattedValue || t('trip.select_date', 'Select a date')}
         </Text>
       </TouchableOpacity>
 

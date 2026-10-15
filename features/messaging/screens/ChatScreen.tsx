@@ -119,7 +119,7 @@ export function ChatScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <ConversationHeader
         initials={travelerInitials}
         name={travelerName}

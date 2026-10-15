@@ -10,8 +10,9 @@ import {
   Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { ArrowLeft } from 'lucide-react-native'
+import { ArrowLeft, Inbox } from 'lucide-react-native'
 import { useFocusEffect } from 'expo-router'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { TripDetailSummary } from '../components/TripDetailSummary'
 import { BookingRequestCard } from '../components/BookingRequestCard'
@@ -50,6 +51,7 @@ export function TripRequestsScreen({
   onBack,
   onOpenBooking,
 }: TripRequestsScreenProps) {
+  const { t } = useTranslation()
   const [requests, setRequests] = useState<RequestListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -115,14 +117,15 @@ export function TripRequestsScreen({
           JSON.stringify(err?.response?.data),
         )
         setError(
-          err?.response?.data?.message ?? 'Failed to load booking requests.',
+          err?.response?.data?.message ??
+            t('trip.errors.load_requests_failed', 'Failed to load booking requests.'),
         )
       } finally {
         setLoading(false)
         setRefreshing(false)
       }
     },
-    [tripId],
+    [tripId, t],
   )
 
   useFocusEffect(
@@ -133,12 +136,12 @@ export function TripRequestsScreen({
 
   const handleAccept = async (id: string) => {
     Alert.alert(
-      'Accept Booking',
-      'Are you sure you want to accept this booking request?',
+      t('booking.accept_title', 'Accept Booking'),
+      t('booking.accept_msg', 'Are you sure you want to accept this booking request?'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel', 'Cancel'), style: 'cancel' },
         {
-          text: 'Accept',
+          text: t('booking.accept', 'Accept'),
           onPress: async () => {
             const result = await accept(id)
             if (result) {
@@ -156,12 +159,12 @@ export function TripRequestsScreen({
 
   const handleReject = async (id: string) => {
     Alert.alert(
-      'Reject Booking',
-      'Are you sure you want to reject this booking request?',
+      t('booking.reject_title', 'Reject Booking'),
+      t('booking.reject_msg', 'Are you sure you want to reject this booking request?'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel', 'Cancel'), style: 'cancel' },
         {
-          text: 'Reject',
+          text: t('booking.reject', 'Reject'),
           style: 'destructive',
           onPress: async () => {
             const result = await reject(id)
@@ -183,7 +186,7 @@ export function TripRequestsScreen({
     .reduce((sum, r) => sum + r.weightKg, 0)
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.navHeader}>
         <TouchableOpacity
           onPress={onBack}
@@ -192,9 +195,9 @@ export function TripRequestsScreen({
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.navTitle}>Trip Requests</Text>
+          <Text style={styles.navTitle}>{t('trip.requests_title', 'Trip Requests')}</Text>
           <Text style={styles.navSubtitle}>
-            {requests.length} request{requests.length !== 1 ? 's' : ''}
+            {t('trip.requests_count', { count: requests.length })}
           </Text>
         </View>
       </View>
@@ -254,10 +257,15 @@ export function TripRequestsScreen({
           )}
           ListEmptyComponent={
             <View style={styles.emptyState}>
-              <Text style={styles.emptyEmoji}>📭</Text>
-              <Text style={styles.emptyText}>No booking requests yet</Text>
+              <Inbox size={48} color='#d1d5db' />
+              <Text style={styles.emptyText}>
+                {t('booking.no_requests', 'No booking requests yet')}
+              </Text>
               <Text style={styles.emptySubtext}>
-                Requests will appear here when senders book your trip.
+                {t(
+                  'booking.no_requests_subtitle',
+                  'Requests will appear here when senders book your trip.',
+                )}
               </Text>
             </View>
           }
@@ -310,7 +318,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing[12],
   },
-  emptyEmoji: { fontSize: 48, marginBottom: Spacing[3] },
   emptyText: {
     color: Colors.foreground,
     fontSize: FontSize.lg,

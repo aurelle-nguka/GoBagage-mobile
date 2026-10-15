@@ -1,5 +1,7 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
 import Svg, { Rect, Circle, Path, Text as SvgText } from 'react-native-svg'
+import { Check } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import type { PaymentProvider } from '../types/payment.types'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 import { JSX } from 'react/jsx-runtime'
@@ -77,32 +79,42 @@ interface PaymentMethodConfig {
   Icon: () => JSX.Element
 }
 
-const PAYMENT_METHODS: PaymentMethodConfig[] = [
-  {
-    provider: 'STRIPE',
-    label: 'Credit / Debit Card',
-    sublabel: 'Visa, Mastercard, Amex',
-    Icon: StripeIcon,
-  },
-  {
-    provider: 'ORANGE_MONEY',
-    label: 'Orange Money',
-    sublabel: 'Mobile money · Cameroun, CI...',
-    Icon: OrangeMoneyIcon,
-  },
-  {
-    provider: 'MTN_MOMO',
-    label: 'MTN MoMo',
-    sublabel: 'Mobile money · Cameroun, GH...',
-    Icon: MtnMomoIcon,
-  },
-  {
-    provider: 'INTERAC',
-    label: 'Interac e-Transfer',
-    sublabel: 'Canadian banks only',
-    Icon: InteracIcon,
-  },
-]
+function getPaymentMethods(
+  t: (key: string, fallback: string) => string,
+): PaymentMethodConfig[] {
+  return [
+    {
+      provider: 'STRIPE',
+      label: t('payment.method_stripe_label', 'Credit / Debit Card'),
+      sublabel: t('payment.method_stripe_sublabel', 'Visa, Mastercard, Amex'),
+      Icon: StripeIcon,
+    },
+    {
+      provider: 'ORANGE_MONEY',
+      label: t('payment.method_orange_label', 'Orange Money'),
+      sublabel: t(
+        'payment.method_orange_sublabel',
+        'Mobile money · Cameroun, CI...',
+      ),
+      Icon: OrangeMoneyIcon,
+    },
+    {
+      provider: 'MTN_MOMO',
+      label: t('payment.method_momo_label', 'MTN MoMo'),
+      sublabel: t(
+        'payment.method_momo_sublabel',
+        'Mobile money · Cameroun, GH...',
+      ),
+      Icon: MtnMomoIcon,
+    },
+    {
+      provider: 'INTERAC',
+      label: t('payment.method_interac_label', 'Interac e-Transfer'),
+      sublabel: t('payment.method_interac_sublabel', 'Canadian banks only'),
+      Icon: InteracIcon,
+    },
+  ]
+}
 
 interface PaymentMethodSelectorProps {
   selected: PaymentProvider
@@ -113,9 +125,12 @@ export function PaymentMethodSelector({
   selected,
   onSelect,
 }: PaymentMethodSelectorProps) {
+  const { t } = useTranslation()
+  const paymentMethods = getPaymentMethods(t)
+
   return (
     <View style={styles.list}>
-      {PAYMENT_METHODS.map((method) => {
+      {paymentMethods.map((method) => {
         const isActive = method.provider === selected
         return (
           <TouchableOpacity
@@ -135,7 +150,7 @@ export function PaymentMethodSelector({
               <Text style={styles.sublabel}>{method.sublabel}</Text>
             </View>
             <View style={[styles.radio, isActive && styles.radioActive]}>
-              {isActive && <Text style={styles.checkmark}>✓</Text>}
+              {isActive && <Check size={12} color={Colors.white} />}
             </View>
           </TouchableOpacity>
         )
@@ -198,9 +213,5 @@ const styles = StyleSheet.create({
   radioActive: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
-  },
-  checkmark: {
-    color: Colors.white,
-    fontSize: 11,
   },
 })

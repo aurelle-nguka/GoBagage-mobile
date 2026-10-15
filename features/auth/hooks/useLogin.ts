@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { login, getMyProfile } from '../api/auth.api';
 import type { LoginDto } from '../types/auth.types';
 import { useAuthStore } from '../../../store/auth.store';
@@ -16,6 +17,7 @@ interface UseLoginResult {
 }
 
 export function useLogin(): UseLoginResult {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [error, setError]     = useState('');
   const { setUser }           = useAuthStore();
@@ -23,7 +25,7 @@ export function useLogin(): UseLoginResult {
   const submit = async (data: LoginDto): Promise<LoginResult> => {
     const validation = loginSchema.safeParse(data);
     if (!validation.success) {
-      setError(getFirstZodError(validation) ?? 'Validation error');
+      setError(getFirstZodError(validation) ?? t('common.errors.validation_error', 'Validation error'));
       return false;
     }
 
@@ -57,7 +59,7 @@ export function useLogin(): UseLoginResult {
       return user.roles.includes('ADMIN') ? 'ADMIN' : 'USER';
 
 } catch (err: any) {
-  setError(getApiErrorMessage(err));
+  setError(getApiErrorMessage(err, t));
   return false;
 } finally {
       setLoading(false);

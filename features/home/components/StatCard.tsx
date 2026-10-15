@@ -1,25 +1,31 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { FontSize, FontWeight, Radius, Spacing } from '../../../theme';
+import { View, Text, StyleSheet } from 'react-native'
+import { FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 interface StatCardProps {
-  emoji: string;
-  value: string;
-  label: string;
-  suffix?: string;
-  backgroundColor: string;
+  icon: React.ReactNode
+  value: string
+  label: string
+  suffix?: string
+  backgroundColor: string
 }
 
-export function StatCard({ emoji, value, label, suffix, backgroundColor }: StatCardProps) {
+export function StatCard({
+  icon,
+  value,
+  label,
+  suffix,
+  backgroundColor,
+}: StatCardProps) {
   return (
     <View style={[styles.card, { backgroundColor }]}>
-      <Text style={styles.emoji}>{emoji}</Text>
+      <View style={styles.iconWrapper}>{icon}</View>
       <Text style={styles.value}>
         {value}
         {suffix ? <Text style={styles.suffix}> {suffix}</Text> : null}
       </Text>
       <Text style={styles.label}>{label}</Text>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -29,8 +35,8 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing[3],
     alignItems: 'center',
   },
-  emoji: {
-    fontSize: 22,
+  iconWrapper: {
+    marginBottom: 2,
   },
   value: {
     fontSize: FontSize.lg,
@@ -47,4 +53,4 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginTop: 2,
   },
-});
+})

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { AuthHeader } from '../components/AuthHeader'
 import { AuthProgressSteps } from '../components/AuthProgressSteps'
@@ -10,6 +11,7 @@ import { TextField } from '../../../shared/components/ui/TextField'
 import { ErrorBanner } from '../../../shared/components/feedback/ErrorBanner'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
 import { useRegister } from '../hooks/useRegister'
+import { PhoneField } from '../../../shared/components/ui/PhoneField'
 
 type RoleChoice = 'TRAVELER' | 'SENDER' | 'BOTH'
 
@@ -18,12 +20,6 @@ interface RegisterScreenProps {
   onBack: () => void
   onSuccess: (data: { phone: string }) => void
   onLogin: () => void
-}
-
-const ROLE_LABELS: Record<RoleChoice, string> = {
-  TRAVELER: 'Traveler',
-  SENDER: 'Sender',
-  BOTH: 'Traveler & Sender',
 }
 
 function roleChoiceToRoles(role: RoleChoice): UserRole[] {
@@ -44,6 +40,7 @@ export function RegisterScreen({
   onSuccess,
   onLogin,
 }: RegisterScreenProps) {
+  const { t } = useTranslation()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -53,34 +50,39 @@ export function RegisterScreen({
 
   const { loading, error, submit } = useRegister()
 
+  const ROLE_LABELS: Record<RoleChoice, string> = {
+    TRAVELER: t('onboarding.traveler'),
+    SENDER: t('onboarding.sender'),
+    BOTH: `${t('onboarding.traveler')} & ${t('onboarding.sender')}`,
+  }
+
   const validate = (): boolean => {
     const errors: FieldErrors = {}
 
-    if (!firstName.trim()) errors.firstName = 'First name is required.'
+    if (!firstName.trim())
+      errors.firstName = t('auth.errors.first_name_required')
     else if (firstName.trim().length < 2)
-      errors.firstName = 'First name must be at least 2 characters.'
+      errors.firstName = t('auth.errors.first_name_min')
 
-    if (!lastName.trim()) errors.lastName = 'Last name is required.'
+    if (!lastName.trim()) errors.lastName = t('auth.errors.last_name_required')
     else if (lastName.trim().length < 2)
-      errors.lastName = 'Last name must be at least 2 characters.'
+      errors.lastName = t('auth.errors.last_name_min')
 
-    if (!email.trim()) errors.email = 'Email address is required.'
+    if (!email.trim()) errors.email = t('auth.errors.email_required')
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
-      errors.email = 'Please enter a valid email address.'
+      errors.email = t('auth.errors.email_invalid')
 
-    if (!phone.trim()) errors.phone = 'Phone number is required.'
-    else if (!/^\+[1-9]\d{7,14}$/.test(phone.trim()))
-      errors.phone = 'Use international format: +237650255873'
+    if (!phone.trim()) errors.phone = t('auth.errors.phone_required')
 
-    if (!password) errors.password = 'Password is required.'
+    if (!password) errors.password = t('auth.errors.password_required')
     else if (password.length < 8)
-      errors.password = 'Password must be at least 8 characters.'
+      errors.password = t('auth.errors.password_min')
     else if (!/[A-Z]/.test(password))
-      errors.password = 'Password must contain at least 1 uppercase letter.'
+      errors.password = t('auth.errors.password_uppercase')
     else if (!/[0-9]/.test(password))
-      errors.password = 'Password must contain at least 1 number.'
+      errors.password = t('auth.errors.password_number')
     else if (!/[^a-zA-Z0-9]/.test(password))
-      errors.password = 'Password must contain at least 1 special character.'
+      errors.password = t('auth.errors.password_special')
 
     setFieldErrors(errors)
     return Object.keys(errors).length === 0
@@ -88,7 +90,6 @@ export function RegisterScreen({
 
   const handleSubmit = async () => {
     if (!validate()) return
-
     const result = await submit({
       firstName: firstName.trim(),
       lastName: lastName.trim(),
@@ -97,12 +98,11 @@ export function RegisterScreen({
       password,
       roles: roleChoiceToRoles(role),
     })
-
     if (result) onSuccess(result)
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <AuthHeader roleLabel={ROLE_LABELS[role]} onBack={onBack} />
 
       <KeyboardAwareScrollView
@@ -112,37 +112,40 @@ export function RegisterScreen({
       >
         <AuthProgressSteps currentStep={0} />
 
-        <Text style={styles.title}>Create your account</Text>
+        <Text style={styles.title}>{t('auth.register')}</Text>
         <Text style={styles.subtitle}>
-          Join thousands of global travelers and senders.
+          {t(
+            'auth.register_subtitle',
+            'Join thousands of global travelers and senders.',
+          )}
         </Text>
 
         <View style={styles.form}>
           <View style={styles.nameRow}>
             <View style={styles.nameField}>
               <TextField
-                label='First name *'
+                label={`${t('auth.first_name')} *`}
                 value={firstName}
                 onChangeText={(v) => {
                   setFirstName(v)
                   if (fieldErrors.firstName)
                     setFieldErrors((e) => ({ ...e, firstName: undefined }))
                 }}
-                placeholder='Jean'
+                placeholder={t('auth.first_name_placeholder')}
                 autoCapitalize='words'
                 error={fieldErrors.firstName}
               />
             </View>
             <View style={styles.nameField}>
               <TextField
-                label='Last name *'
+                label={`${t('auth.last_name')} *`}
                 value={lastName}
                 onChangeText={(v) => {
                   setLastName(v)
                   if (fieldErrors.lastName)
                     setFieldErrors((e) => ({ ...e, lastName: undefined }))
                 }}
-                placeholder='Dupont'
+                placeholder={t('auth.last_name_placeholder')}
                 autoCapitalize='words'
                 error={fieldErrors.lastName}
               />
@@ -150,56 +153,53 @@ export function RegisterScreen({
           </View>
 
           <TextField
-            label='Email address *'
+            label={`${t('auth.email')} *`}
             value={email}
             onChangeText={(v) => {
               setEmail(v)
               if (fieldErrors.email)
                 setFieldErrors((e) => ({ ...e, email: undefined }))
             }}
-            placeholder='jean.dupont@email.com'
+            placeholder={t('auth.email_placeholder')}
             keyboardType='email-address'
             autoCapitalize='none'
             error={fieldErrors.email}
           />
 
           <View>
-            <TextField
-              label='Phone number *'
+            <PhoneField
               value={phone}
               onChangeText={(v) => {
                 setPhone(v)
                 if (fieldErrors.phone)
                   setFieldErrors((e) => ({ ...e, phone: undefined }))
               }}
-              placeholder='+237650255873'
-              keyboardType='phone-pad'
               error={fieldErrors.phone}
             />
-            {!fieldErrors.phone && (
-              <Text style={styles.hint}>
-                International format required (e.g. +237650255873)
-              </Text>
-            )}
           </View>
 
           <View>
             <TextField
-              label='Password *'
+              label={`${t('auth.password')} *`}
               value={password}
               onChangeText={(v) => {
                 setPassword(v)
                 if (fieldErrors.password)
                   setFieldErrors((e) => ({ ...e, password: undefined }))
               }}
-              placeholder='Min. 8 chars, uppercase, number, special char'
+              placeholder={t(
+                'auth.password_hint',
+                'Min. 8 chars, uppercase, number, special char',
+              )}
               isPassword
               error={fieldErrors.password}
             />
             {!fieldErrors.password && (
               <Text style={styles.hint}>
-                At least 8 characters, 1 uppercase, 1 number, 1 special
-                character
+                {t(
+                  'auth.password_hint',
+                  'At least 8 characters, 1 uppercase, 1 number, 1 special character',
+                )}
               </Text>
             )}
           </View>
@@ -207,8 +207,8 @@ export function RegisterScreen({
           {error ? <ErrorBanner message={error} /> : null}
 
           <PrimaryButton
-            label='Create Account'
-            loadingLabel='Creating account...'
+            label={t('auth.register')}
+            loadingLabel={t('auth.loading.register')}
             loading={loading}
             onPress={handleSubmit}
             style={styles.submitButton}
@@ -217,7 +217,7 @@ export function RegisterScreen({
 
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>or</Text>
+          <Text style={styles.dividerText}>{t('common.or', 'or')}</Text>
           <View style={styles.dividerLine} />
         </View>
 
@@ -227,8 +227,8 @@ export function RegisterScreen({
           activeOpacity={0.85}
         >
           <Text style={styles.loginText}>
-            Already have an account?{' '}
-            <Text style={styles.loginHighlight}>Log in</Text>
+            {t('auth.have_account')}{' '}
+            <Text style={styles.loginHighlight}>{t('auth.login')}</Text>
           </Text>
         </TouchableOpacity>
       </KeyboardAwareScrollView>

@@ -1,4 +1,6 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { Calendar, Weight, Inbox } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
@@ -23,6 +25,7 @@ export function ActiveTripCard({
   pendingRequests,
   onPress,
 }: ActiveTripCardProps) {
+  const { t } = useTranslation()
   const isConfirmed = status === 'Confirmed' || status === 'BOOKED'
 
   return (
@@ -41,16 +44,29 @@ export function ActiveTripCard({
               { color: isConfirmed ? Colors.primary : Colors.mutedForeground },
             ]}
           >
-            {isConfirmed ? 'Confirmed' : 'Open'}
+            {isConfirmed ? t('home.status_confirmed', 'Confirmed') : t('trip.open', 'Open')}
           </Text>
         </View>
       </View>
 
       <View style={styles.metaRow}>
-        <Text style={styles.metaText}>📅 {date}</Text>
-        <Text style={styles.metaText}>⚖️ {availableKg} kg available</Text>
+        <View style={styles.metaItem}>
+          <Calendar size={13} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>{date}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Weight size={13} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>
+            {t('trip.kg_available', '{{value}} kg available', { value: availableKg })}
+          </Text>
+        </View>
         {pendingRequests > 0 && (
-          <Text style={styles.requestsText}>📩 {pendingRequests} requests</Text>
+          <View style={styles.metaItem}>
+            <Inbox size={13} color={Colors.warning} />
+            <Text style={styles.requestsText}>
+              {t('home.requests_count', '{{count}} requests', { count: pendingRequests })}
+            </Text>
+          </View>
         )}
       </View>
     </TouchableOpacity>
@@ -89,6 +105,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: Spacing[4],
     flexWrap: 'wrap',
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   metaText: {
     fontSize: FontSize.sm,

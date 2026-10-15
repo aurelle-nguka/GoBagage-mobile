@@ -1,4 +1,6 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { Check } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 interface DeclarationCheckboxProps {
@@ -12,6 +14,8 @@ export function DeclarationCheckbox({
   onToggle,
   error,
 }: DeclarationCheckboxProps) {
+  const { t } = useTranslation()
+
   return (
     <View>
       <TouchableOpacity
@@ -26,13 +30,17 @@ export function DeclarationCheckbox({
             error && !checked ? styles.boxError : null,
           ]}
         >
-          {checked && <Text style={styles.checkmark}>✓</Text>}
+          {checked && <Check size={12} color={Colors.white} />}
         </View>
         <Text style={styles.text}>
-          I confirm that the content of this parcel is{' '}
-          <Text style={styles.bold}>legal, not restricted</Text>, and complies
-          with all applicable customs regulations. I accept full legal
-          responsibility.
+          {t('parcel.declaration_prefix', 'I confirm that the content of this parcel is')}{' '}
+          <Text style={styles.bold}>
+            {t('parcel.declaration_bold', 'legal, not restricted')}
+          </Text>
+          {t(
+            'parcel.declaration_suffix',
+            ', and complies with all applicable customs regulations. I accept full legal responsibility.',
+          )}
         </Text>
       </TouchableOpacity>
       {error && !checked ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -66,7 +74,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.destructive,
     backgroundColor: '#fef2f2',
   },
-  checkmark: { color: Colors.white, fontSize: 12 },
   text: {
     flex: 1,
     fontSize: FontSize.sm,

@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { OTP_RESEND_DELAY } from '../../../shared/constants/app.constants'
 
@@ -15,12 +16,12 @@ function formatTime(totalSeconds: number): string {
 }
 
 export function ResendTimer({ onResend, resetKey = 0 }: ResendTimerProps) {
+  const { t } = useTranslation()
   const [secondsLeft, setSecondsLeft] = useState(OTP_RESEND_DELAY)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   useEffect(() => {
     setSecondsLeft(OTP_RESEND_DELAY)
-
     intervalRef.current = setInterval(() => {
       setSecondsLeft((prev) => {
         if (prev <= 1) {
@@ -30,7 +31,6 @@ export function ResendTimer({ onResend, resetKey = 0 }: ResendTimerProps) {
         return prev - 1
       })
     }, 1000)
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
@@ -53,12 +53,14 @@ export function ResendTimer({ onResend, resetKey = 0 }: ResendTimerProps) {
     >
       {canResend ? (
         <Text style={styles.resendText}>
-          Didn't receive a code?{' '}
-          <Text style={styles.resendHighlight}>Resend</Text>
+          {t('auth.no_code', "Didn't receive a code?")}{' '}
+          <Text style={styles.resendHighlight}>
+            {t('auth.resend', 'Resend')}
+          </Text>
         </Text>
       ) : (
         <Text style={styles.waitingText}>
-          Resend code in{' '}
+          {t('auth.resend_in', 'Resend code in')}{' '}
           <Text style={styles.timerText}>{formatTime(secondsLeft)}</Text>
         </Text>
       )}
@@ -72,20 +74,8 @@ const styles = StyleSheet.create({
     marginTop: Spacing[4],
     alignItems: 'center',
   },
-  resendText: {
-    color: Colors.mutedForeground,
-    fontSize: FontSize.base,
-  },
-  resendHighlight: {
-    color: Colors.primary,
-    fontWeight: FontWeight.semibold,
-  },
-  waitingText: {
-    color: '#9ca3af',
-    fontSize: FontSize.base,
-  },
-  timerText: {
-    color: Colors.foreground,
-    fontWeight: FontWeight.semibold,
-  },
+  resendText: { color: Colors.mutedForeground, fontSize: FontSize.base },
+  resendHighlight: { color: Colors.primary, fontWeight: FontWeight.semibold },
+  waitingText: { color: '#9ca3af', fontSize: FontSize.base },
+  timerText: { color: Colors.foreground, fontWeight: FontWeight.semibold },
 })
