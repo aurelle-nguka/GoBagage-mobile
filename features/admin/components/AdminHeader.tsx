@@ -1,10 +1,7 @@
-/**
- * Go Bagage — AdminHeader
- * Header du dashboard admin avec titre, badge ADMIN et logout.
- */
-
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { LogOut, Shield } from 'lucide-react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native'
+import { useRouter } from 'expo-router'
+import { LogOut, Shield, Languages } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface AdminHeaderProps {
@@ -13,22 +10,50 @@ interface AdminHeaderProps {
 }
 
 export function AdminHeader({ adminName, onLogout }: AdminHeaderProps) {
+  const { t } = useTranslation()
+  const router = useRouter()
+
+  const handleLogout = () => {
+    Alert.alert(
+      t('auth.logout'),
+      t('auth.logout_confirm_admin'),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('auth.logout'), style: 'destructive', onPress: onLogout },
+      ],
+      { cancelable: true },
+    )
+  }
+
   return (
     <View style={styles.header}>
       <View style={styles.left}>
         <View style={styles.badgeRow}>
           <Shield size={14} color={Colors.primary} />
-          <Text style={styles.badge}>ADMIN</Text>
+          <Text style={styles.badge}>{t('admin.title')}</Text>
         </View>
-        <Text style={styles.greeting}>Hello, {adminName}</Text>
+        <Text style={styles.greeting}>
+          {t('admin.greeting', { name: adminName })}
+        </Text>
       </View>
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={onLogout}
-        activeOpacity={0.8}
-      >
-        <LogOut size={18} color={Colors.destructive} />
-      </TouchableOpacity>
+      <View style={styles.actions}>
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => router.push('/(modals)/language')}
+          activeOpacity={0.8}
+          accessibilityLabel={t('profile.language', 'Language')}
+        >
+          <Languages size={18} color={Colors.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.iconButton, styles.logoutButton]}
+          onPress={handleLogout}
+          activeOpacity={0.8}
+          accessibilityLabel={t('auth.logout')}
+        >
+          <LogOut size={18} color={Colors.destructive} />
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
@@ -63,12 +88,20 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  logoutButton: {
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
+  iconButton: {
     width: 40,
     height: 40,
     borderRadius: Radius.full,
-    backgroundColor: '#fef2f2',
+    backgroundColor: '#f3f4f6',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#fef2f2',
   },
 })

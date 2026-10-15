@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { Text, TouchableOpacity, StyleSheet, ActivityIndicator, ViewStyle } from 'react-native';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme';
 
@@ -8,6 +9,7 @@ interface PrimaryButtonProps {
   disabled?: boolean;
   onPress: () => void;
   style?: ViewStyle;
+  icon?: ReactNode;
 }
 
 export function PrimaryButton({
@@ -17,6 +19,7 @@ export function PrimaryButton({
   disabled = false,
   onPress,
   style,
+  icon,
 }: PrimaryButtonProps) {
   const isDisabled = loading || disabled;
 
@@ -33,7 +36,10 @@ export function PrimaryButton({
           <Text style={styles.label}>{loadingLabel ?? label}</Text>
         </>
       ) : (
-        <Text style={styles.label}>{label}</Text>
+        <>
+          {icon}
+          <Text style={styles.label}>{label}</Text>
+        </>
       )}
     </TouchableOpacity>
   );

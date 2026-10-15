@@ -7,9 +7,8 @@
 
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { Star } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
-
-const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent!']
 
 interface StarRatingProps {
   rating: number
@@ -17,6 +16,16 @@ interface StarRatingProps {
 }
 
 export function StarRating({ rating, onChange }: StarRatingProps) {
+  const { t } = useTranslation()
+
+  const RATING_LABELS = [
+    '',
+    t('review.rating_labels.poor', 'Poor'),
+    t('review.rating_labels.fair', 'Fair'),
+    t('review.rating_labels.good', 'Good'),
+    t('review.rating_labels.great', 'Great'),
+    t('review.rating_labels.excellent', 'Excellent!'),
+  ]
   const label = RATING_LABELS[rating] ?? ''
   const labelColor =
     rating >= 4
@@ -27,7 +36,9 @@ export function StarRating({ rating, onChange }: StarRatingProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.prompt}>How was your overall experience?</Text>
+      <Text style={styles.prompt}>
+        {t('review.rating_prompt', 'How was your overall experience?')}
+      </Text>
 
       <View style={styles.starsRow}>
         {[1, 2, 3, 4, 5].map((star) => {

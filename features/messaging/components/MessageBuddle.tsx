@@ -4,6 +4,7 @@
  */
 
 import { View, Text, StyleSheet } from 'react-native'
+import { Lock } from 'lucide-react-native'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 export type MessageSender = 'me' | 'traveler' | 'system'
@@ -24,8 +25,9 @@ export function MessageBubble({
   if (sender === 'system') {
     return (
       <View style={styles.systemRow}>
-        <View style={styles.systemBubble}>
-          <Text style={styles.systemText}>🔒 {text}</Text>
+        <View style={styles.systemBubbleRow}>
+          <Lock size={12} color={Colors.primary} />
+          <Text style={styles.systemText}>{text}</Text>
         </View>
       </View>
     )
@@ -66,7 +68,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: Spacing[2],
   },
-  systemBubble: {
+  systemBubbleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
     backgroundColor: '#e8faf0',
     borderWidth: 1,
     borderColor: '#c8f5df',

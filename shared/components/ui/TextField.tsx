@@ -7,7 +7,7 @@ import {
   StyleSheet,
   TextInputProps,
 } from 'react-native'
-import { Eye, EyeOff } from 'lucide-react-native'
+import { Eye, EyeOff, AlertCircle } from 'lucide-react-native'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
 interface TextFieldProps extends TextInputProps {
@@ -60,7 +60,12 @@ export function TextField({
           </TouchableOpacity>
         )}
       </View>
-      {hasError && <Text style={styles.errorText}>⚠ {error}</Text>}
+      {hasError && (
+        <View style={styles.errorRow}>
+          <AlertCircle size={13} color={Colors.destructive} />
+          <Text style={styles.errorText}>{error}</Text>
+        </View>
+      )}
     </View>
   )
 }
@@ -102,9 +107,14 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
   },
+  errorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    marginTop: Spacing[1],
+  },
   errorText: {
     fontSize: FontSize.sm,
     color: Colors.destructive,
-    marginTop: Spacing[1],
   },
 })

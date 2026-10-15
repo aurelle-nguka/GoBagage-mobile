@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ScrollView, StyleSheet } from 'react-native'
+import { useState, useCallback } from 'react'
+import { ScrollView, StyleSheet, RefreshControl } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Colors, Spacing } from '../../../theme'
 import { HomeHeader } from '../components/HomeHeader'
@@ -17,6 +17,8 @@ interface HomeScreenProps {
   onTripPress: (tripId: string) => void
   onParcelTracking: (parcelId: string) => void
   onNotifications: () => void
+  onSeeAllTrips: () => void
+  onSeeAllActivity: () => void
 }
 
 export function HomeScreen({
@@ -27,19 +29,27 @@ export function HomeScreen({
   onTripPress,
   onParcelTracking,
   onNotifications,
+  onSeeAllTrips,
+  onSeeAllActivity,
 }: HomeScreenProps) {
   const defaultView: DashboardView = role === 'TRAVELER' ? 'traveler' : 'sender'
-
   const [view, setView] = useState<DashboardView>(defaultView)
+  const [refreshing, setRefreshing] = useState(false)
 
   const activeDashboard: DashboardView =
     role === 'SENDER' ? 'sender' : role === 'TRAVELER' ? 'traveler' : view
 
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true)
+    await new Promise((resolve) => setTimeout(resolve, 1500))
+    setRefreshing(false)
+  }, [])
+
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <HomeHeader
         firstName={firstName}
-        unreadNotifications={3}
+        unreadNotifications={0}
         showToggle={role === 'BOTH'}
         view={activeDashboard}
         onChangeView={setView}
@@ -50,11 +60,29 @@ export function HomeScreen({
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={[Colors.primary]}
+            tintColor={Colors.primary}
+          />
+        }
       >
         {activeDashboard === 'sender' ? (
-          <SenderDashboard onSearch={onSearch} onTracking={onParcelTracking} />
+          <SenderDashboard
+            onSearch={onSearch}
+            onTracking={onParcelTracking}
+            onSeeAllActivity={onSeeAllActivity}
+            refreshing={refreshing}
+          />
         ) : (
-          <TravelerDashboard onPublish={onPublish} onTracking={onTripPress} />
+          <TravelerDashboard
+            onPublish={onPublish}
+            onTracking={onTripPress}
+            onSeeAllTrips={onSeeAllTrips}
+            refreshing={refreshing}
+          />
         )}
       </ScrollView>
     </SafeAreaView>
@@ -62,14 +90,8 @@ export function HomeScreen({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.primary,
-  },
-  content: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.primary },
+  content: { flex: 1, backgroundColor: Colors.background },
   contentContainer: {
     paddingHorizontal: Spacing[5],
     paddingVertical: Spacing[5],

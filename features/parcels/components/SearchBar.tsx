@@ -1,5 +1,6 @@
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Search, X } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
 import { Colors, FontSize, Radius, Spacing } from '../../../theme';
 
 interface SearchBarProps {
@@ -14,18 +15,19 @@ interface SearchBarProps {
 export function SearchBar({
   value,
   onChangeText,
-  placeholder = 'e.g. Montreal → Douala',
+  placeholder,
   onSubmit,
   onClear,
   editable = true,
 }: SearchBarProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.wrapper}>
       <Search size={18} color="#9ca3af" />
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t('search.placeholder', 'e.g. Montreal -> Douala')}
         placeholderTextColor="#9ca3af"
         editable={editable}
         onSubmitEditing={onSubmit}

@@ -4,6 +4,8 @@
  */
 
 import { View, Text, StyleSheet } from 'react-native'
+import { CheckCircle } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { formatCAD } from '../../../shared/utils/currency.utils'
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '../../../theme'
 
@@ -16,14 +18,21 @@ export function DeliveryConfirmedBanner({
   releasedAmount,
   travelerName,
 }: DeliveryConfirmedBannerProps) {
+  const { t } = useTranslation()
+
   return (
     <View style={styles.banner}>
-      <Text style={styles.emoji}>✅</Text>
+      <CheckCircle size={22} color={Colors.primary} />
       <View>
-        <Text style={styles.title}>Delivery Confirmed</Text>
+        <Text style={styles.title}>
+          {t('review.delivery_confirmed_title', 'Delivery Confirmed')}
+        </Text>
         <Text style={styles.description}>
-          Payment of {formatCAD(releasedAmount)} has been released to{' '}
-          {travelerName}
+          {t(
+            'review.delivery_confirmed_desc',
+            'Payment of {{amount}} has been released to {{traveler}}',
+            { amount: formatCAD(releasedAmount), traveler: travelerName },
+          )}
         </Text>
       </View>
     </View>
@@ -41,9 +50,6 @@ const styles = StyleSheet.create({
     borderRadius: Radius['2xl'],
     padding: Spacing[4],
     marginBottom: Spacing[6],
-  },
-  emoji: {
-    fontSize: 22,
   },
   title: {
     fontSize: FontSize.base,

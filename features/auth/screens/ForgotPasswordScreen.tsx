@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 import { ArrowLeft, MailCheck } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { useForgotPassword } from '../hooks/useForgotPassword'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
@@ -18,6 +19,7 @@ export function ForgotPasswordScreen({
   onBack,
   onDone,
 }: ForgotPasswordScreenProps) {
+  const { t } = useTranslation()
   const [email, setEmail] = useState('')
   const [emailError, setEmailError] = useState('')
   const [sent, setSent] = useState(false)
@@ -26,11 +28,11 @@ export function ForgotPasswordScreen({
 
   const validate = (): boolean => {
     if (!email.trim()) {
-      setEmailError('Email address is required.')
+      setEmailError(t('auth.errors.email_required'))
       return false
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setEmailError('Please enter a valid email address.')
+      setEmailError(t('auth.errors.email_invalid'))
       return false
     }
     setEmailError('')
@@ -50,14 +52,18 @@ export function ForgotPasswordScreen({
           <View style={styles.iconCircle}>
             <MailCheck size={40} color={Colors.primary} />
           </View>
-          <Text style={styles.successTitle}>Check your email</Text>
+          <Text style={styles.successTitle}>{t('auth.check_email')}</Text>
           <Text style={styles.successDesc}>
-            If an account exists for <Text style={styles.bold}>{email}</Text>,
-            we've sent a password reset link. It may take a few minutes to
-            arrive.
+            {t('auth.reset_sent_prefix', 'If an account exists for')}{' '}
+            <Text style={styles.bold}>{email}</Text>
+            {', '}
+            {t(
+              'auth.reset_sent_suffix',
+              "we've sent a password reset link. It may take a few minutes to arrive.",
+            )}
           </Text>
           <PrimaryButton
-            label='Back to Login'
+            label={t('auth.back_to_login', 'Back to Login')}
             onPress={onDone}
             style={styles.successButton}
           />
@@ -67,7 +73,7 @@ export function ForgotPasswordScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -82,21 +88,25 @@ export function ForgotPasswordScreen({
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps='handled'
       >
-        <Text style={styles.title}>Forgot your password?</Text>
+        <Text style={styles.title}>
+          {t('auth.forgot_title', 'Forgot your password?')}
+        </Text>
         <Text style={styles.subtitle}>
-          Enter the email address associated with your account and we'll send
-          you a reset link.
+          {t(
+            'auth.forgot_subtitle',
+            "Enter the email address associated with your account and we'll send you a reset link.",
+          )}
         </Text>
 
         <View style={styles.form}>
           <TextField
-            label='Email address'
+            label={t('auth.email')}
             value={email}
             onChangeText={(v) => {
               setEmail(v)
               if (emailError) setEmailError('')
             }}
-            placeholder='you@example.com'
+            placeholder={t('auth.email_placeholder')}
             keyboardType='email-address'
             autoCapitalize='none'
             error={emailError}
@@ -105,8 +115,8 @@ export function ForgotPasswordScreen({
           {error ? <ErrorBanner message={error} /> : null}
 
           <PrimaryButton
-            label='Send Reset Link'
-            loadingLabel='Sending...'
+            label={t('auth.send_reset')}
+            loadingLabel={t('auth.loading.sending')}
             loading={loading}
             onPress={handleSubmit}
           />

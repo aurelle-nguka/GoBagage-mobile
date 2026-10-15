@@ -1,5 +1,6 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
-import { Package, ArrowRight } from 'lucide-react-native'
+import { Package, ArrowRight, Calendar, Weight } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'
 
@@ -7,12 +8,27 @@ type ParcelDisplayStatus = 'In Transit' | 'Pending' | 'Delivered' | 'Confirmed'
 
 const STATUS_CONFIG: Record<
   ParcelDisplayStatus,
-  { bg: string; color: string }
+  { key: string; fallback: string; bg: string; color: string }
 > = {
-  Pending: { bg: '#fff8e8', color: Colors.warning },
-  'In Transit': { bg: '#e8f4fd', color: Colors.secondary },
-  Delivered: { bg: '#e8faf0', color: Colors.primary },
-  Confirmed: { bg: '#e8faf0', color: Colors.primary },
+  Pending: { key: 'admin.pending', fallback: 'Pending', bg: '#fff8e8', color: Colors.warning },
+  'In Transit': {
+    key: 'trip.in_transit',
+    fallback: 'In Transit',
+    bg: '#e8f4fd',
+    color: Colors.secondary,
+  },
+  Delivered: {
+    key: 'trip.delivered',
+    fallback: 'Delivered',
+    bg: '#e8faf0',
+    color: Colors.primary,
+  },
+  Confirmed: {
+    key: 'home.status_confirmed',
+    fallback: 'Confirmed',
+    bg: '#e8faf0',
+    color: Colors.primary,
+  },
 }
 
 interface RecentParcelCardProps {
@@ -34,6 +50,7 @@ export function RecentParcelCard({
   status,
   onPress,
 }: RecentParcelCardProps) {
+  const { t } = useTranslation()
   const config = STATUS_CONFIG[status] ?? STATUS_CONFIG['Pending']
 
   return (
@@ -45,20 +62,28 @@ export function RecentParcelCard({
           </View>
           <View style={styles.textBlock}>
             <RouteLabel from={from} to={to} size='sm' />
-            <Text style={styles.viaText}>via {travelerName}</Text>
+            <Text style={styles.viaText}>
+              {t('parcel.via_traveler', 'via {{name}}', { name: travelerName })}
+            </Text>
           </View>
         </View>
 
         <View style={[styles.statusBadge, { backgroundColor: config.bg }]}>
           <Text style={[styles.statusText, { color: config.color }]}>
-            {status}
+            {t(config.key, config.fallback)}
           </Text>
         </View>
       </View>
 
       <View style={styles.metaRow}>
-        <Text style={styles.metaText}>📅 {date}</Text>
-        <Text style={styles.metaText}>⚖️ {weight}</Text>
+        <View style={styles.metaItem}>
+          <Calendar size={12} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>{date}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Weight size={12} color={Colors.mutedForeground} />
+          <Text style={styles.metaText}>{weight}</Text>
+        </View>
         <ArrowRight size={14} color='#9ca3af' style={styles.chevron} />
       </View>
     </TouchableOpacity>
@@ -115,6 +140,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing[4],
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   metaText: {
     fontSize: FontSize.sm,

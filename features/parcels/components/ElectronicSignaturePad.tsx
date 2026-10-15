@@ -1,4 +1,6 @@
 import { TouchableOpacity, View, Text, StyleSheet } from 'react-native'
+import { PenLine, CheckCircle2 } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, Radius, Spacing } from '../../../theme'
 
 interface ElectronicSignaturePadProps {
@@ -14,9 +16,11 @@ export function ElectronicSignaturePad({
   onToggle,
   error,
 }: ElectronicSignaturePadProps) {
+  const { t } = useTranslation()
+
   return (
     <View>
-      <Text style={styles.label}>Electronic Signature *</Text>
+      <Text style={styles.label}>{`${t('parcel.electronic_signature', 'Electronic Signature')} *`}</Text>
       <TouchableOpacity
         style={[
           styles.pad,
@@ -29,12 +33,17 @@ export function ElectronicSignaturePad({
         {signed ? (
           <>
             <Text style={styles.signatureName}>{signerName}</Text>
-            <Text style={styles.signedLabel}>✓ Signed electronically</Text>
+            <View style={styles.signedRow}>
+              <CheckCircle2 size={12} color={Colors.primary} />
+              <Text style={styles.signedLabel}>
+                {t('parcel.signed_electronically', 'Signed electronically')}
+              </Text>
+            </View>
           </>
         ) : (
           <>
-            <Text style={styles.signEmoji}>✍️</Text>
-            <Text style={styles.tapLabel}>Tap to sign</Text>
+            <PenLine size={24} color='#9ca3af' />
+            <Text style={styles.tapLabel}>{t('parcel.tap_to_sign', 'Tap to sign')}</Text>
           </>
         )}
       </TouchableOpacity>
@@ -74,13 +83,17 @@ const styles = StyleSheet.create({
     borderColor: Colors.destructive,
     backgroundColor: '#fef2f2',
   },
-  signEmoji: { fontSize: 24 },
   tapLabel: { fontSize: FontSize.sm, color: '#9ca3af' },
   signatureName: {
     fontSize: FontSize['2xl'],
     fontStyle: 'italic',
     color: Colors.primary,
     fontWeight: '700',
+  },
+  signedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
   signedLabel: { fontSize: 11, color: Colors.primary },
   errorText: {

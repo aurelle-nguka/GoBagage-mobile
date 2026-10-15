@@ -59,18 +59,18 @@ export default function ProfilePage() {
   return (
     <ProfileScreen
       user={user}
-      tripsCount={user.totalDeliveries}
-      parcelsSentCount={0}
-      totalEarnings={0}
       refreshing={refreshing}
       onRefresh={handleRefresh}
       onBack={() => router.back()}
       onGoToKyc={() => router.push('/(auth)/kyc')}
-      onSeeAllActivity={() => {}}
-      onOpenActivity={(_id) => {}}
+      onSeeAllActivity={() => router.push('/(modals)/activity')}
+      onOpenActivity={(bookingId) =>
+        router.push(`/(modals)/tracking/${bookingId}`)
+      }
       onPaymentMethods={() => {}}
       onNotificationSettings={() => {}}
-      onLanguageSettings={() => {}}
+      onLanguageSettings={() => router.push('/(modals)/language')}
+      onEditProfile={() => router.push('/(modals)/edit-profile')}
       onLogout={async () => {
         await logout()
         router.replace('/(auth)/onboarding')

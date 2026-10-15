@@ -5,6 +5,7 @@
 
 import { View, Text, StyleSheet } from 'react-native'
 import { Crown } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { SubscriptionType } from '../../../types/user.types'
 
@@ -13,6 +14,7 @@ interface SubscriptionCardProps {
 }
 
 export function SubscriptionCard({ plan }: SubscriptionCardProps) {
+  const { t } = useTranslation()
   const isPremium = plan === 'PREMIUM'
 
   return (
@@ -20,12 +22,20 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
       <Crown size={22} color='#FFD600' />
       <View style={styles.textBlock}>
         <Text style={styles.title}>
-          {isPremium ? 'Premium Member' : 'Free Plan'}
+          {isPremium
+            ? t('profile.subscription.premium_title', 'Premium Member')
+            : t('profile.subscription.free_title', 'Free Plan')}
         </Text>
         <Text style={styles.subtitle}>
           {isPremium
-            ? 'Priority listings · 0% extra fee · Priority support'
-            : 'Upgrade to unlock unlimited transactions'}
+            ? t(
+                'profile.subscription.premium_subtitle',
+                'Priority listings · 0% extra fee · Priority support',
+              )
+            : t(
+                'profile.subscription.free_subtitle',
+                'Upgrade to unlock unlimited transactions',
+              )}
         </Text>
       </View>
       <View
@@ -35,7 +45,9 @@ export function SubscriptionCard({ plan }: SubscriptionCardProps) {
         ]}
       >
         <Text style={[styles.badgeText, isPremium && styles.badgeTextDark]}>
-          {isPremium ? 'ACTIVE' : 'UPGRADE'}
+          {isPremium
+            ? t('profile.subscription.active', 'ACTIVE')
+            : t('profile.subscription.upgrade', 'UPGRADE')}
         </Text>
       </View>
     </View>

@@ -1,8 +1,3 @@
-/**
- * Go Bagage — KycReviewScreen
- * Revue d'un dossier KYC — visualisation documents + décision Approuver/Rejeter.
- */
-
 import { useState } from 'react'
 import {
   View,
@@ -17,6 +12,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { ArrowLeft, CheckCircle, XCircle, ZoomIn } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import type { KycQueueItem } from '../types/admin.types'
 
@@ -33,13 +29,14 @@ export function KycReviewScreen({
   onApprove,
   onReject,
 }: KycReviewScreenProps) {
+  const { t, i18n } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [rejectModalVisible, setRejectModal] = useState(false)
   const [rejectNote, setRejectNote] = useState('')
   const [zoomedImage, setZoomedImage] = useState<string | null>(null)
 
   const fullName = `${item.userFirstName} ${item.userLastName}`
-  const submittedAt = new Intl.DateTimeFormat('en', {
+  const submittedAt = new Intl.DateTimeFormat(i18n.language, {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
@@ -68,7 +65,7 @@ export function KycReviewScreen({
   const isPending = item.status === 'PENDING' || item.status === 'UNDER_REVIEW'
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity
           onPress={onBack}
@@ -77,7 +74,9 @@ export function KycReviewScreen({
           <ArrowLeft size={22} color={Colors.foreground} />
         </TouchableOpacity>
         <View>
-          <Text style={styles.headerTitle}>KYC Review</Text>
+          <Text style={styles.headerTitle}>
+            {t('admin.kyc_review', 'KYC Review')}
+          </Text>
           <Text style={styles.headerSubtitle}>{fullName}</Text>
         </View>
       </View>
@@ -87,17 +86,31 @@ export function KycReviewScreen({
         contentContainerStyle={styles.scrollContent}
       >
         <View style={styles.infoCard}>
-          <Text style={styles.cardTitle}>User Information</Text>
-          <InfoRow label='Full name' value={fullName} />
-          <InfoRow label='Email' value={item.userEmail} />
-          <InfoRow label='Document type' value={item.documentType} />
-          <InfoRow label='Submitted' value={submittedAt} />
-          <InfoRow label='Status' value={item.status} highlight />
+          <Text style={styles.cardTitle}>
+            {t('admin.user_info', 'User Information')}
+          </Text>
+          <InfoRow label={t('admin.full_name', 'Full name')} value={fullName} />
+          <InfoRow label={t('admin.email', 'Email')} value={item.userEmail} />
+          <InfoRow
+            label={t('admin.doc_type', 'Document type')}
+            value={item.documentType ?? '—'}
+          />
+          <InfoRow
+            label={t('admin.submitted', 'Submitted')}
+            value={submittedAt}
+          />
+          <InfoRow
+            label={t('admin.status_label', 'Status')}
+            value={item.status}
+            highlight
+          />
         </View>
 
-        <Text style={styles.sectionTitle}>Identity Documents</Text>
+        <Text style={styles.sectionTitle}>
+          {t('admin.identity_docs', 'Identity Documents')}
+        </Text>
 
-        <Text style={styles.docLabel}>Front of document</Text>
+        <Text style={styles.docLabel}>{t('kyc.front')}</Text>
         <TouchableOpacity
           onPress={() => setZoomedImage(item.frontDocumentUrl)}
           activeOpacity={0.9}
@@ -114,14 +127,16 @@ export function KycReviewScreen({
             />
             <View style={styles.zoomHint}>
               <ZoomIn size={16} color={Colors.white} />
-              <Text style={styles.zoomText}>Tap to zoom</Text>
+              <Text style={styles.zoomText}>
+                {t('admin.tap_zoom', 'Tap to zoom')}
+              </Text>
             </View>
           </View>
         </TouchableOpacity>
 
         {item.backDocumentUrl && (
           <>
-            <Text style={styles.docLabel}>Back of document</Text>
+            <Text style={styles.docLabel}>{t('kyc.back')}</Text>
             <TouchableOpacity
               onPress={() => setZoomedImage(item.backDocumentUrl!)}
               activeOpacity={0.9}
@@ -134,7 +149,9 @@ export function KycReviewScreen({
                 />
                 <View style={styles.zoomHint}>
                   <ZoomIn size={16} color={Colors.white} />
-                  <Text style={styles.zoomText}>Tap to zoom</Text>
+                  <Text style={styles.zoomText}>
+                    {t('admin.tap_zoom', 'Tap to zoom')}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -150,7 +167,7 @@ export function KycReviewScreen({
               disabled={loading}
             >
               <XCircle size={18} color={Colors.destructive} />
-              <Text style={styles.rejectLabel}>Reject</Text>
+              <Text style={styles.rejectLabel}>{t('admin.reject')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -164,7 +181,7 @@ export function KycReviewScreen({
               ) : (
                 <>
                   <CheckCircle size={18} color={Colors.white} />
-                  <Text style={styles.approveLabel}>Approve</Text>
+                  <Text style={styles.approveLabel}>{t('admin.approve')}</Text>
                 </>
               )}
             </TouchableOpacity>
@@ -181,20 +198,27 @@ export function KycReviewScreen({
               },
             ]}
           >
-            <Text
-              style={{
-                color:
-                  item.status === 'VERIFIED'
-                    ? Colors.primary
-                    : Colors.destructive,
-                fontWeight: FontWeight.bold,
-                fontSize: FontSize.base,
-              }}
-            >
-              {item.status === 'VERIFIED'
-                ? '✅ Already approved'
-                : '❌ Already rejected'}
-            </Text>
+            <View style={styles.alreadyReviewedRow}>
+              {item.status === 'VERIFIED' ? (
+                <CheckCircle size={18} color={Colors.primary} />
+              ) : (
+                <XCircle size={18} color={Colors.destructive} />
+              )}
+              <Text
+                style={{
+                  color:
+                    item.status === 'VERIFIED'
+                      ? Colors.primary
+                      : Colors.destructive,
+                  fontWeight: FontWeight.bold,
+                  fontSize: FontSize.base,
+                }}
+              >
+                {item.status === 'VERIFIED'
+                  ? t('admin.already_approved', 'Already approved')
+                  : t('admin.already_rejected', 'Already rejected')}
+              </Text>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -202,14 +226,22 @@ export function KycReviewScreen({
       <Modal visible={rejectModalVisible} transparent animationType='slide'>
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Reject KYC</Text>
+            <Text style={styles.modalTitle}>
+              {t('admin.reject_kyc', 'Reject KYC')}
+            </Text>
             <Text style={styles.modalSubtitle}>
-              Please provide a reason. The user will be notified.
+              {t(
+                'admin.reject_subtitle',
+                'Please provide a reason. The user will be notified.',
+              )}
             </Text>
             <TextInput
               value={rejectNote}
               onChangeText={setRejectNote}
-              placeholder='e.g. Document is blurry, ID expired, information mismatch...'
+              placeholder={t(
+                'admin.reject_placeholder',
+                'e.g. Document is blurry, ID expired...',
+              )}
               placeholderTextColor='#9ca3af'
               multiline
               numberOfLines={4}
@@ -224,7 +256,7 @@ export function KycReviewScreen({
                   setRejectNote('')
                 }}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text style={styles.cancelText}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[
@@ -237,7 +269,9 @@ export function KycReviewScreen({
                 {loading ? (
                   <ActivityIndicator size='small' color={Colors.white} />
                 ) : (
-                  <Text style={styles.confirmRejectText}>Confirm Reject</Text>
+                  <Text style={styles.confirmRejectText}>
+                    {t('admin.confirm_reject', 'Confirm Reject')}
+                  </Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -258,7 +292,9 @@ export function KycReviewScreen({
               resizeMode='contain'
             />
           )}
-          <Text style={styles.zoomClose}>Tap to close</Text>
+          <Text style={styles.zoomClose}>
+            {t('admin.tap_close', 'Tap to close')}
+          </Text>
         </TouchableOpacity>
       </Modal>
     </SafeAreaView>
@@ -320,10 +356,7 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  headerSubtitle: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
+  headerSubtitle: { fontSize: FontSize.sm, color: Colors.mutedForeground },
   scroll: { flex: 1 },
   scrollContent: {
     paddingHorizontal: Spacing[5],
@@ -370,10 +403,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     position: 'relative',
   },
-  docImage: {
-    width: '100%',
-    height: 200,
-  },
+  docImage: { width: '100%', height: 200 },
   zoomHint: {
     position: 'absolute',
     bottom: Spacing[2],
@@ -387,11 +417,7 @@ const styles = StyleSheet.create({
     borderRadius: Radius.full,
   },
   zoomText: { color: Colors.white, fontSize: 11 },
-  decisionRow: {
-    flexDirection: 'row',
-    gap: Spacing[3],
-    marginTop: Spacing[4],
-  },
+  decisionRow: { flexDirection: 'row', gap: Spacing[3], marginTop: Spacing[4] },
   decisionButton: {
     flex: 1,
     flexDirection: 'row',
@@ -430,6 +456,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing[4],
   },
+  alreadyReviewedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing[2],
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -462,10 +493,7 @@ const styles = StyleSheet.create({
     minHeight: 100,
     marginBottom: Spacing[4],
   },
-  modalActions: {
-    flexDirection: 'row',
-    gap: Spacing[3],
-  },
+  modalActions: { flexDirection: 'row', gap: Spacing[3] },
   cancelButton: {
     flex: 1,
     paddingVertical: Spacing[4],
@@ -498,10 +526,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  zoomedImage: {
-    width: '100%',
-    height: '85%',
-  },
+  zoomedImage: { width: '100%', height: '85%' },
   zoomClose: {
     color: 'rgba(255,255,255,0.6)',
     fontSize: FontSize.sm,

@@ -4,15 +4,16 @@
  */
 
 import { ScrollView, TouchableOpacity, Text, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 export type TripFilter = 'ALL' | 'OPEN' | 'BOOKED' | 'COMPLETED'
 
-const FILTERS: { id: TripFilter; label: string }[] = [
-  { id: 'ALL', label: 'All' },
-  { id: 'OPEN', label: 'Open' },
-  { id: 'BOOKED', label: 'Booked' },
-  { id: 'COMPLETED', label: 'Completed' },
+const FILTER_KEYS: { id: TripFilter; key: string; fallback: string }[] = [
+  { id: 'ALL', key: 'trip.filter_all', fallback: 'All' },
+  { id: 'OPEN', key: 'trip.open', fallback: 'Open' },
+  { id: 'BOOKED', key: 'trip.booked', fallback: 'Booked' },
+  { id: 'COMPLETED', key: 'trip.completed', fallback: 'Completed' },
 ]
 
 interface TripStatusFilterProps {
@@ -24,13 +25,15 @@ export function TripStatusFilter({
   selected,
   onSelect,
 }: TripStatusFilterProps) {
+  const { t } = useTranslation()
+
   return (
     <ScrollView
       horizontal
       showsHorizontalScrollIndicator={false}
       contentContainerStyle={styles.row}
     >
-      {FILTERS.map((filter) => {
+      {FILTER_KEYS.map((filter) => {
         const isActive = filter.id === selected
         return (
           <TouchableOpacity
@@ -40,7 +43,7 @@ export function TripStatusFilter({
             style={[styles.chip, isActive && styles.chipActive]}
           >
             <Text style={[styles.label, isActive && styles.labelActive]}>
-              {filter.label}
+              {t(filter.key, filter.fallback)}
             </Text>
           </TouchableOpacity>
         )

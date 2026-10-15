@@ -5,6 +5,7 @@
 
 import { useState } from 'react'
 import { View, Text, TextInput, StyleSheet } from 'react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 import { COMMISSION_RATE } from '../../../shared/constants/app.constants'
 
@@ -19,6 +20,7 @@ export function PricePerKgField({
   onChangePricePerKg,
   availableKg,
 }: PricePerKgFieldProps) {
+  const { t } = useTranslation()
   const [focused, setFocused] = useState(false)
 
   const numericPrice = Number(pricePerKg) || 0
@@ -28,7 +30,7 @@ export function PricePerKgField({
 
   return (
     <View>
-      <Text style={styles.label}>Price per kg (CAD)</Text>
+      <Text style={styles.label}>{t('trip.price_per_kg_cad', 'Price per kg (CAD)')}</Text>
 
       <View style={styles.inputWrapper}>
         <Text style={styles.dollarSign}>$</Text>
@@ -44,7 +46,11 @@ export function PricePerKgField({
 
       {numericPrice > 0 && availableKg > 0 && (
         <Text style={styles.earningsText}>
-          Potential earnings: ${estimatedEarnings} CAD (after 12% fee)
+          {t(
+            'trip.potential_earnings',
+            'Potential earnings: ${{amount}} CAD (after {{percent}}% fee)',
+            { amount: estimatedEarnings, percent: COMMISSION_RATE * 100 },
+          )}
         </Text>
       )}
     </View>

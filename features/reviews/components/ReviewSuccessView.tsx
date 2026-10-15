@@ -5,7 +5,8 @@
 
 import { View, Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Star } from 'lucide-react-native'
+import { Star, PartyPopper } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface ReviewSuccessViewProps {
@@ -17,15 +18,20 @@ export function ReviewSuccessView({
   rating,
   revieweeName,
 }: ReviewSuccessViewProps) {
+  const { t } = useTranslation()
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.iconCircle}>
-        <Text style={styles.emoji}>🎉</Text>
+        <PartyPopper size={48} color={Colors.primary} />
       </View>
-      <Text style={styles.title}>Thank you!</Text>
+      <Text style={styles.title}>{t('review.thank_you_title', 'Thank you!')}</Text>
       <Text style={styles.description}>
-        Your review helps build trust in our community. {revieweeName} has been
-        notified.
+        {t(
+          'review.thank_you_desc',
+          'Your review helps build trust in our community. {{name}} has been notified.',
+          { name: revieweeName },
+        )}
       </Text>
 
       <View style={styles.starsRow}>
@@ -53,9 +59,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: Spacing[6],
-  },
-  emoji: {
-    fontSize: 48,
   },
   title: {
     fontSize: FontSize['2xl'],

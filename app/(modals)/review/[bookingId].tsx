@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { View, ActivityIndicator, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
 import { ReviewScreen } from '../../../features/reviews/screens/ReviewScreen'
 import { useSubmitReview } from '../../../features/reviews/hooks/useSubmitReview'
 import { getBooking } from '../../../features/bookings/api/bookings.api'
@@ -9,6 +10,7 @@ import { Colors } from '../../../theme'
 import { BookingDTO } from '../../../features/bookings/types/booking.type'
 
 export default function ReviewPage() {
+  const { t } = useTranslation()
   const router = useRouter()
   const { bookingId } = useLocalSearchParams<{ bookingId: string }>()
 
@@ -38,11 +40,11 @@ export default function ReviewPage() {
 
   const routeLabel = corridor
     ? `${corridor.departureCity} → ${corridor.arrivalCity}`
-    : 'Your trip'
+    : t('review.your_trip_fallback', 'Your trip')
 
   const travelerName = traveler
     ? `${traveler.firstName} ${traveler.lastNameInitial}.`
-    : 'Your traveler'
+    : t('review.your_traveler_fallback', 'Your traveler')
 
   const travelerInitials = traveler
     ? `${(traveler.firstName ?? 'T')[0]}${traveler.lastNameInitial ?? ''}`.toUpperCase()
@@ -57,7 +59,9 @@ export default function ReviewPage() {
       releasedAmount={releasedAmount}
       revieweeInitials={travelerInitials}
       revieweeName={travelerName}
-      revieweeContext={`Your traveler on ${routeLabel}`}
+      revieweeContext={t('review.traveler_on_route', 'Your traveler on {{route}}', {
+        route: routeLabel,
+      })}
       onBack={() => router.back()}
       onSubmit={async ({ rating, badges, comment }) => {
         if (!booking || !traveler) return

@@ -1,7 +1,3 @@
-/**
- * Go Bagage — PopularRouteChip
- */
-
 import { TouchableOpacity, StyleSheet } from 'react-native'
 import { Colors, Spacing, Radius } from '../../../theme'
 import { RouteLabel } from '../../../shared/components/ui/RouteLabel'

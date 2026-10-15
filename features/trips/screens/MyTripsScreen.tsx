@@ -9,6 +9,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { PlusCircle } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing } from '../../../theme'
 import { PrimaryButton } from '../../../shared/components/ui/PrimaryButton'
 import { TripFilter, TripStatusFilter } from '../components/TripStatusFilter'
@@ -30,52 +31,53 @@ interface MyTripListItem {
 interface MyTripsScreenProps {
   onPublish: () => void
   onOpenTrip: (tripId: string) => void
+  onEditTrip: (tripId: string) => void
 }
 
-export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
+export function MyTripsScreen({
+  onPublish,
+  onOpenTrip,
+  onEditTrip,
+}: MyTripsScreenProps) {
+  const { t } = useTranslation()
   const [filter, setFilter] = useState<TripFilter>('ALL')
   const [trips, setTrips] = useState<MyTripListItem[]>([])
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState('')
 
-  const loadTrips = useCallback(async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true)
-    else setLoading(true)
-    setError('')
+  const loadTrips = useCallback(
+    async (isRefresh = false) => {
+      if (isRefresh) setRefreshing(true)
+      else setLoading(true)
+      setError('')
 
-    try {
-      console.log('=== GET /trips/mine ===')
-      const response = await apiClient.get('/trips/mine')
-      console.log('response:', JSON.stringify(response.data))
+      try {
+        const response = await apiClient.get('/trips/mine')
+        const raw = Array.isArray(response.data)
+          ? response.data
+          : (response.data?.content ?? [])
 
-      const raw = Array.isArray(response.data)
-        ? response.data
-        : (response.data?.content ?? [])
+        const mapped: MyTripListItem[] = raw.map((trip: any) => ({
+          id: String(trip.id),
+          from: trip.corridor?.departureCity ?? 'Unknown',
+          to: trip.corridor?.arrivalCity ?? 'Unknown',
+          departureDate: trip.departureDate ?? '',
+          availableKg: trip.availableKg ?? 0,
+          status: trip.status ?? 'OPEN',
+          pendingRequestsCount: trip.pendingRequestsCount ?? 0,
+        }))
 
-      const mapped: MyTripListItem[] = raw.map((trip: any) => ({
-        id: String(trip.id),
-        from: trip.corridor?.departureCity ?? 'Unknown',
-        to: trip.corridor?.arrivalCity ?? 'Unknown',
-        departureDate: trip.departureDate ?? '',
-        availableKg: trip.availableKg ?? 0,
-        status: trip.status ?? 'OPEN',
-        pendingRequestsCount: trip.pendingRequestsCount ?? 0,
-      }))
-
-      setTrips(mapped)
-    } catch (err: any) {
-      console.log(
-        '❌ Error:',
-        err?.response?.status,
-        JSON.stringify(err?.response?.data),
-      )
-      setError(err?.response?.data?.message ?? 'Failed to load trips.')
-    } finally {
-      setLoading(false)
-      setRefreshing(false)
-    }
-  }, [])
+        setTrips(mapped)
+      } catch (err: any) {
+        setError(err?.response?.data?.message ?? t('common.error'))
+      } finally {
+        setLoading(false)
+        setRefreshing(false)
+      }
+    },
+    [t],
+  )
 
   useFocusEffect(
     useCallback(() => {
@@ -89,11 +91,11 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
   }, [filter, trips])
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>My Trips</Text>
+        <Text style={styles.title}>{t('nav.my_trips')}</Text>
         <Text style={styles.subtitle}>
-          Manage your published trips & requests
+          {t('trip.manage_subtitle', 'Manage your published trips & requests')}
         </Text>
       </View>
 
@@ -109,7 +111,7 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
         <View style={styles.centered}>
           <Text style={styles.errorText}>{error}</Text>
           <PrimaryButton
-            label='Retry'
+            label={t('common.retry')}
             onPress={() => loadTrips()}
             style={{ marginTop: Spacing[4] }}
           />
@@ -137,6 +139,7 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
               status={item.status}
               pendingRequestsCount={item.pendingRequestsCount}
               onPress={() => onOpenTrip(item.id)}
+              onEdit={() => onEditTrip(item.id)}
             />
           )}
           ListEmptyComponent={
@@ -144,12 +147,12 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
               <PlusCircle size={48} color='#d1d5db' />
               <Text style={styles.emptyText}>
                 {filter === 'ALL'
-                  ? 'No trips published yet'
-                  : `No trips with status "${filter}"`}
+                  ? t('trip.no_trips_published', 'No trips published yet')
+                  : t('trip.no_trips_filter', 'No trips with this filter')}
               </Text>
               {filter === 'ALL' && (
                 <PrimaryButton
-                  label='Publish a Trip'
+                  label={t('home.publish_trip')}
                   onPress={onPublish}
                   style={styles.emptyButton}
                 />
@@ -163,10 +166,7 @@ export function MyTripsScreen({ onPublish, onOpenTrip }: MyTripsScreenProps) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-  },
+  container: { flex: 1, backgroundColor: Colors.background },
   header: {
     paddingHorizontal: Spacing[5],
     paddingTop: Spacing[4],
@@ -177,18 +177,9 @@ const styles = StyleSheet.create({
     fontWeight: FontWeight.bold,
     color: Colors.foreground,
   },
-  subtitle: {
-    fontSize: FontSize.sm,
-    color: Colors.mutedForeground,
-  },
-  filterRow: {
-    paddingHorizontal: Spacing[5],
-    marginBottom: Spacing[4],
-  },
-  listContent: {
-    paddingHorizontal: Spacing[5],
-    paddingBottom: Spacing[6],
-  },
+  subtitle: { fontSize: FontSize.sm, color: Colors.mutedForeground },
+  filterRow: { paddingHorizontal: Spacing[5], marginBottom: Spacing[4] },
+  listContent: { paddingHorizontal: Spacing[5], paddingBottom: Spacing[6] },
   centered: {
     flex: 1,
     alignItems: 'center',
@@ -201,17 +192,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingHorizontal: Spacing[8],
   },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: Spacing[12],
-  },
+  emptyState: { alignItems: 'center', paddingVertical: Spacing[12] },
   emptyText: {
     color: '#9ca3af',
     fontSize: FontSize.base,
     marginTop: Spacing[3],
     marginBottom: Spacing[4],
   },
-  emptyButton: {
-    paddingHorizontal: Spacing[6],
-  },
+  emptyButton: { paddingHorizontal: Spacing[6] },
 })

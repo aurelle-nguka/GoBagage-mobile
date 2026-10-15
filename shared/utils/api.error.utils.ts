@@ -1,7 +1,8 @@
 import axios from 'axios';
+import type { TFunction } from 'i18next';
 import { ApiErrorResponse } from '../../features/auth/types/auth.types';
 
-export function getApiErrorMessage(error: unknown): string {
+export function getApiErrorMessage(error: unknown, t: TFunction): string {
   if (axios.isAxiosError(error)) {
     const data = error.response?.data;
 
@@ -14,30 +15,30 @@ export function getApiErrorMessage(error: unknown): string {
     }
 
     switch (error.response?.status) {
-      case 400: return 'Invalid request. Please check your information.';
-      case 401: return 'Incorrect email or password.';
-      case 403: return 'Access denied.';
-      case 404: return 'Resource not found.';
-      case 409: return 'Conflict error.';
-      case 500: return 'Server error. Please try again later.';
-      case 501: return 'Service unavailable. Please try again later.';
-      case 502: return 'Server error. Please try again later.';
-      case 503: return 'Service unavailable. Please try again later.';
-      case 504: return 'Gateway timeout. Please try again later.';
+      case 400: return t('common.errors.invalid_request', 'Invalid request. Please check your information.');
+      case 401: return t('common.errors.unauthorized', 'Incorrect email or password.');
+      case 403: return t('common.errors.forbidden', 'Access denied.');
+      case 404: return t('common.errors.not_found', 'Resource not found.');
+      case 409: return t('common.errors.conflict', 'Conflict error.');
+      case 500: return t('common.errors.server_error', 'Server error. Please try again later.');
+      case 501: return t('common.errors.service_unavailable', 'Service unavailable. Please try again later.');
+      case 502: return t('common.errors.server_error', 'Server error. Please try again later.');
+      case 503: return t('common.errors.service_unavailable', 'Service unavailable. Please try again later.');
+      case 504: return t('common.errors.gateway_timeout', 'Gateway timeout. Please try again later.');
     }
 
     if (!error.response) {
-      return 'Cannot reach the server. Please check your internet connection.';
+      return t('common.network_error', 'Cannot reach the server. Please check your internet connection.');
     }
   }
 
   if (error instanceof Error && error.message === 'No refresh token') {
-    return 'Session expired. Please log in again.';
+    return t('common.errors.session_expired', 'Session expired. Please log in again.');
   }
 
   if (error instanceof Error) {
     return error.message;
   }
 
-  return 'An unexpected error occurred. Please try again.';
+  return t('common.error', 'An unexpected error occurred. Please try again.');
 }

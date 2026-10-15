@@ -1,5 +1,6 @@
 import { Alert, TouchableOpacity, Text, StyleSheet, View } from 'react-native'
 import { LogOut } from 'lucide-react-native'
+import { useTranslation } from 'react-i18next'
 import { Colors, FontSize, FontWeight, Spacing, Radius } from '../../../theme'
 
 interface LogoutButtonProps {
@@ -7,20 +8,15 @@ interface LogoutButtonProps {
 }
 
 export function LogoutButton({ onPress }: LogoutButtonProps) {
+  const { t } = useTranslation()
+
   const handlePress = () => {
     Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out of your account?',
+      t('auth.logout'),
+      t('auth.logout_confirm'),
       [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Log Out',
-          style: 'destructive',
-          onPress,
-        },
+        { text: t('common.cancel'), style: 'cancel' },
+        { text: t('auth.logout'), style: 'destructive', onPress },
       ],
       { cancelable: true },
     )
@@ -35,7 +31,7 @@ export function LogoutButton({ onPress }: LogoutButtonProps) {
       <View style={styles.iconWrapper}>
         <LogOut size={18} color={Colors.destructive} />
       </View>
-      <Text style={styles.label}>Log Out</Text>
+      <Text style={styles.label}>{t('auth.logout')}</Text>
     </TouchableOpacity>
   )
 }
